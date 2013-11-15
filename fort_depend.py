@@ -3,9 +3,9 @@ import os
 import re
 
 #Definitions
-def run(TALK=True,OVERW=None):
+def run(TALK=True,OVERW=None,macros={}):
 
-    l=create_file_objs()
+    l=create_file_objs(macros)
     mod2fil=file_objs_to_mod_dict(FIL_OBJS=l)
     depends=get_depends(fob=l,m2f=mod2fil)
     if TALK:
@@ -48,25 +48,24 @@ def get_source(EXT=[".f90",".F90"]):
         fil.extend(filter(lambda x: x.endswith(i),tmp))
 	return fil
 
-def create_file_objs():
+def create_file_objs(macros={}):
     l=[]
     for i in get_source():
         tmp=file_obj()
 
         tmp.file_name=i
-        tmp.uses=get_uses(i)
+        tmp.uses=get_uses(i,macros)
         tmp.contains=get_contains(i)
 
         l.append(tmp)
 	return l
 
-def get_uses(FNM=None):
-    import re as re
+def get_uses(FNM=None, macros={}):
     p=re.compile("^\s*use\s*(?P<moduse>\w*)\s*(,)?\s*(only)?\s*(:)?.*?$",re.IGNORECASE).match
 
     uses=[]
 
-	#Open file
+    #Open file
     l=open(FNM,'r')
     t=l.readlines()
     l.close()
@@ -75,7 +74,15 @@ def get_uses(FNM=None):
         tmp=p(i)
         if tmp:
             uses.append(tmp.group('moduse').strip())
-	return uniq_list(LIST=uses)
+
+    uniq_mods = uniq_list(LIST=uses)
+
+    for i, mod in enumerate(uniq_mods):
+        for k, v in macros.items():
+            if re.match(k, mod, re.IGNORECASE):
+                uniq_mods[i] = mod.replace(k,v)
+
+    return uniq_mods
 
 def get_contains(FNM=None):
     import re as re
