@@ -41,7 +41,6 @@ def write_depend(FILE="makefile.depend",dep=[],OVERW=False):
 	return
 def get_source(EXT=[".f90",".F90"]):
 	#Function to return all files ending with any of EXT
-    import os
     tmp=os.listdir(".")
     fil=[]
     for i in EXT:
@@ -85,7 +84,6 @@ def get_uses(FNM=None, macros={}):
     return uniq_mods
 
 def get_contains(FNM=None):
-    import re as re
     p=re.compile("^\s*module\s*(?P<modname>\w*?)\s*$",re.IGNORECASE).match
 
     contains=[]
