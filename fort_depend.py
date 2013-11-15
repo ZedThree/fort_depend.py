@@ -13,8 +13,8 @@ def run(files=None,TALK=True,OVERW=None,macros={}):
             print "\033[032m"+i+"\033[039m depends on :\033[034m"
             for j in depends[i]: print "\t"+j
             print "\033[039m"
-	tmp=write_depend(FILE="makefile.dep",dep=depends,OVERW=OVERW)
-	return depends
+    tmp=write_depend(FILE="makefile.dep",dep=depends,OVERW=OVERW)
+    return depends
 
 def write_depend(FILE="makefile.depend",dep=[],OVERW=False):
 	#Test file doesn't exist
@@ -29,23 +29,24 @@ def write_depend(FILE="makefile.depend",dep=[],OVERW=False):
         else:
             return
 
-	#Open file
-	f=open(FILE,'w')
-	for i in dep.keys():
-            stri="\n"+i.split(".")[0]+".o"+" : "
-            for j in dep[i]:
-                stri=stri+" \\\n\t"+j.split(".")[0]+".o"
-		stri=stri+"\n"
-		f.write(stri)
-	f.close()
-	return
+    #Open file
+    f=open(FILE,'w')
+    for i in dep.keys():
+        stri="\n"+i.split(".")[0]+".o"+" : "
+        for j in dep[i]:
+            stri=stri+" \\\n\t"+j.split(".")[0]+".o"
+        stri=stri+"\n"
+        f.write(stri)
+    f.close()
+    return
+
 def get_source(EXT=[".f90",".F90"]):
 	#Function to return all files ending with any of EXT
     tmp=os.listdir(".")
     fil=[]
     for i in EXT:
         fil.extend(filter(lambda x: x.endswith(i),tmp))
-	return fil
+    return fil
 
 def create_file_objs(files=None, macros={}):
     l=[]
@@ -102,20 +103,20 @@ def get_contains(FNM=None):
         tmp=p(i)
         if tmp:
             contains.append(tmp.group('modname').strip())
-	return uniq_list(LIST=contains)
+    return uniq_list(LIST=contains)
 
 def uniq_list(LIST=[]):
     keys = {}
     for e in LIST:
         keys[e] = 1
-	return keys.keys()
+    return keys.keys()
 
 def file_objs_to_mod_dict(FIL_OBJS=[]):
     dic={}
     for i in FIL_OBJS:
         for j in i.contains:
             dic[j.lower()]=i.file_name
-	return dic
+    return dic
 
 def get_depends(fob=[],m2f=[]):
     deps={}
@@ -127,9 +128,9 @@ def get_depends(fob=[],m2f=[]):
             except:
                 print "\033[031mError\033[039m module \033[032m"+j+"\033[039m not defined in any files. Skipping..."
 
-		deps[i.file_name]=tmp
+        deps[i.file_name]=tmp
 
-	return deps
+    return deps
 
 class file_obj:
     def __init__(self):
