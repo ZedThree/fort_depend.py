@@ -3,9 +3,9 @@ import os
 import re
 
 #Definitions
-def run(TALK=True,OVERW=None,macros={}):
+def run(files=None,TALK=True,OVERW=None,macros={}):
 
-    l=create_file_objs(macros)
+    l=create_file_objs(files,macros)
     mod2fil=file_objs_to_mod_dict(FIL_OBJS=l)
     depends=get_depends(fob=l,m2f=mod2fil)
     if TALK:
@@ -47,17 +47,22 @@ def get_source(EXT=[".f90",".F90"]):
         fil.extend(filter(lambda x: x.endswith(i),tmp))
 	return fil
 
-def create_file_objs(macros={}):
+def create_file_objs(files=None, macros={}):
     l=[]
-    for i in get_source():
-        tmp=file_obj()
 
-        tmp.file_name=i
-        tmp.uses=get_uses(i,macros)
-        tmp.contains=get_contains(i)
+    if files is None:
+        files = get_source()
 
-        l.append(tmp)
-	return l
+    for i in files:
+        source_file = file_obj()
+
+        source_file.file_name = i
+        source_file.uses = get_uses(i,PREPS)
+        source_file.contains = get_contains(i)
+
+        l.append(source_file)
+
+    return l
 
 def get_uses(FNM=None, macros={}):
     p=re.compile("^\s*use\s*(?P<moduse>\w*)\s*(,)?\s*(only)?\s*(:)?.*?$",re.IGNORECASE).match
