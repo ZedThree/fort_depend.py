@@ -57,7 +57,7 @@ def create_file_objs(files=None, macros={}):
         source_file = file_obj()
 
         source_file.file_name = i
-        source_file.uses = get_uses(i,PREPS)
+        source_file.uses = get_uses(i,macros)
         source_file.contains = get_contains(i)
 
         l.append(source_file)
