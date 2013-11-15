@@ -130,4 +130,5 @@ class file_obj:
 		
 		
 #Script
-run(TALK=False,OVERW=True)
+if __name__ == "__main__":
+    run(TALK=False,OVERW=True)
