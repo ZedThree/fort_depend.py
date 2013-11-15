@@ -24,10 +24,10 @@ def write_depend(FILE="makefile.depend",dep=[],OVERW=False):
             opt=raw_input("Overwrite? Y... for yes.")
         else:
             opt="y"
-            if opt.lower().startswith("y"):
-                pass
-            else:
-                return
+        if opt.lower().startswith("y"):
+            pass
+        else:
+            return
 
 	#Open file
 	f=open(FILE,'w')
