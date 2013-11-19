@@ -3,7 +3,7 @@ import os
 import re
 
 #Definitions
-def run(files=None,TALK=True,OVERW=None,macros={}):
+def run(files=None,TALK=True,OVERW=None,output="makefile.dep",macros={}):
 
     l=create_file_objs(files,macros)
     mod2fil=file_objs_to_mod_dict(FIL_OBJS=l)
@@ -13,7 +13,7 @@ def run(files=None,TALK=True,OVERW=None,macros={}):
             print "\033[032m"+i+"\033[039m depends on :\033[034m"
             for j in depends[i]: print "\t"+j
             print "\033[039m"
-    tmp=write_depend(FILE="makefile.dep",dep=depends,OVERW=OVERW)
+    tmp=write_depend(FILE=output,dep=depends,OVERW=OVERW)
     return depends
 
 def write_depend(FILE="makefile.depend",dep=[],OVERW=False):
