@@ -142,4 +142,21 @@ class file_obj:
 
 #Script
 if __name__ == "__main__":
-    run(TALK=False,OVERW=True)
+    import argparse
+
+    parser = argparse.ArgumentParser(description='Generate Fortran dependencies')
+    parser.add_argument('-f','--files',nargs='+',help='list of files')
+    parser.add_argument('-a','--aux',nargs=1,help='macro to replace PHYSICS_AUX')
+    parser.add_argument('-d','--diagnostics',nargs=1,help='macro to replace PHYSICS_DIAGNOSTICS')
+    parser.add_argument('-p','--parameters',nargs=1,help='macro to replace PHYSICS_PARAMETERS')
+    parser.add_argument('-m','--module',nargs=1,help='macro to replace PHYSICS_MODULE')
+    parser.add_argument('-o','--output',nargs=1,help='output file')
+
+    args = parser.parse_args()
+
+    modules = {'PHYSICS_AUX'         : args.aux[0],
+               'PHYSICS_DIAGNOSTICS' : args.diagnostics[0],
+               'PHYSICS_PARAMETERS'  : args.parameters[0],
+               'PHYSICS_MODULE'      : args.module[0]}
+
+    run(files=args.files,TALK=False,OVERW=False, macros=modules, output=args.output)
