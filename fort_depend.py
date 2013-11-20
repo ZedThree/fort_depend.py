@@ -145,18 +145,19 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser(description='Generate Fortran dependencies')
-    parser.add_argument('-f','--files',nargs='+',help='list of files')
-    parser.add_argument('-a','--aux',nargs=1,help='macro to replace PHYSICS_AUX')
-    parser.add_argument('-d','--diagnostics',nargs=1,help='macro to replace PHYSICS_DIAGNOSTICS')
-    parser.add_argument('-p','--parameters',nargs=1,help='macro to replace PHYSICS_PARAMETERS')
-    parser.add_argument('-m','--module',nargs=1,help='macro to replace PHYSICS_MODULE')
-    parser.add_argument('-o','--output',nargs=1,help='output file')
+    parser.add_argument('-f','--files',nargs='+',help='Files to process')
+    parser.add_argument('-D',nargs='+',action='append',metavar='NAME=DESCRIPTION',
+                        help="""The macro NAME is replaced by DEFINITION in 'use' statements""")
+    parser.add_argument('-o','--output',nargs=1,help='Output file')
+    parser.add_argument('-v','--verbose',action='store_true',help='explain what is done')
+    parser.add_argument('-w','--overwrite',action='store_true',help='Overwrite output file without warning')
 
     args = parser.parse_args()
 
-    modules = {'PHYSICS_AUX'         : args.aux[0],
-               'PHYSICS_DIAGNOSTICS' : args.diagnostics[0],
-               'PHYSICS_PARAMETERS'  : args.parameters[0],
-               'PHYSICS_MODULE'      : args.module[0]}
+    macros = {}
+    for arg in args.D:
+        for var in arg:
+            temp = var.split('=')
+            macros[temp[0]] = temp[1]
 
-    run(files=args.files,TALK=False,OVERW=False, macros=modules, output=args.output)
+    run(files=args.files,TALK=args.verbose,OVERW=args.overwrite, macros=macros, output=args.output[0])
