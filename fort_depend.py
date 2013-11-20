@@ -144,6 +144,7 @@ class file_obj:
 if __name__ == "__main__":
     import argparse
 
+    # Add command line arguments
     parser = argparse.ArgumentParser(description='Generate Fortran dependencies')
     parser.add_argument('-f','--files',nargs='+',help='Files to process')
     parser.add_argument('-D',nargs='+',action='append',metavar='NAME=DESCRIPTION',
@@ -152,8 +153,10 @@ if __name__ == "__main__":
     parser.add_argument('-v','--verbose',action='store_true',help='explain what is done')
     parser.add_argument('-w','--overwrite',action='store_true',help='Overwrite output file without warning')
 
+    # Parse the command line arguments
     args = parser.parse_args()
 
+    # Assemble a dictionary out of the macro definitions
     macros = {}
     for arg in args.D:
         for var in arg:
