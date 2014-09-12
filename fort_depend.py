@@ -3,13 +3,13 @@ import os
 import re
 
 #Definitions
-def run(files=None,TALK=True,OVERW=None,output=None,macros={}):
+def run(files=None,verbose=True,overwrite=None,output=None,macros={}):
 
     l=create_file_objs(files,macros)
     mod2fil=file_objs_to_mod_dict(FIL_OBJS=l)
     depends=get_depends(fob=l,m2f=mod2fil)
 
-    if TALK:
+    if verbose:
         for i in depends.keys():
             print "\033[032m"+i+"\033[039m depends on :\033[034m"
             for j in depends[i]: print "\t"+j
@@ -18,14 +18,15 @@ def run(files=None,TALK=True,OVERW=None,output=None,macros={}):
     if output is None:
         output = "makefile.dep"
 
-    tmp=write_depend(FILE=output,dep=depends,OVERW=OVERW)
+    tmp=write_depend(outfile=output,dep=depends,overwrite=overwrite)
 
     return depends
 
-def write_depend(FILE="makefile.depend",dep=[],OVERW=False):
+def write_depend(outfile="makefile.dep",dep=[],overwrite=False):
+    "Write the dependencies to outfile"
     #Test file doesn't exist
-    if os.path.exists(FILE):
-        if not(OVERW):
+    if os.path.exists(outfile):
+        if not(overwrite):
             print "\033[031mWarning file exists.\033[039m"
             opt=raw_input("Overwrite? Y... for yes.")
         else:
@@ -36,7 +37,7 @@ def write_depend(FILE="makefile.depend",dep=[],OVERW=False):
             return
 
     #Open file
-    f=open(FILE,'w')
+    f=open(outfile,'w')
     for i in dep.keys():
         stri="\n"+i.split(".")[0]+".o"+" : "
         for j in dep[i]:
@@ -46,11 +47,11 @@ def write_depend(FILE="makefile.depend",dep=[],OVERW=False):
     f.close()
     return
 
-def get_source(EXT=[".f90",".F90"]):
-	#Function to return all files ending with any of EXT
+def get_source(ext=[".f90",".F90"]):
+    "Return all files ending with any of ext"
     tmp=os.listdir(".")
     fil=[]
-    for i in EXT:
+    for i in ext:
         fil.extend(filter(lambda x: x.endswith(i),tmp))
     return fil
 
@@ -71,22 +72,22 @@ def create_file_objs(files=None, macros={}):
 
     return l
 
-def get_uses(FNM=None, macros={}):
+def get_uses(infile=None, macros={}):
+    "Return which modules are used in infile after expanding macros"
     p=re.compile("^\s*use\s*(?P<moduse>\w*)\s*(,)?\s*(only)?\s*(:)?.*?$",re.IGNORECASE).match
 
     uses=[]
 
-    #Open file
-    l=open(FNM,'r')
-    t=l.readlines()
-    l.close()
+    with open(infile,'r') as f:
+        t=f.readlines()
 
     for i in t:
         tmp=p(i)
         if tmp:
             uses.append(tmp.group('moduse').strip())
 
-    uniq_mods = uniq_list(LIST=uses)
+    # Remove duplicates
+    uniq_mods = list(set(uses))
 
     for i, mod in enumerate(uniq_mods):
         for k, v in macros.items():
@@ -95,31 +96,27 @@ def get_uses(FNM=None, macros={}):
 
     return uniq_mods
 
-def get_contains(FNM=None):
+def get_contains(infile=None):
+    "Return all the modules that are in infile"
     p=re.compile("^\s*module\s*(?P<modname>\w*?)\s*$",re.IGNORECASE).match
 
     contains=[]
 
-	#Open file
-    l=open(FNM,'r')
-    t=l.readlines()
-    l.close()
+    with open(infile,'r') as f:
+        t=f.readlines()
 
     for i in t:
         tmp=p(i)
         if tmp:
             contains.append(tmp.group('modname').strip())
-    return uniq_list(LIST=contains)
 
-def uniq_list(LIST=[]):
-    keys = {}
-    for e in LIST:
-        keys[e] = 1
-    return keys.keys()
+    # Remove duplicates before returning
+    return list(set(contains))
 
-def file_objs_to_mod_dict(FIL_OBJS=[]):
+def file_objs_to_mod_dict(file_objs=[]):
+    "Turn a list of file_objs in a dictionary, containing which modules depend on which files"
     dic={}
-    for i in FIL_OBJS:
+    for i in file_objs:
         for j in i.contains:
             dic[j.lower()]=i.file_name
     return dic
@@ -172,4 +169,4 @@ if __name__ == "__main__":
 
     output = args.output[0] if args.output else None
 
-    run(files=args.files, TALK=args.verbose, OVERW=args.overwrite, macros=macros, output=output)
+    run(files=args.files, verbose=args.verbose, overwrite=args.overwrite, macros=macros, output=output)
