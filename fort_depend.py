@@ -3,21 +3,27 @@ import os
 import re
 
 #Definitions
-def run(files=None,TALK=True,OVERW=None,output="makefile.dep",macros={}):
+def run(files=None,TALK=True,OVERW=None,output=None,macros={}):
 
     l=create_file_objs(files,macros)
     mod2fil=file_objs_to_mod_dict(FIL_OBJS=l)
     depends=get_depends(fob=l,m2f=mod2fil)
+
     if TALK:
         for i in depends.keys():
             print "\033[032m"+i+"\033[039m depends on :\033[034m"
             for j in depends[i]: print "\t"+j
             print "\033[039m"
+
+    if output is None:
+        output = "makefile.dep"
+
     tmp=write_depend(FILE=output,dep=depends,OVERW=OVERW)
+
     return depends
 
 def write_depend(FILE="makefile.depend",dep=[],OVERW=False):
-	#Test file doesn't exist
+    #Test file doesn't exist
     if os.path.exists(FILE):
         if not(OVERW):
             print "\033[031mWarning file exists.\033[039m"
@@ -158,9 +164,12 @@ if __name__ == "__main__":
 
     # Assemble a dictionary out of the macro definitions
     macros = {}
-    for arg in args.D:
-        for var in arg:
-            temp = var.split('=')
+    if args.D:
+        for arg in args.D:
+            for var in arg:
+                temp = var.split('=')
             macros[temp[0]] = temp[1]
 
-    run(files=args.files,TALK=args.verbose,OVERW=args.overwrite, macros=macros, output=args.output[0])
+    output = args.output[0] if args.output else None
+
+    run(files=args.files, TALK=args.verbose, OVERW=args.overwrite, macros=macros, output=output)
