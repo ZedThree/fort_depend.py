@@ -6,7 +6,7 @@ import re
 def run(files=None,verbose=True,overwrite=None,output=None,macros={}):
 
     l=create_file_objs(files,macros)
-    mod2fil=file_objs_to_mod_dict(FIL_OBJS=l)
+    mod2fil=file_objs_to_mod_dict(file_objs=l)
     depends=get_depends(fob=l,m2f=mod2fil)
 
     if verbose:
