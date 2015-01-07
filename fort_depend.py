@@ -39,9 +39,11 @@ def write_depend(outfile="makefile.dep",dep=[],overwrite=False):
     #Open file
     f=open(outfile,'w')
     for i in dep.keys():
-        stri="\n"+i.split(".")[0]+".o"+" : "
+        tmp,fil=os.path.split(i)
+        stri="\n"+fil.split(".")[0]+".o"+" : "
         for j in dep[i]:
-            stri=stri+" \\\n\t"+j.split(".")[0]+".o"
+            tmp,fil=os.path.split(j)
+            stri=stri+" \\\n\t"+fil.split(".")[0]+".o"
         stri=stri+"\n"
         f.write(stri)
     f.close()
