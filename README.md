@@ -32,3 +32,5 @@ Here's an example of how to use `fort_depend.py` in your makefiles:
     $(DEP_FILE): $(OBJECTS)
         @echo "Making dependencies!"
         cd $(SRCPATH) && $(MAKEDEPEND) -w -o /path/to/$(DEP_FILE) -f $(OBJECTS)
+        
+    include $(DEP_FILE)
