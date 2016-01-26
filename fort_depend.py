@@ -38,6 +38,7 @@ def write_depend(outfile="makefile.dep",dep=[],overwrite=False):
 
     #Open file
     f=open(outfile,'w')
+    f.write('# This file is generated automatically. DO NOT EDIT!\n')
     for i in dep.keys():
         tmp,fil=os.path.split(i)
         stri="\n"+fil.split(".")[0]+".o"+" : "
