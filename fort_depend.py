@@ -3,7 +3,7 @@ import os
 import re
 
 #Definitions
-def run(files=None,verbose=True,overwrite=None,output=None,macros={}):
+def run(files=None,verbose=True,overwrite=None,output=None,macros={},build=''):
 
     l=create_file_objs(files,macros)
     mod2fil=file_objs_to_mod_dict(file_objs=l)
@@ -18,11 +18,11 @@ def run(files=None,verbose=True,overwrite=None,output=None,macros={}):
     if output is None:
         output = "makefile.dep"
 
-    tmp=write_depend(outfile=output,dep=depends,overwrite=overwrite)
+    tmp=write_depend(outfile=output,dep=depends,overwrite=overwrite,build=build)
 
     return depends
 
-def write_depend(outfile="makefile.dep",dep=[],overwrite=False):
+def write_depend(outfile="makefile.dep",dep=[],overwrite=False,build=''):
     "Write the dependencies to outfile"
     #Test file doesn't exist
     if os.path.exists(outfile):
@@ -38,12 +38,13 @@ def write_depend(outfile="makefile.dep",dep=[],overwrite=False):
 
     #Open file
     f=open(outfile,'w')
+    f.write('# This file is generated automatically. DO NOT EDIT!\n')
     for i in dep.keys():
         tmp,fil=os.path.split(i)
-        stri="\n"+fil.split(".")[0]+".o"+" : "
+        stri="\n"+os.path.join(build, fil.split(".")[0]+".o"+" : ")
         for j in dep[i]:
             tmp,fil=os.path.split(j)
-            stri=stri+" \\\n\t"+fil.split(".")[0]+".o"
+            stri=stri+" \\\n\t"+os.path.join(build, fil.split(".")[0]+".o")
         stri=stri+"\n"
         f.write(stri)
     f.close()
@@ -154,6 +155,8 @@ if __name__ == "__main__":
     parser.add_argument('-f','--files',nargs='+',help='Files to process')
     parser.add_argument('-D',nargs='+',action='append',metavar='NAME=DESCRIPTION',
                         help="""The macro NAME is replaced by DEFINITION in 'use' statements""")
+    parser.add_argument('-b','--build',nargs=1,help='Build Directory (prepended to all files in output',
+                        default='')
     parser.add_argument('-o','--output',nargs=1,help='Output file')
     parser.add_argument('-v','--verbose',action='store_true',help='explain what is done')
     parser.add_argument('-w','--overwrite',action='store_true',help='Overwrite output file without warning')
@@ -170,5 +173,6 @@ if __name__ == "__main__":
             macros[temp[0]] = temp[1]
 
     output = args.output[0] if args.output else None
+    build = args.build[0] if args.build else ''
 
-    run(files=args.files, verbose=args.verbose, overwrite=args.overwrite, macros=macros, output=output)
+    run(files=args.files, verbose=args.verbose, overwrite=args.overwrite, macros=macros, output=output, build=build)
