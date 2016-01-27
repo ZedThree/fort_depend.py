@@ -41,10 +41,10 @@ def write_depend(outfile="makefile.dep",dep=[],overwrite=False,build=''):
     f.write('# This file is generated automatically. DO NOT EDIT!\n')
     for i in dep.keys():
         tmp,fil=os.path.split(i)
-        stri="\n"+build+fil.split(".")[0]+".o"+" : "
+        stri="\n"+os.path.join(build, fil.split(".")[0]+".o"+" : ")
         for j in dep[i]:
             tmp,fil=os.path.split(j)
-            stri=stri+" \\\n\t"+build+fil.split(".")[0]+".o"
+            stri=stri+" \\\n\t"+os.path.join(build, fil.split(".")[0]+".o")
         stri=stri+"\n"
         f.write(stri)
     f.close()
