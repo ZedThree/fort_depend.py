@@ -173,6 +173,6 @@ if __name__ == "__main__":
             macros[temp[0]] = temp[1]
 
     output = args.output[0] if args.output else None
-    build = args.build[0] if args.build else None
+    build = args.build[0] if args.build else ''
 
     run(files=args.files, verbose=args.verbose, overwrite=args.overwrite, macros=macros, output=output, build=build)
