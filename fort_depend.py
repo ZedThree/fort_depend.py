@@ -1,4 +1,5 @@
 #!/usr/bin/python
+from itertools import chain
 import os
 import re
 
@@ -12,15 +13,38 @@ class FortranFile(object):
     """
     def __init__(self, filename=None, macros={}):
         self.filename = filename
-        self.uses = []
-        self.contains = None
+        self.uses = None
+        self.modules = None
         self.depends_on = None
 
         with open(self.filename, 'r') as f:
             contents = f.readlines()
 
+        self.modules = self.get_modules(contents)
         self.uses = self.get_uses(contents, macros)
-        self.contains = self.get_contains(contents)
+
+    def get_modules(self, contents):
+        """Return all the modules or programs that are in the file
+
+        Args:
+            contents: Contents of the source file
+        """
+
+        p = re.compile("^\s*(?P<unit_type>module|program)\s*(?P<modname>\w*)",
+                       re.IGNORECASE).match
+
+        contains = []
+
+        for line in contents:
+            found = p(line)
+            if found:
+                contains.append(
+                    FortranModule(unit_type=found.group('unit_type'),
+                                  name=found.group('modname'),
+                                  filename=self.filename))
+
+        # Remove duplicates before returning
+        return list(set(contains))
 
     def get_uses(self, contents, macros={}):
         """Return which modules are used in the file after expanding macros
@@ -49,28 +73,38 @@ class FortranFile(object):
 
         return uniq_mods
 
-    def get_contains(self, contents):
-        "Return all the modules that are in infile"
 
-        p = re.compile("^\s*module\s*(?P<modname>\w*)", re.IGNORECASE).match
+class FortranModule(object):
+    """A Fortran Module or Program
 
-        contains = []
+    unit_type: 'module' or 'program'
+    name: Name of the module/program
+    filename: Name of the file containing the module/program
+    """
+    def __init__(self, unit_type, name, filename):
+        self.unit_type = unit_type.strip().lower()
+        self.name = name.strip().lower()
+        self.filename = filename
 
-        for line in contents:
-            found = p(line)
-            if found:
-                contains.append(found.group('modname').strip())
+    def __repr__(self):
+        return "({}: {})".format(self.name, self.filename)
 
-        # Remove duplicates before returning
-        return list(set(contains))
+
+def make_module_dict(file_list):
+    """Make a dict of FortranModules from a list of FortranFiles
+    """
+
+    # Flatten the lists of modules in each file using chain
+    return {mod.name: mod for mod in
+            chain.from_iterable([f.modules for f in file_list])}
 
 
 # Definitions
 def run(files=None, verbose=True, overwrite=None, output=None, macros={}, build=''):
 
-    l = create_file_objs(files, macros)
-    mod2fil = file_objs_to_mod_dict(file_objs=l)
-    depends = get_depends(fob=l, m2f=mod2fil)
+    file_list = create_file_list(files, macros)
+    mod_list = make_module_dict(file_list)
+    depends = get_depends(fob=file_list, m2f=mod_list)
 
     if verbose:
         for i in depends.keys():
@@ -92,7 +126,7 @@ def write_depend(outfile="makefile.dep", dep=[], overwrite=False, build=''):
     if os.path.exists(outfile):
         if not(overwrite):
             print("\033[031mWarning file exists.\033[039m")
-            opt = input("Overwrite? Y... for yes.")
+            opt = raw_input("Overwrite? Y... for yes.")
         else:
             opt = "y"
         if opt.lower().startswith("y"):
@@ -124,7 +158,7 @@ def get_source(ext=[".f90", ".F90"]):
     return fil
 
 
-def create_file_objs(files=None, macros={}):
+def create_file_list(files=None, macros={}):
     """Create a list of FortranFile objects
     """
 
@@ -134,22 +168,13 @@ def create_file_objs(files=None, macros={}):
     return [FortranFile(filename, macros) for filename in files]
 
 
-def file_objs_to_mod_dict(file_objs=[]):
-    "Turn a list of file_objs in a dictionary, containing which modules depend on which files"
-    dic = {}
-    for i in file_objs:
-        for j in i.contains:
-            dic[j.lower()] = i.filename
-    return dic
-
-
 def get_depends(fob=[], m2f=[]):
     deps = {}
     for i in fob:
         tmp = []
         for j in i.uses:
             try:
-                tmp.append(m2f[j.lower()])
+                tmp.append(m2f[j].filename)
             except:
                 print("\033[031mError\033[039m module \033[032m"+j+"\033[039m not defined in any files. Skipping...")
 
