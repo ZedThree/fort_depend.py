@@ -101,7 +101,7 @@ def get_uses(infile=None, macros={}):
 
 def get_contains(infile=None):
     "Return all the modules that are in infile"
-    p=re.compile("^\s*module\s*(?P<modname>\w*?)\s*$",re.IGNORECASE).match
+    p=re.compile("^\s*module\s*(?P<modname>\w*)",re.IGNORECASE).match
 
     contains=[]
 
