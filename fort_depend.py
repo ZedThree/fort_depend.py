@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 from itertools import chain
 import os
 import re
