@@ -24,7 +24,7 @@ class FortranFile(object):
         self.uses = self.get_uses(contents, macros)
 
     def __repr__(self):
-        return "FortranFile({}, {}, {})".format(self.filename)
+        return "FortranFile('{}')".format(self.filename)
 
     def get_modules(self, contents):
         """Return all the modules or programs that are in the file
@@ -90,7 +90,7 @@ class FortranModule(object):
         self.filename = filename
 
     def __repr__(self):
-        return "FortranModule({}, {}, {})".format(self.unit_type, self.name, self.filename)
+        return "FortranModule({}, '{}', '{}')".format(self.unit_type, self.name, self.filename)
 
 
 def make_module_dict(file_list):
