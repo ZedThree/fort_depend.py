@@ -36,18 +36,18 @@ class FortranFile(object):
         p = re.compile("^\s*(?P<unit_type>module|program)\s*(?P<modname>\w*)",
                        re.IGNORECASE).match
 
-        contains = []
+        contains = {}
 
         for line in contents:
             found = p(line)
             if found:
-                contains.append(
-                    FortranModule(unit_type=found.group('unit_type'),
-                                  name=found.group('modname'),
-                                  filename=self.filename))
+                name = found.group('modname')
+                contains[name] = FortranModule(unit_type=found.group('unit_type'),
+                                               name=name,
+                                               filename=self.filename)
 
         # Remove duplicates before returning
-        return list(set(contains))
+        return contains
 
     def get_uses(self, contents, macros={}):
         """Return which modules are used in the file after expanding macros
@@ -94,12 +94,16 @@ class FortranModule(object):
 
 
 def make_module_dict(file_list):
-    """Make a dict of FortranModules from a list of FortranFiles
+    """Merge dicts of FortranModules from list of FortranFiles
+
+    Args:
+        file_list: List of FortranFiles
     """
 
-    # Flatten the lists of modules in each file using chain
-    return {mod.name: mod for mod in
-            chain.from_iterable([f.modules for f in file_list])}
+    result = {}
+    for source_file in file_list:
+        result.update(source_file.modules)
+    return result
 
 
 # Definitions
@@ -107,7 +111,7 @@ def run(files=None, verbose=True, overwrite=None, output=None, macros={}, build=
 
     file_list = create_file_list(files, macros)
     mod_list = make_module_dict(file_list)
-    depends = get_depends(fob=file_list, m2f=mod_list)
+    depends = get_depends(file_list, mod_dict=mod_list)
 
     if verbose:
         for i in depends.keys():
@@ -171,19 +175,19 @@ def create_file_list(files=None, macros={}):
     return [FortranFile(filename, macros) for filename in files]
 
 
-def get_depends(fob=[], m2f=[]):
-    deps = {}
-    for i in fob:
-        tmp = []
-        for j in i.uses:
+def get_depends(file_list=[], mod_dict={}):
+    depends = {}
+    for source_file in file_list:
+        graph = []
+        for mod in source_file.uses:
             try:
-                tmp.append(m2f[j].filename)
-            except:
-                print("\033[031mError\033[039m module \033[032m"+j+"\033[039m not defined in any files. Skipping...")
+                graph.append(mod_dict[mod].filename)
+            except KeyError:
+                print("\033[031mError\033[039m module \033[032m"+mod+"\033[039m not defined in any files. Skipping...")
 
-        deps[i.filename] = tmp
+        depends[source_file.filename] = graph
 
-    return deps
+    return depends
 
 # Script
 if __name__ == "__main__":
