@@ -1,7 +1,81 @@
 #!/usr/bin/env python
-from itertools import chain
 import os
 import re
+
+
+class FortranProject(object):
+    def __init__(self, files=None, macros={}):
+        """Create a list of FortranFile objects
+        """
+
+        if files is None:
+            files = self.get_source()
+
+        self.file_list = [FortranFile(filename, macros) for filename in files]
+
+    def get_source(self, extensions=[".f90", ".F90"]):
+        "Return all files ending with any of ext"
+        tmp = os.listdir(".")
+        files = []
+        for ext in extensions:
+            files.extend([x for x in tmp if x.endswith(ext)])
+
+        return files
+
+    def make_module_dict(self):
+        """Merge dicts of FortranModules from list of FortranFiles
+        """
+
+        self.mod_dict = {}
+        for source_file in self.file_list:
+            self.mod_dict.update(source_file.modules)
+
+    def get_depends(self, verbose=True):
+        """Get the dependencies of each file in file_list
+
+        """
+        self.depends = {}
+        for source_file in self.file_list:
+            graph = []
+            for mod in source_file.uses:
+                try:
+                    graph.append(self.mod_dict[mod].filename)
+                except KeyError:
+                    print("\033[031mError\033[039m module \033[032m"+mod+"\033[039m not defined in any files. Skipping...")
+
+            self.depends[source_file.filename] = graph
+
+        if verbose:
+            for file_ in self.depends.keys():
+                print("\033[032m"+file_+"\033[039m depends on :\033[034m")
+                for dep in self.depends[file_]:
+                    print("\t"+dep)
+                print("\033[039m")
+
+    def write_depend(self, outfile="makefile.dep", overwrite=False, build=''):
+        "Write the dependencies to outfile"
+        # Test file doesn't exist
+        if os.path.exists(outfile):
+            if not(overwrite):
+                print("\033[031mWarning file exists.\033[039m")
+                opt = raw_input("Overwrite? Y... for yes.")
+            else:
+                opt = "y"
+            if opt.lower().startswith("y"):
+                pass
+            else:
+                return
+
+        with open(outfile, 'w') as f:
+            f.write('# This file is generated automatically. DO NOT EDIT!\n')
+            for file_ in self.depends.keys():
+                _, filename = os.path.split(file_)
+                listing = "\n"+os.path.join(build, filename.split(".")[0]+".o"+" : ")
+                for dep in self.depends[file_]:
+                    _, filename = os.path.split(dep)
+                    listing += " \\\n\t"+os.path.join(build, filename.split(".")[0]+".o")
+                listing += "\n"
+                f.write(listing)
 
 
 class FortranFile(object):
@@ -93,101 +167,18 @@ class FortranModule(object):
         return "FortranModule({}, '{}', '{}')".format(self.unit_type, self.name, self.filename)
 
 
-def make_module_dict(file_list):
-    """Merge dicts of FortranModules from list of FortranFiles
-
-    Args:
-        file_list: List of FortranFiles
-    """
-
-    result = {}
-    for source_file in file_list:
-        result.update(source_file.modules)
-    return result
-
-
 # Definitions
 def run(files=None, verbose=True, overwrite=None, output=None, macros={}, build=''):
 
-    file_list = create_file_list(files, macros)
-    mod_list = make_module_dict(file_list)
-    depends = get_depends(file_list, mod_dict=mod_list)
-
-    if verbose:
-        for i in depends.keys():
-            print("\033[032m"+i+"\033[039m depends on :\033[034m")
-            for j in depends[i]:
-                print("\t"+j)
-            print("\033[039m")
+    project = FortranProject(files, macros)
+    project.make_module_dict()
+    project.get_depends(verbose)
 
     if output is None:
         output = "makefile.dep"
 
-    tmp = write_depend(outfile=output, dep=depends, overwrite=overwrite, build=build)
+    project.write_depend(outfile=output, overwrite=overwrite, build=build)
 
-    return depends
-
-def write_depend(outfile="makefile.dep", dep=[], overwrite=False, build=''):
-    "Write the dependencies to outfile"
-    # Test file doesn't exist
-    if os.path.exists(outfile):
-        if not(overwrite):
-            print("\033[031mWarning file exists.\033[039m")
-            opt = raw_input("Overwrite? Y... for yes.")
-        else:
-            opt = "y"
-        if opt.lower().startswith("y"):
-            pass
-        else:
-            return
-
-    # Open file
-    with open(outfile, 'w') as f:
-        f.write('# This file is generated automatically. DO NOT EDIT!\n')
-        for i in dep.keys():
-            tmp, fil = os.path.split(i)
-            stri = "\n"+os.path.join(build, fil.split(".")[0]+".o"+" : ")
-            for j in dep[i]:
-                tmp, fil = os.path.split(j)
-                stri = stri+" \\\n\t"+os.path.join(build, fil.split(".")[0]+".o")
-            stri = stri+"\n"
-            f.write(stri)
-
-    return
-
-
-def get_source(ext=[".f90", ".F90"]):
-    "Return all files ending with any of ext"
-    tmp = os.listdir(".")
-    fil = []
-    for i in ext:
-        fil.extend([x for x in tmp if x.endswith(i)])
-    return fil
-
-
-def create_file_list(files=None, macros={}):
-    """Create a list of FortranFile objects
-    """
-
-    if files is None:
-        files = get_source()
-
-    return [FortranFile(filename, macros) for filename in files]
-
-
-def get_depends(file_list=[], mod_dict={}):
-    depends = {}
-    for source_file in file_list:
-        graph = []
-        for mod in source_file.uses:
-            try:
-                graph.append(mod_dict[mod].filename)
-            except KeyError:
-                print("\033[031mError\033[039m module \033[032m"+mod+"\033[039m not defined in any files. Skipping...")
-
-        depends[source_file.filename] = graph
-
-    return depends
 
 # Script
 if __name__ == "__main__":
