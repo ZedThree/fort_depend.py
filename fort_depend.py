@@ -4,14 +4,16 @@ import re
 
 
 class FortranProject(object):
-    def __init__(self, files=None, macros={}):
+    def __init__(self, files=None, macros={}, verbose=False):
         """Create a list of FortranFile objects
         """
 
         if files is None:
             files = self.get_source()
 
-        self.file_list = [FortranFile(filename, macros) for filename in files]
+        self.files = [FortranFile(filename, macros) for filename in files]
+        self.modules = self.get_modules()
+        self.depends = self.get_depends(verbose)
 
     def get_source(self, extensions=[".f90", ".F90"]):
         "Return all files ending with any of ext"
@@ -22,37 +24,39 @@ class FortranProject(object):
 
         return files
 
-    def make_module_dict(self):
+    def get_modules(self):
         """Merge dicts of FortranModules from list of FortranFiles
         """
 
         self.mod_dict = {}
-        for source_file in self.file_list:
+        for source_file in self.files:
             self.mod_dict.update(source_file.modules)
 
-    def get_depends(self, verbose=True):
+    def get_depends(self, verbose=False):
         """Get the dependencies of each file in file_list
-
         """
-        self.depends = {}
-        for source_file in self.file_list:
+        depends = {}
+        for source_file in self.files:
             graph = []
             for mod in source_file.uses:
                 try:
-                    graph.append(self.mod_dict[mod].filename)
+                    graph.append(self.mod_dict[mod].source_file.filename)
                 except KeyError:
-                    print("\033[031mError\033[039m module \033[032m"+mod+"\033[039m not defined in any files. Skipping...")
+                    print("\033[031mError\033[039m module \033[032m"+
+                          mod+"\033[039m not defined in any files. Skipping...")
 
-            self.depends[source_file.filename] = graph
+            depends[source_file.filename] = graph
 
         if verbose:
-            for file_ in self.depends.keys():
+            for file_ in depends.keys():
                 print("\033[032m"+file_+"\033[039m depends on :\033[034m")
-                for dep in self.depends[file_]:
+                for dep in depends[file_]:
                     print("\t"+dep)
                 print("\033[039m")
 
-    def write_depend(self, outfile="makefile.dep", overwrite=False, build=''):
+        return depends
+
+    def write_depends(self, outfile="makefile.dep", overwrite=False, build=''):
         "Write the dependencies to outfile"
         # Test file doesn't exist
         if os.path.exists(outfile):
@@ -170,14 +174,12 @@ class FortranModule(object):
 # Definitions
 def run(files=None, verbose=True, overwrite=None, output=None, macros={}, build=''):
 
-    project = FortranProject(files, macros)
-    project.make_module_dict()
-    project.get_depends(verbose)
+    project = FortranProject(files, macros, verbose)
 
     if output is None:
         output = "makefile.dep"
 
-    project.write_depend(outfile=output, overwrite=overwrite, build=build)
+    project.write_depends(outfile=output, overwrite=overwrite, build=build)
 
 
 # Script
