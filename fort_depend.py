@@ -47,18 +47,19 @@ class FortranProject(object):
             graph = []
             for mod in source_file.uses:
                 try:
-                    graph.append(self.mod_dict[mod].source_file.filename)
+                    graph.append(self.mod_dict[mod].source_file)
                 except KeyError:
                     print("\033[031mError\033[039m module \033[032m"+
                           mod+"\033[039m not defined in any files. Skipping...")
 
-            depends[source_file.filename] = sorted(graph)
+            depends[source_file] = sorted(graph,
+                                          key=lambda f: f.filename)
 
         if verbose:
             for file_ in depends.keys():
                 print("\033[032m"+file_+"\033[039m depends on :\033[034m")
-                for dep in depends[file_]:
-                    print("\t"+dep)
+                for dep in depends[file_.filename]:
+                    print("\t"+dep.filename)
                 print("\033[039m")
 
         return depends
@@ -79,11 +80,13 @@ class FortranProject(object):
 
         with open(outfile, 'w') as f:
             f.write('# This file is generated automatically. DO NOT EDIT!\n')
-            for file_ in self.depends.keys():
-                _, filename = os.path.split(file_)
+            alpha_list = sorted(self.depends.keys(),
+                                key=lambda f: f.filename)
+            for file_ in alpha_list:
+                _, filename = os.path.split(file_.filename)
                 listing = "\n"+os.path.join(build, filename.split(".")[0]+".o"+" : ")
                 for dep in self.depends[file_]:
-                    _, filename = os.path.split(dep)
+                    _, filename = os.path.split(dep.filename)
                     listing += " \\\n\t"+os.path.join(build, filename.split(".")[0]+".o")
                 listing += "\n"
                 f.write(listing)
