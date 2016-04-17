@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import os
 import re
+from collections import defaultdict
 
 UNIT_REGEX = re.compile("^\s*(?P<unit_type>module|program)\s*(?P<modname>\w*)",
                         re.IGNORECASE)
@@ -18,9 +19,11 @@ class FortranProject(object):
         if files is None:
             files = self.get_source()
 
-        self.files = [FortranFile(filename, macros) for filename in files]
+        self.files = {filename: FortranFile(filename, macros)
+                      for filename in files}
         self.modules = self.get_modules()
-        self.depends = self.get_depends(verbose)
+        self.depends_by_module = self.get_depends_by_module(verbose)
+        self.depends_by_file = self.get_depends_by_file(verbose)
 
     def get_source(self, extensions=[".f90", ".F90"]):
         "Return all files ending with any of ext"
@@ -35,32 +38,56 @@ class FortranProject(object):
         """Merge dicts of FortranModules from list of FortranFiles
         """
 
-        self.mod_dict = {}
-        for source_file in self.files:
-            self.mod_dict.update(source_file.modules)
+        mod_dict = {}
+        for source_file in self.files.values():
+            mod_dict.update(source_file.modules)
+        return mod_dict
 
-    def get_depends(self, verbose=False):
+    def get_depends_by_module(self, verbose=False):
         """Get the dependencies of each file in file_list
         """
         depends = {}
-        for source_file in self.files:
+        for module in self.modules.values():
             graph = []
-            for mod in source_file.uses:
+            for used_mod in module.uses:
                 try:
-                    graph.append(self.mod_dict[mod].source_file)
+                    graph.append(self.modules[used_mod])
                 except KeyError:
                     print("\033[031mError\033[039m module \033[032m"+
-                          mod+"\033[039m not defined in any files. Skipping...")
+                          used_mod+"\033[039m not defined in any files. Skipping...")
 
-            depends[source_file] = sorted(graph,
-                                          key=lambda f: f.filename)
-
+            depends[module] = sorted(graph,
+                                     key=lambda f: f.source_file.filename)
         if verbose:
             for file_ in depends.keys():
                 print("\033[032m"+file_+"\033[039m depends on :\033[034m")
                 for dep in depends[file_.filename]:
                     print("\t"+dep.filename)
                 print("\033[039m")
+
+        return depends
+
+    def get_depends_by_file(self, verbose=False):
+        """Get the dependencies of each file in file_list
+        """
+        # depends = defaultdict(list)
+        # for module, dependencies in self.depends_by_module.items():
+        #     for dependency in dependencies:
+        #         depends[module.source_file].append(
+        #             dependency.source_file)
+        #     depends[module.source_file].sort(
+        #         key=lambda f: f.filename)
+        depends = {}
+        for source_file in self.files.values():
+            graph = []
+            for mod in source_file.uses:
+                try:
+                    graph.append(self.modules[mod].source_file)
+                except KeyError:
+                    print("\033[031mError\033[039m module \033[032m"+
+                          mod+"\033[039m not defined in any files. Skipping...")
+            depends[source_file] = sorted(graph,
+                                          key=lambda f: f.filename)
 
         return depends
 
@@ -80,12 +107,12 @@ class FortranProject(object):
 
         with open(outfile, 'w') as f:
             f.write('# This file is generated automatically. DO NOT EDIT!\n')
-            alpha_list = sorted(self.depends.keys(),
+            alpha_list = sorted(self.depends_by_file.keys(),
                                 key=lambda f: f.filename)
             for file_ in alpha_list:
                 _, filename = os.path.split(file_.filename)
                 listing = "\n"+os.path.join(build, filename.split(".")[0]+".o"+" : ")
-                for dep in self.depends[file_]:
+                for dep in self.depends_by_file[file_]:
                     _, filename = os.path.split(dep.filename)
                     listing += " \\\n\t"+os.path.join(build, filename.split(".")[0]+".o")
                 listing += "\n"
@@ -175,7 +202,7 @@ class FortranModule(object):
         self.uses = self.get_uses(text[0], macros)
 
     def __repr__(self):
-        return "FortranModule({}, '{}', '{}')".format(self.unit_type, self.name, self.filename)
+        return "FortranModule({}, '{}', '{}')".format(self.unit_type, self.name, self.source_file.filename)
 
     def get_uses(self, contents, macros={}):
         """Return which modules are used in the file after expanding macros
