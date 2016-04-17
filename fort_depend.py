@@ -118,6 +118,20 @@ class FortranProject(object):
                 listing += "\n"
                 f.write(listing)
 
+    def get_graph(self, exclude=['hdf5', 'h5lt', 'mpi_f08']):
+        # Start the graph
+        graph = "digraph G {\n"
+
+        for source_file in self.depends:
+            for module in self.depends[source_file]:
+                # Add the edges to the graph
+                edge = '"' + source_file.filename + '" -> "' + module.filename + '";\n'
+                graph += edge
+
+        # Close the graph and return it
+        graph = graph + "}"
+        return graph
+
 
 class FortranFile(object):
     """The modules and dependencies of a Fortran source file
@@ -231,14 +245,19 @@ class FortranModule(object):
 
 
 # Definitions
-def run(files=None, verbose=True, overwrite=None, output=None, macros={}, build=''):
+def run(files=None, verbose=False, overwrite=None, output=None, macros={}, build='',
+        graph=False):
 
     project = FortranProject(files, macros, verbose)
 
-    if output is None:
-        output = "makefile.dep"
+    # if output is None:
+    #     output = "makefile.dep"
 
-    project.write_depends(outfile=output, overwrite=overwrite, build=build)
+    if output is not None:
+        project.write_depends(outfile=output, overwrite=overwrite, build=build)
+
+    if graph:
+        print(project.get_graph())
 
 
 # Script
@@ -253,6 +272,8 @@ if __name__ == "__main__":
     parser.add_argument('-b', '--build', nargs=1, default='',
                         help='Build Directory (prepended to all files in output)')
     parser.add_argument('-o', '--output', nargs=1, help='Output file')
+    parser.add_argument('-g', '--graph', action='store_true',
+                        help='Make a graph of the project')
     parser.add_argument('-v', '--verbose', action='store_true',
                         help='explain what is done')
     parser.add_argument('-w', '--overwrite', action='store_true',
@@ -273,4 +294,4 @@ if __name__ == "__main__":
     build = args.build[0] if args.build else ''
 
     run(files=args.files, verbose=args.verbose, overwrite=args.overwrite,
-        macros=macros, output=output, build=build)
+        macros=macros, output=output, build=build, graph=args.graph)
