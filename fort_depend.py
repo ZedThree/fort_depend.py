@@ -3,6 +3,11 @@ import os
 import re
 from collections import defaultdict
 
+try:
+    input = raw_input
+except NameError:
+    pass
+
 UNIT_REGEX = re.compile("^\s*(?P<unit_type>module|program)\s*(?P<modname>\w*)",
                         re.IGNORECASE)
 END_REGEX = re.compile("^\s*end\s*(?P<unit_type>module|program)\s*(?P<modname>\w*)?",
@@ -97,7 +102,7 @@ class FortranProject(object):
         if os.path.exists(outfile):
             if not(overwrite):
                 print("\033[031mWarning file exists.\033[039m")
-                opt = raw_input("Overwrite? Y... for yes.")
+                opt = input("Overwrite? Y... for yes.")
             else:
                 opt = "y"
             if opt.lower().startswith("y"):
