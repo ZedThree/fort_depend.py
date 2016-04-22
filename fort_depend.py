@@ -96,21 +96,25 @@ class FortranProject(object):
 
         return depends
 
-    def write_depends(self, outfile="makefile.dep", overwrite=False, build=''):
-        "Write the dependencies to outfile"
+    def write_depends(self, filename="makefile.dep", overwrite=False, build=''):
+        """Write the dependencies to file
+
+        Args:
+            filename: Name of the output file
+            overwrite: Overwrite existing dependency file [False]
+            build: Directory to prepend to filenames
+        """
         # Test file doesn't exist
-        if os.path.exists(outfile):
+        if os.path.exists(filename):
             if not(overwrite):
                 print("\033[031mWarning file exists.\033[039m")
                 opt = input("Overwrite? Y... for yes.")
-            else:
-                opt = "y"
-            if opt.lower().startswith("y"):
-                pass
-            else:
-                return
+                if opt.lower().startswith("y"):
+                    pass
+                else:
+                    return
 
-        with open(outfile, 'w') as f:
+        with open(filename, 'w') as f:
             f.write('# This file is generated automatically. DO NOT EDIT!\n')
             alpha_list = sorted(self.depends_by_file.keys(),
                                 key=lambda f: f.filename)
@@ -259,7 +263,7 @@ def run(files=None, verbose=False, overwrite=None, output=None, macros={}, build
     #     output = "makefile.dep"
 
     if output is not None:
-        project.write_depends(outfile=output, overwrite=overwrite, build=build)
+        project.write_depends(filename=output, overwrite=overwrite, build=build)
 
     if graph:
         print(project.get_graph())
