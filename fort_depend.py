@@ -4,6 +4,12 @@ import re
 from collections import defaultdict
 
 try:
+    import graphviz as gv
+    has_graphviz = True
+except ImportError:
+    has_graphviz = False
+
+try:
     input = raw_input
 except NameError:
     pass
@@ -17,9 +23,14 @@ USE_REGEX = re.compile("^\s*use\s*(?P<moduse>\w*)\s*(, )?\s*(only)?\s*(:)?.*?$",
 
 
 class FortranProject(object):
-    def __init__(self, files=None, macros={}, verbose=False):
+    def __init__(self, name=None, files=None, macros={}, verbose=False):
         """Create a list of FortranFile objects
         """
+
+        if name is None:
+            self.name = os.path.basename(os.getcwd())
+        else:
+            self.name = name
 
         if files is None:
             files = self.get_source()
@@ -127,19 +138,30 @@ class FortranProject(object):
                 listing += "\n"
                 f.write(listing)
 
-    def get_graph(self, exclude=['hdf5', 'h5lt', 'mpi_f08']):
+    def make_graph(self, filename=None, format='svg', view=True):
+        """Draw a graph of the project using graphviz
+
+        Args:
+            filename: Name of the output file
+            format: Image format
+            view: Immediately display the graph [True]
+        """
+        if not has_graphviz:
+            return
+
+        if filename is None:
+            filename = self.name + ".dot"
+
         # Start the graph
-        graph = "digraph G {\n"
+        graph = gv.Digraph(name=filename, format=format)
 
-        for source_file in self.depends:
-            for module in self.depends[source_file]:
+        for source_file in self.depends_by_file:
+            graph.node(source_file.filename)
+            for module in self.depends_by_file[source_file]:
                 # Add the edges to the graph
-                edge = '"' + source_file.filename + '" -> "' + module.filename + '";\n'
-                graph += edge
+                graph.edge(source_file.filename, module.filename)
 
-        # Close the graph and return it
-        graph = graph + "}"
-        return graph
+        graph.render(filename, view=view, cleanup=False)
 
 
 class FortranFile(object):
@@ -257,7 +279,7 @@ class FortranModule(object):
 def run(files=None, verbose=False, overwrite=None, output=None, macros={}, build='',
         graph=False):
 
-    project = FortranProject(files, macros, verbose)
+    project = FortranProject(files=files, macros=macros, verbose=verbose)
 
     # if output is None:
     #     output = "makefile.dep"
@@ -266,7 +288,7 @@ def run(files=None, verbose=False, overwrite=None, output=None, macros={}, build
         project.write_depends(filename=output, overwrite=overwrite, build=build)
 
     if graph:
-        print(project.get_graph())
+        project.make_graph()
 
 
 # Script
