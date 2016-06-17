@@ -18,7 +18,7 @@ UNIT_REGEX = re.compile("^\s*(?P<unit_type>module|program)\s*(?P<modname>\w*)",
                         re.IGNORECASE)
 END_REGEX = re.compile("^\s*end\s*(?P<unit_type>module|program)\s*(?P<modname>\w*)?",
                        re.IGNORECASE)
-USE_REGEX = re.compile("^\s*use\s*(?P<moduse>\w*)\s*(, )?\s*(only)?\s*(:)?.*?$",
+USE_REGEX = re.compile("^\s*use(\s*,\s*intrinsic\s*::)?\s*(?P<moduse>\w*)\s*(, )?\s*(only)?\s*(:)?.*?$",
                        re.IGNORECASE)
 
 
@@ -76,9 +76,9 @@ class FortranProject(object):
                                      key=lambda f: f.source_file.filename)
         if verbose:
             for file_ in depends.keys():
-                print("\033[032m"+file_+"\033[039m depends on :\033[034m")
-                for dep in depends[file_.filename]:
-                    print("\t"+dep.filename)
+                print("\033[032m"+file_.source_file.filename+"\033[039m depends on :\033[034m")
+                for dep in depends[file_]:
+                    print("\t"+dep.source_file.filename)
                 print("\033[039m")
 
         return depends
