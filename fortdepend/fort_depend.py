@@ -3,6 +3,9 @@ import re
 from collections import defaultdict
 from .units import FortranFile, FortranModule
 
+# Terminal colours
+from colorama import Fore, Style
+
 try:
     import graphviz as gv
     has_graphviz = True
@@ -62,17 +65,19 @@ class FortranProject(object):
                 try:
                     graph.append(self.modules[used_mod])
                 except KeyError:
-                    print("\033[031mError\033[039m module \033[032m"+
-                          used_mod+"\033[039m not defined in any files. Skipping...")
+                    print(Fore.RED + "Error" + Fore.RESET + " module " +
+                          Fore.GREEN + used_mod + Fore.RESET +
+                          " not defined in any files. Skipping...")
 
             depends[module] = sorted(graph,
                                      key=lambda f: f.source_file.filename)
         if verbose:
             for file_ in depends.keys():
-                print("\033[032m"+file_.source_file.filename+"\033[039m depends on :\033[034m")
+                print(Fore.GREEN + file_.source_file.filename + Fore.RESET +
+                      " depends on :" + Fore.BLUE)
                 for dep in depends[file_]:
-                    print("\t"+dep.source_file.filename)
-                print("\033[039m")
+                    print("\t" + dep.source_file.filename)
+                print(Fore.RESET)
 
         return depends
 
@@ -93,8 +98,8 @@ class FortranProject(object):
                 try:
                     graph.append(self.modules[mod].source_file)
                 except KeyError:
-                    print("\033[031mError\033[039m module \033[032m"+
-                          mod+"\033[039m not defined in any files. Skipping...")
+                    print(Fore.RED + "Error" + Fore.RESET + " module " + Fore.GREEN +
+                          mod + Fore.RESET + " not defined in any files. Skipping...")
             depends[source_file] = sorted(graph,
                                           key=lambda f: f.filename)
 
@@ -111,7 +116,8 @@ class FortranProject(object):
         # Test file doesn't exist
         if os.path.exists(filename):
             if not(overwrite):
-                print("\033[031mWarning file exists.\033[039m")
+                print(Fore.RED + "Warning: file '{}' exists.".format(filename) +
+                      Fore.RESET)
                 opt = input("Overwrite? Y... for yes.")
                 if opt.lower().startswith("y"):
                     pass

@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 import argparse
+import colorama
 from fortdepend import FortranProject
+
 
 def main(args=None):
     """Run the module as a script
@@ -10,7 +12,7 @@ def main(args=None):
     parser = argparse.ArgumentParser(description='Generate Fortran dependencies')
     parser.add_argument('-f', '--files', nargs='+', help='Files to process')
     parser.add_argument('-D', nargs='+', action='append', metavar='NAME=DESCRIPTION',
-                        help="""The macro NAME is replaced by DEFINITION in 'use' statements""")
+                        help="The macro NAME is replaced by DEFINITION in 'use' statements")
     parser.add_argument('-b', '--build', nargs=1, default='',
                         help='Build Directory (prepended to all files in output)')
     parser.add_argument('-o', '--output', nargs=1, help='Output file')
@@ -20,6 +22,8 @@ def main(args=None):
                         help='explain what is done')
     parser.add_argument('-w', '--overwrite', action='store_true',
                         help='Overwrite output file without warning')
+    parser.add_argument('-c', '--colour', action='store_true',
+                        help='Print in colour')
 
     # Parse the command line arguments
     args = parser.parse_args()
@@ -34,6 +38,10 @@ def main(args=None):
 
     output = args.output[0] if args.output else None
     build = args.build[0] if args.build else ''
+
+    # Sorts out the terminal colours on Windows
+    strip_colours = not args.colour
+    colorama.init(strip=strip_colours)
 
     project = FortranProject(files=args.files, macros=macros, verbose=args.verbose)
 

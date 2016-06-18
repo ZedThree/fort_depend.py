@@ -21,6 +21,7 @@ setup(name='fortdepend',
           'Programming Language :: Fortran',
       ],
       packages=['fortdepend'],
+      install_requires=['colorama'],
       keywords=['build', 'dependencies', 'fortran'],
       entry_points={
           'console_scripts': [
