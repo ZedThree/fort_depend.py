@@ -1,4 +1,5 @@
 import os
+import sys
 import warnings
 
 # Terminal colours
@@ -69,12 +70,13 @@ class FortranProject(object):
                 except KeyError:
                     print(Fore.RED + "Error" + Fore.RESET + " module " +
                           Fore.GREEN + used_mod + Fore.RESET +
-                          " not defined in any files. Skipping...")
+                          " not defined in any files. Skipping...",
+                          file=sys.stderr)
 
             depends[module] = sorted(graph,
                                      key=lambda f: f.source_file.filename)
         if verbose:
-            for file_ in depends.keys():
+            for file_ in sorted(depends.keys(), key=lambda f: f.source_file.filename):
                 print(Fore.GREEN + file_.source_file.filename + Fore.RESET +
                       " depends on :" + Fore.BLUE)
                 for dep in depends[file_]:
@@ -101,7 +103,8 @@ class FortranProject(object):
                     graph.append(self.modules[mod].source_file)
                 except KeyError:
                     print(Fore.RED + "Error" + Fore.RESET + " module " + Fore.GREEN +
-                          mod + Fore.RESET + " not defined in any files. Skipping...")
+                          mod + Fore.RESET + " not defined in any files. Skipping...",
+                          file=sys.stderr)
             depends[source_file] = sorted(graph,
                                           key=lambda f: f.filename)
 
@@ -132,10 +135,12 @@ class FortranProject(object):
                                 key=lambda f: f.filename)
             for file_ in alpha_list:
                 _, filename = os.path.split(file_.filename)
-                listing = "\n"+os.path.join(build, filename.split(".")[0]+".o"+" : ")
+                objectname = os.path.splitext(filename)[0] + ".o"
+                listing = "\n{} : ".format(os.path.join(build, objectname))
                 for dep in self.depends_by_file[file_]:
-                    _, filename = os.path.split(dep.filename)
-                    listing += " \\\n\t"+os.path.join(build, filename.split(".")[0]+".o")
+                    _, depfilename = os.path.split(dep.filename)
+                    depobjectname = os.path.splitext(depfilename)[0] + ".o"
+                    listing += " \\\n\t{}".format(os.path.join(build, depobjectname))
                 listing += "\n"
                 f.write(listing)
 
