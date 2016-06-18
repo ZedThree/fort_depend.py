@@ -1,17 +1,19 @@
 import os
-import re
-from collections import defaultdict
-from .units import FortranFile, FortranModule
+import warnings
 
 # Terminal colours
-from colorama import Fore, Style
+from colorama import Fore
 
+from .units import FortranFile
+
+# If graphviz is not installed, graphs can't be produced
 try:
     import graphviz as gv
     has_graphviz = True
 except ImportError:
     has_graphviz = False
 
+# Python 2/3 compatibility
 try:
     input = raw_input
 except NameError:
@@ -146,6 +148,8 @@ class FortranProject(object):
             view: Immediately display the graph [True]
         """
         if not has_graphviz:
+            warnings.warn("graphviz not installed: can't make graph",
+                          RuntimeWarning)
             return
 
         if filename is None:
