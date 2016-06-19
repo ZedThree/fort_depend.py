@@ -5,6 +5,7 @@ import warnings
 # Terminal colours
 from colorama import Fore
 
+from .smartopen import smart_open
 from .units import FortranFile
 
 # If graphviz is not installed, graphs can't be produced
@@ -129,7 +130,7 @@ class FortranProject(object):
                 else:
                     return
 
-        with open(filename, 'w') as f:
+        with smart_open(filename, 'w') as f:
             f.write('# This file is generated automatically. DO NOT EDIT!\n')
             alpha_list = sorted(self.depends_by_file.keys(),
                                 key=lambda f: f.filename)

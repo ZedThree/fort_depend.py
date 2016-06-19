@@ -1,5 +1,7 @@
 import re
 
+from .smartopen import smart_open
+
 UNIT_REGEX = re.compile("^\s*(?P<unit_type>module|program)\s*(?P<modname>\w*)",
                         re.IGNORECASE)
 END_REGEX = re.compile("^\s*end\s*(?P<unit_type>module|program)\s*(?P<modname>\w*)?",
@@ -21,7 +23,7 @@ class FortranFile(object):
         self.modules = None
         self.depends_on = None
 
-        with open(self.filename, 'r') as f:
+        with smart_open(self.filename, 'r') as f:
             contents = f.readlines()
 
         self.modules = self.get_modules(contents, macros)
