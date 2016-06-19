@@ -82,12 +82,13 @@ class FortranProject(object):
 
             depends[module] = sorted(graph,
                                      key=lambda f: f.source_file.filename)
+
         if verbose:
-            for file_ in sorted(depends.keys(), key=lambda f: f.source_file.filename):
-                print(Fore.GREEN + file_.source_file.filename + Fore.RESET +
+            for module_ in sorted(depends.keys(), key=lambda f: f.source_file.filename):
+                print(Fore.GREEN + module_.name + Fore.RESET +
                       " depends on :" + Fore.BLUE)
-                for dep in depends[file_]:
-                    print("\t" + dep.source_file.filename)
+                for dep in depends[module_]:
+                    print("\t" + dep.name)
                 print(Fore.RESET)
 
         return depends
@@ -114,6 +115,14 @@ class FortranProject(object):
                           file=sys.stderr)
             depends[source_file] = sorted(graph,
                                           key=lambda f: f.filename)
+
+        if verbose:
+            for file_ in sorted(depends.keys(), key=lambda f: f.filename):
+                print(Fore.GREEN + file_.filename + Fore.RESET +
+                      " depends on :" + Fore.BLUE)
+                for dep in depends[file_]:
+                    print("\t" + dep.filename)
+                print(Fore.RESET)
 
         return depends
 
