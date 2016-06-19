@@ -24,6 +24,8 @@ def main(args=None):
                         help='Overwrite output file without warning')
     parser.add_argument('-c', '--colour', action='store_true',
                         help='Print in colour')
+    parser.add_argument('-e', '--exclude', nargs='+', default=None,
+                        help='Files or modules to exclude')
 
     # Parse the command line arguments
     args = parser.parse_args()
@@ -43,7 +45,8 @@ def main(args=None):
     strip_colours = not args.colour
     colorama.init(strip=strip_colours)
 
-    project = FortranProject(files=args.files, macros=macros, verbose=args.verbose)
+    project = FortranProject(files=args.files, excludes=args.exclude,
+                             macros=macros, verbose=args.verbose)
 
     if output is not None:
         project.write_depends(filename=output, overwrite=args.overwrite, build=build)

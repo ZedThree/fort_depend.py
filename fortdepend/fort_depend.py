@@ -23,7 +23,7 @@ except NameError:
 
 
 class FortranProject(object):
-    def __init__(self, name=None, files=None, macros={}, verbose=False):
+    def __init__(self, name=None, excludes=None, files=None, macros={}, verbose=False):
         """Create a list of FortranFile objects
         """
 
@@ -35,9 +35,15 @@ class FortranProject(object):
         if files is None:
             files = self.get_source()
 
+        if excludes is not None:
+            files = set(files) - set(excludes)
+
         self.files = {filename: FortranFile(filename, macros)
                       for filename in files}
         self.modules = self.get_modules()
+
+        self.remove_excluded_modules(excludes)
+
         self.depends_by_module = self.get_depends_by_module(verbose)
         self.depends_by_file = self.get_depends_by_file(verbose)
 
@@ -171,3 +177,27 @@ class FortranProject(object):
                 graph.edge(source_file.filename, module.filename)
 
         graph.render(filename, view=view, cleanup=False)
+
+    def remove_excluded_modules(self, excludes=None):
+        """Remove the modules in iterable excludes from
+        all dependencies
+        """
+        if excludes is None:
+            return
+        # Remove from module dict
+        for exclude in excludes:
+            self.modules.pop(exclude, None)
+        # Remove from 'used' modules
+        for module in self.modules.values():
+            for exclude in excludes:
+                try:
+                    module.uses.remove(exclude)
+                except ValueError:
+                    pass
+        # Remove from 'used' files
+        for source_file in self.files.values():
+            for exclude in excludes:
+                try:
+                    source_file.uses.remove(exclude)
+                except ValueError:
+                    pass
