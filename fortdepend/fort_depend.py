@@ -6,7 +6,7 @@ import warnings
 from colorama import Fore
 
 from .smartopen import smart_open
-from .units import FortranFile
+from .units import FortranFile, FortranModule
 
 # If graphviz is not installed, graphs can't be produced
 try:
@@ -75,9 +75,13 @@ class FortranProject(object):
                 try:
                     graph.append(self.modules[used_mod])
                 except KeyError:
+                    new_module = FortranModule(unit_type='module',
+                                               name=used_mod)
+                    graph.append(new_module)
+
                     print(Fore.RED + "Error" + Fore.RESET + " module " +
                           Fore.GREEN + used_mod + Fore.RESET +
-                          " not defined in any files. Skipping...",
+                          " not defined in any files. Creating empty ",
                           file=sys.stderr)
 
             depends[module] = sorted(graph,

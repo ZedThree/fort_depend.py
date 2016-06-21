@@ -16,18 +16,20 @@ class FortranFile(object):
     Args:
         filename: Source file
         macros: Dict of preprocessor macros to be expanded
+        readfile: Read and process the file [True]
     """
-    def __init__(self, filename=None, macros={}):
+    def __init__(self, filename=None, macros=None, readfile=True):
         self.filename = filename
         self.uses = None
         self.modules = None
         self.depends_on = None
 
-        with smart_open(self.filename, 'r') as f:
-            contents = f.readlines()
+        if readfile:
+            with smart_open(self.filename, 'r') as f:
+                contents = f.readlines()
 
-        self.modules = self.get_modules(contents, macros)
-        self.uses = self.get_uses()
+            self.modules = self.get_modules(contents, macros)
+            self.uses = self.get_uses()
 
     def __repr__(self):
         return "FortranFile('{}')".format(self.filename)
@@ -81,21 +83,28 @@ class FortranModule(object):
 
     unit_type: 'module' or 'program'
     name: Name of the module/program
-    filename: Name of the file containing the module/program
+    source_file: Name of the file containing the module/program
+    text: Tuple containing source_file contents, and start and end lines of the module
+    macros: Any defined macros
     """
-    def __init__(self, unit_type, name, source_file, text, macros={}):
+    def __init__(self, unit_type, name, source_file=None, text=None, macros=None):
         self.unit_type = unit_type.strip().lower()
         self.name = name.strip().lower()
-        self.source_file = source_file
-        self.defined_at = text[1]
-        self.end = text[2]
 
-        self.uses = self.get_uses(text[0], macros)
+        if source_file is not None:
+            self.source_file = source_file
+            self.defined_at = text[1]
+            self.end = text[2]
+
+            self.uses = self.get_uses(text[0], macros)
+        else:
+            self.source_file = FortranFile(filename='empty',
+                                           readfile=False)
 
     def __repr__(self):
         return "FortranModule({}, '{}', '{}')".format(self.unit_type, self.name, self.source_file.filename)
 
-    def get_uses(self, contents, macros={}):
+    def get_uses(self, contents, macros=None):
         """Return which modules are used in the file after expanding macros
 
         Args:
