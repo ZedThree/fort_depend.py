@@ -7,6 +7,7 @@ from colorama import Fore
 
 from .smartopen import smart_open
 from .units import FortranFile, FortranModule
+from .graph import Graph
 
 # If graphviz is not installed, graphs can't be produced
 try:
@@ -180,16 +181,9 @@ class FortranProject(object):
         if filename is None:
             filename = self.name + ".dot"
 
-        # Start the graph
-        graph = gv.Digraph(name=filename, format=format)
-
-        for source_file in self.depends_by_file:
-            graph.node(source_file.filename)
-            for module in self.depends_by_file[source_file]:
-                # Add the edges to the graph
-                graph.edge(source_file.filename, module.filename)
-
-        graph.render(filename, view=view, cleanup=False)
+        graph = Graph(self.depends_by_module, filename=filename,
+                      format=format, view=view)
+        graph.draw()
 
     def remove_excluded_modules(self, excludes=None):
         """Remove the modules in iterable excludes from
