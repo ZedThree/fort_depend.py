@@ -1,0 +1,12 @@
+digraph "tests.dot" {
+	"programTest.f90"
+		"programTest.f90" -> "moduleC.f90"
+		"programTest.f90" -> "moduleD.f90"
+	"moduleC.f90"
+		"moduleC.f90" -> "moduleA.f90"
+		"moduleC.f90" -> "moduleB.f90"
+	"moduleA.f90"
+	"moduleD.f90"
+	"moduleB.f90"
+		"moduleB.f90" -> "moduleA.f90"
+}
