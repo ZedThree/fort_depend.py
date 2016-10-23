@@ -1,13 +1,24 @@
 #!/usr/bin/python
 import os
 import re
+import glob
+import fnmatch
+import os
+import sys
 
 #Definitions
-def run(files=None,verbose=True,overwrite=None,output=None,macros={},build=''):
 
+def run(path,files=None,verbose=True,overwrite=None,output=None,macros={},build=''):
+   
+    cwd = os.getcwd()
+    
+    path = check_path(path=path)
+    cwd = check_path(path=cwd)
+
+    ff=get_all_files(path=path) 
     l=create_file_objs(files,macros)
     mod2fil=file_objs_to_mod_dict(file_objs=l)
-    depends=get_depends(fob=l,m2f=mod2fil)
+    depends=get_depends(fob=l,m2f=mod2fil,ffiles=ff)
 
     if verbose:
        for i in depends.keys():
@@ -18,11 +29,11 @@ def run(files=None,verbose=True,overwrite=None,output=None,macros={},build=''):
     if output is None:
         output = "makefile.dep"
 
-    tmp=write_depend(outfile=output,dep=depends,overwrite=overwrite,build=build)
+    tmp=write_depend(path=path,cwd=cwd,outfile=output,dep=depends,overwrite=overwrite,build=build)
 
     return depends
 
-def write_depend(outfile="makefile.dep",dep=[],overwrite=False,build=''):
+def write_depend(path,cwd,outfile="makefile.dep",dep=[],overwrite=False,build=''):
     "Write the dependencies to outfile"
     #Test file doesn't exist
     if os.path.exists(outfile):
@@ -43,8 +54,17 @@ def write_depend(outfile="makefile.dep",dep=[],overwrite=False,build=''):
         tmp,fil=os.path.split(i)
         stri="\n"+os.path.join(build, fil.split(".")[0]+".o"+" : ")
         for j in dep[i]:
-            tmp,fil=os.path.split(j)
-            stri=stri+" \\\n\t"+os.path.join(build, fil.split(".")[0]+".o")
+            npathseg = j.count('/')
+            if npathseg == 0:
+                tmp,fil=os.path.split(j)
+            else:
+                fil = get_relative_path_name(j,path=path,cwd=cwd)
+
+            if "../" in fil:
+                stri = stri + " \\\n\t" + fil
+            else:
+                stri=stri+" \\\n\t"+os.path.join(build, fil.split(".")[0]+".o")
+                
         stri=stri+"\n"
         f.write(stri)
     f.close()
@@ -57,6 +77,33 @@ def get_source(ext=[".f90",".F90"]):
     for i in ext:
         fil.extend(filter(lambda x: x.endswith(i),tmp))
     return fil
+
+def get_all_files(path):
+    #l=[] 
+    
+    #for filename in glob.iglob('/home/jka/OSS_CFD/trunk/**/*.f90', recursive=True):
+        #print(filename)
+        #l.append(filename)
+        
+    #return l
+    
+    matches = []
+    for root, dirnames, filenames in os.walk(path):
+        for filename in fnmatch.filter(filenames, '*.f90'):
+            matches.append(os.path.join(root, filename))
+        
+    return matches
+
+def check_if_there(use,file):
+    "return if you see module name"
+    with open(file) as f:
+        for line in f:
+            if "module" in line.lower():
+                if use in line:
+                    return 1
+
+    return 0
+
 
 def create_file_objs(files=None, macros={}):
     l=[]
@@ -124,7 +171,7 @@ def file_objs_to_mod_dict(file_objs=[]):
             dic[j.lower()]=i.file_name
     return dic
 
-def get_depends(fob=[],m2f=[]):
+def get_depends(fob=[],m2f=[], ffiles=[]):
     deps={}
     for i in fob:
         tmp=[]
@@ -132,13 +179,43 @@ def get_depends(fob=[],m2f=[]):
             try:
                 tmp.append(m2f[j.lower()])
             except KeyError:
-                tmp.append(j.lower())
-                print ("\033[031mNote: \033[039m module \033[032m"+j+"\033[039m not defined in any files in this directory")
-                print ("adding it to dependency file but not checking it any further \033[032m")
+                for k in ffiles:
+                    retval=check_if_there(use=j,file=k)
+                    if retval > 0:
+                        name=os.path.splitext(k)[0]+'.o'
+                        tmp.append(name.lower())
+                        print ("\033[031mNote: \033[039m module \033[032m"+j+"\033[039m not defined in any files in this directory")
+                        print ("\033[031m..... \033[039m module is in \033[032m"+name+"\033[039m file")
+                        print ("\033[031m..... \033[039m adding it to dependency file, not checking its dependency further \033[032m")
 
         deps[i.file_name]=tmp
 
     return deps
+
+def check_path(path):
+    if path.endswith("/"):
+        print("Path correct")
+    else:
+        print( "adding / to the path in "+path)
+        path=path + "/"
+
+    return path
+
+def get_relative_path_name(file,path,cwd):
+    length = len(path)
+    #tmp,fil=os.path.split(j)
+    filetmp = file
+    fil = filetmp.replace(filetmp[:length], '')
+    
+    loccwd = cwd
+    loccwd = loccwd.replace(loccwd[:length], '')
+
+    npathseg = loccwd.count('/')
+    for x in range(0, npathseg):
+        fil = "../"+fil
+
+    return fil
+
 
 class file_obj:
     def __init__(self):
@@ -162,6 +239,7 @@ if __name__ == "__main__":
     parser.add_argument('-o','--output',nargs=1,help='Output file')
     parser.add_argument('-v','--verbose',action='store_true',help='explain what is done')
     parser.add_argument('-w','--overwrite',action='store_true',help='Overwrite output file without warning')
+    parser.add_argument('-r','--root_dir',nargs=1,help='Project root directory')
 
     # Parse the command line arguments
     args = parser.parse_args()
@@ -176,5 +254,10 @@ if __name__ == "__main__":
 
     output = args.output[0] if args.output else None
     build = args.build[0] if args.build else ''
+    root_dir = args.root_dir[0] if args.root_dir else None
+    
+    if not root_dir:
+        print ("\033[031mError: \033[039m missing path to project root directory \033[032m")
+        sys.exit()
 
-    run(files=args.files, verbose=args.verbose, overwrite=args.overwrite, macros=macros, output=output, build=build)
+    run(path=root_dir, files=args.files, verbose=args.verbose, overwrite=args.overwrite, macros=macros, output=output, build=build)
