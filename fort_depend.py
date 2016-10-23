@@ -10,10 +10,10 @@ def run(files=None,verbose=True,overwrite=None,output=None,macros={},build=''):
     depends=get_depends(fob=l,m2f=mod2fil)
 
     if verbose:
-        for i in depends.keys():
-            print "\033[032m"+i+"\033[039m depends on :\033[034m"
-            for j in depends[i]: print "\t"+j
-            print "\033[039m"
+       for i in depends.keys():
+           print ("\033[032m"+i+"\033[039m depends on :\033[034m")
+           for j in depends[i]: print( "\t"+j)
+           print ("\033[039m")
 
     if output is None:
         output = "makefile.dep"
@@ -27,7 +27,7 @@ def write_depend(outfile="makefile.dep",dep=[],overwrite=False,build=''):
     #Test file doesn't exist
     if os.path.exists(outfile):
         if not(overwrite):
-            print "\033[031mWarning file exists.\033[039m"
+            print ("\033[031mWarning file exists.\033[039m")
             opt=raw_input("Overwrite? Y... for yes.")
         else:
             opt="y"
@@ -131,8 +131,10 @@ def get_depends(fob=[],m2f=[]):
         for j in i.uses:
             try:
                 tmp.append(m2f[j.lower()])
-            except:
-                print "\033[031mError\033[039m module \033[032m"+j+"\033[039m not defined in any files. Skipping..."
+            except KeyError:
+                tmp.append(j.lower())
+                print ("\033[031mNote: \033[039m module \033[032m"+j+"\033[039m not defined in any files in this directory")
+                print ("adding it to dependency file but not checking it any further \033[032m")
 
         deps[i.file_name]=tmp
 
