@@ -1,0 +1,79 @@
+# This file is generated automatically. DO NOT EDIT!
+
+ll_cat.o :  \
+	ll_type.o
+
+ll_cp.o :  \
+	ll_cat.o \
+	ll_rm.o \
+	ll_mv.o \
+	ll_stich.o \
+	ll_duplicate.o \
+	ll_type.o
+
+ll_mk.o :  \
+	ll_type.o
+
+ll_mv.o :  \
+	ll_rm.o \
+	ll_stich.o \
+	ll_type.o
+
+ll_nnodes.o :  \
+	ll_type.o \
+	ll_funct_prt.o
+
+ll_rm.o :  \
+	ll_stich.o \
+	ll_type.o
+
+ll_duplicate.o :  \
+	ll_mk.o \
+	ll_type.o \
+	ll_mv.o
+
+ll_funct_prt.o :  \
+	ll_type.o
+
+ll_mods.o :  \
+	ll_cat.o \
+	ll_nnodes.o \
+	ll_deattach.o \
+	ll_funct_prt.o \
+	ll_mk.o \
+	ll_rm.o \
+	ll_cp.o \
+	ll_write.o \
+	ll_locate.o \
+	ll_mv.o \
+	ll_stich.o \
+	ll_sweep.o \
+	ll_duplicate.o \
+	ll_type.o \
+	ll_read.o
+
+ll_deattach.o :  \
+	ll_stich.o \
+	ll_type.o
+
+ll_locate.o :  \
+	ll_type.o \
+	ll_funct_prt.o
+
+ll_write.o :  \
+	ll_type.o
+
+ll_sweep.o :  \
+	ll_type.o \
+	ll_locate.o
+
+ll_type.o : 
+
+ll_stich.o :  \
+	ll_type.o
+
+ll_read.o :  \
+	ll_mk.o \
+	ll_type.o \
+	ll_funct_prt.o \
+	ll_mv.o

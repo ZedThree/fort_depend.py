@@ -1,0 +1,42 @@
+#/bin/csh
+
+
+	set file_list=`find ./ -iname "*.f90"`
+	
+	foreach file ($file_list)
+		
+		echo $file
+		
+		set LINENUM = `sed -n '/ALLOCATING MEMORY/=' "$file"`
+		echo $LINENUM
+
+		foreach num ($LINENUM)
+
+			set text = `basename $file | sed 's/.f90//' | awk '{print "ALLOCATING MEMORY  ==> ", $1, "ERR:" '$num'}'  `
+			echo $text
+
+			sed -i ''$num's/ALLOCATING MEMORY.*$/'"$text"' APOStroPHE/' $file
+
+		end
+		sed -i "s/APOStroPHE/\'/g" $file
+		
+	end
+	
+	foreach file ($file_list)
+		
+		echo $file
+		
+		set LINENUM = `sed -n '/ALLOCATING ARRAYS/=' "$file"`
+		echo $LINENUM
+
+		foreach num ($LINENUM)
+
+			set text = `basename $file | sed 's/.f90//' | awk '{print "ALLOCATING MEMORY  ==> ", $1, "ERR:" '$num'}'  `
+			echo $text
+
+			sed -i ''$num's/ALLOCATING ARRAYS.*$/'"$text"' APOStroPHE/' $file
+
+		end
+		sed -i "s/APOStroPHE/\'/g" $file
+		
+	end
