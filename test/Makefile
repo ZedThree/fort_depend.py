@@ -1,5 +1,5 @@
 
-EXE    = ll_test
+EXE    = fll_test
 
 include src_dir_path.mk
 include ../config.mk
@@ -12,7 +12,7 @@ FFILES= $(notdir $(wildcard $(srcdir)/*.f90))
 
 
 OFILES=$(FFILES:%.f90=%.o)
-XOFILES=$(wildcard $(FMODDIRS)/*.o)
+XOFILES=$(wildcard ../data_util/*.o)
 
 ###########################################################################
 

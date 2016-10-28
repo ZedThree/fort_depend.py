@@ -1,17 +1,12 @@
-
-# Fortran compiler and flags
-FC='gfortran'
-FFLAGS='-O2 -fdefault-real-8 -fdefault-double-8 -fconvert=big-endian -frecord-marker=4  -fopenmp -cpp'
-FFFLAGS='-O2 -fdefault-real-8 -fdefault-double-8 -ffixed-form -fconvert=big-endian -frecord-marker=4  -fopenmp -cpp'
-LDFLAGS='-O2 -fdefault-real-8 -fdefault-double-8 -fconvert=big-endian -frecord-marker=4'
-
-# C compiler
-CC='gcc'
-CFLAGS='-O2   -fopenmp'
-C_LDFLAGS='-O2   -fopenmp' 
-
-# MPI fortran compiler and flags.
-# Set MPI_FC empty if you don't have/need MPI.
-MPI_FC=
-MPI_FFLAGS="$FFLAGS"
-MPI_LDFLAGS="$LDFLAGS"
+FC                 = gfortran
+FCMODINCFLAG       = -I
+FFLAGS             = -O2 -fdefault-real-8 -fdefault-double-8 -fconvert=big-endian -frecord-marker=4  -fopenmp -cpp -x f95-cpp-input
+FFFLAGS            =-O2 -fdefault-real-8 -fdefault-double-8 -ffixed-form -fconvert=big-endian -frecord-marker=4  -fopenmp -cpp
+UPPER_MODFILE_NAME =
+LDFLAGS            =-O2 -fdefault-real-8 -fdefault-double-8 -fconvert=big-endian -frecord-marker=4  
+CC                 = gcc
+CFLAGS             = -O2   -fopenmp
+C_LDFLAGS          = -O2   -fopenmp
+MPI_FC             = mpif90
+MPI_FFLAGS         = -O2 -fdefault-real-8 -fdefault-double-8 -ffixed-form -fconvert=big-endian -frecord-marker=4  -fopenmp -cpp
+MPI_LDFLAGS        =-O2 -fdefault-real-8 -fdefault-double-8 -ffixed-form -fconvert=big-endian -frecord-marker=4  -fopenmp -cpp

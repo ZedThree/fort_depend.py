@@ -197,7 +197,7 @@ def mkconfigfile(path, cwd,version, bin_dir):
     fconfig.write("#\n")
 
     fconfig.write("#\n")
-    fconfig.write("Compiler settings\n")
+    fconfig.write("# Compiler settings\n")
     fconfig.write("#\n")
 
     with open(filename) as f:
