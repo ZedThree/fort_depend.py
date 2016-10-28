@@ -38,8 +38,11 @@ gmake
 
 3. DEVELOPERS:
 ====================================================
+1. Initialize
 
-1. If modifying, adding removin or changing project in any way, developers
+gmake init
+
+2. If modifying, adding removin or changing project in any way, developers
 have to update project dependencies:
 To update project dependencies, execute 
 
@@ -47,7 +50,7 @@ gmake depend
 
 in the project source directory or in each directory separately
 
-2. Source can be compiled separately in each directory by
+3. Source can be compiled separately in each directory by
 changing location to the directory and issuing command
 
 gmake

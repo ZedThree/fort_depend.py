@@ -27,6 +27,11 @@ all: $(SUBDIRS:%=%.all)
 
 include rules.mk
 
+
+init:
+	echo PROJ_ROOT_PATH=$(PWD) > config.mk
+	echo MAKEDEPEND="$(PROJ_ROOT_PATH)"/python_dep/fort_depend.py >> config.mk
+
 data_util.all: 
 test.all: data_util.all
 
