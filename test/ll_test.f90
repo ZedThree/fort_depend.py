@@ -43,9 +43,9 @@
 !     Description
 !
 !
-    PROGRAM  LL_TEST
+    PROGRAM  FLL_TEST
 
-    USE LL_MODS_M
+    USE FLL_MODS_M
     IMPLICIT NONE
 !
 !   SUBROUTINE MOVES NODE
@@ -65,65 +65,65 @@
 !
 !  read TEST file and store it in PNODE
 !
-   PNODE => LL_READ('TEST',8,'A',FPAR)
+   PNODE => FLL_READ('TEST',8,'A',FPAR)
 !
 ! print Pnode on screen
 !  
-   CALL LL_CAT(PNODE, 6, FPAR)
+   CALL FLL_CAT(PNODE, 6, FPAR)
    WRITE(*,*)'------------------------------------------------------1'
 !
 !  read TEST1 file and store it in PNODE1
 !
-   PNODE1 => LL_READ('TEST1',8,'A',FPAR)
+   PNODE1 => FLL_READ('TEST1',8,'A',FPAR)
 !
 !  print PNODE1 on screen
 !
-  CALL LL_CAT(PNODE1, 6, FPAR)
+  CALL FLL_CAT(PNODE1, 6, FPAR)
    WRITE(*,*)'------------------------------------------------------2'
 !
 !  save  PNODE1 as binary and ascii file
 !
-   OK =  LL_WRITE(PNODE1,'File_2.txt',8,'B',FPAR)
-   OK =  LL_WRITE(PNODE1,'File_1.txt',8,'A',FPAR)
+   OK =  FLL_WRITE(PNODE1,'File_2.txt',8,'B',FPAR)
+   OK =  FLL_WRITE(PNODE1,'File_1.txt',8,'A',FPAR)
 !
 !   read bindary file and store it in PNODE2
 !   then print it on screed and then delete it
-   PNODE2 => LL_READ('File_2.txt',8,'B',FPAR)
-   CALL LL_CAT(PNODE2, 6, FPAR)
-   CALL LL_RM(PNODE2,FPAR) 
+   PNODE2 => FLL_READ('File_2.txt',8,'B',FPAR)
+   CALL FLL_CAT(PNODE2, 6, FPAR)
+   CALL FLL_RM(PNODE2,FPAR) 
    WRITE(*,*)'------------------------------------------------------3'
 !
 !  MAKE A NEW NODE AND MOVE ENTIRE PNODE INTO IT
 !  PRINT IT ON THE SCREEN
 !
-    PNEW1 => LL_MK("newnone","DIR",0_LINT, 0_LINT,FPAR)
-    OK = LL_MV(PNODE, PNEW1, FPAR)
-   CALL LL_CAT(PNEW1, 6, FPAR)	
+    PNEW1 => FLL_MK("newnone","DIR",0_LINT, 0_LINT,FPAR)
+    OK = FLL_MV(PNODE, PNEW1, FPAR)
+   CALL FLL_CAT(PNEW1, 6, FPAR)	
    WRITE(*,*)'------------------------------------------------------4'
 !
 !  COPY PNODE, BECASE THE TARGET IN COPY IS NULL
 !  THE PNEW IS GOING TO BE A DUPLICATE OF PNODE
 !  AND IS GOING TO BE A NEW NODE
 !
-   PNEW => LL_CP(PNODE, NULL(), FPAR)
-   CALL LL_CAT(PNEW, 6, FPAR)
+   PNEW => FLL_CP(PNODE, NULL(), FPAR)
+   CALL FLL_CAT(PNEW, 6, FPAR)
    WRITE(*,*)'------------------------------------------------------5'
 !
 !  REMOVE PNEW1
 !
-   CALL LL_RM(PNEW1,FPAR) 
+   CALL FLL_RM(PNEW1,FPAR) 
 !
 !   COPY PNODE TO PNEW
-!   ON RETURN, THE LL_CP WILL GIVE BACK POINTER OF PNEW IN PNODE LIST
+!   ON RETURN, THE FLL_CP WILL GIVE BACK POINTER OF PNEW IN PNODE LIST
 !
-   PNEW2 => LL_CP(PNEW, PNODE1, FPAR)
-   CALL LL_CAT(PNODE1, 6, FPAR)
+   PNEW2 => FLL_CP(PNEW, PNODE1, FPAR)
+   CALL FLL_CAT(PNODE1, 6, FPAR)
    WRITE(*,*)'------------------------------------------------------6'
 !
 !  LOCATE 1st subdir IN PNODE1 AND PRINT IT ON THE SCREEN
 !
-   PTMP => LL_LOCATE(PNODE1,'subdir',1_lint,'*',.false.,FPAR)
-   CALL LL_CAT(PTMP, 6, FPAR)
+   PTMP => FLL_LOCATE(PNODE1,'subdir',1_lint,'*',.false.,FPAR)
+   CALL FLL_CAT(PTMP, 6, FPAR)
    WRITE(*,*)'------------------------------------------------------7'
 !
 !  CLEANUP ALL MEMORY
@@ -135,8 +135,8 @@
 !  PNODE2 WAS DELETED RIGHT AFTER BEING RETURN FROM READ
 !  PNEW2 IS NOT A NEW NODE, IT POINTS TO A COPY SO DOES NOT NEED TO BE FREED
 !
-   CALL LL_RM(PNEW,FPAR)
-   CALL LL_RM(PNODE1,FPAR)
+   CALL FLL_RM(PNEW,FPAR)
+   CALL FLL_RM(PNODE1,FPAR)
 
   
 END PROGRAM

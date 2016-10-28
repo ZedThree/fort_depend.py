@@ -1,0 +1,20 @@
+# -*-sh-*-
+#
+# For intel ifort 12 compiler, debug compilation.
+#
+
+# Fortran compiler and flags
+FC='ifort'
+FFLAGS='-msse3 -g -traceback -check -warn -convert big_endian -r8 -std03 -fpe0 -ftrapuv'
+LDFLAGS='-msse3 -g -traceback -check -warn -convert big_endian -r8 -std03 -i-static -fpe0 -ftrapuv'
+
+# C compiler
+CC='icc'
+CFLAGS='-msse3 -g -Wall -traceback'
+C_LDFLAGS='-msse3 -w -Wall -traceback -i-static'
+
+# MPI fortran compiler and flags.
+# Set MPI_FC empty if you don't have/need MPI.
+MPI_FC=
+MPI_FFLAGS="$FFLAGS"
+MPI_LDFLAGS="$LDFLAGS"

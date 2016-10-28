@@ -1,0 +1,54 @@
+****************************************************
+
+To install FLL you would need to:
+
+1. configure
+2. compile
+
+1. CONFIGURATION
+====================================================
+
+Make a new directory where the compillation procees takes place
+In this directory execute configure file from FLL project source directory.
+For example, if the FLL source is in 
+
+/home/usr/fll_souce/master
+
+and you want to compile and install everyting in 
+
+/home/usr/fll_exec
+
+directory, then do:
+
+mkdir /home/usr/fll_exec
+cd /home/usr/fll_exec
+/home/usr/fll_souce/master/configure.py
+
+
+NOTE: The configure script should be always located in the 
+project source directory, do not move or remove it
+
+2. COMPILATION:
+====================================================
+
+To compile, type
+
+gmake 
+
+
+3. DEVELOPERS:
+====================================================
+
+1. If modifying, adding removin or changing project in any way, developers
+have to update project dependencies:
+To update project dependencies, execute 
+
+gmake depend 
+
+in the project source directory or in each directory separately
+
+2. Source can be compiled separately in each directory by
+changing location to the directory and issuing command
+
+gmake
+

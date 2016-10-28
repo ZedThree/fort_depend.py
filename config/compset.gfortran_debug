@@ -1,0 +1,37 @@
+# -*-sh-*-
+#
+# For GNU compiler collection (GCC) 4.0
+#
+
+echo '
+!!!!!!!!!!!!!!!!!!! WARNING !!!!!!!!!!!!!!!!!!!!
+!
+! Versions up to 4.1.0 DO NOT WORK with edge due to compiler bugs.
+! Also the binary file format for unformatted I/O is
+! not compatible with the format used by most other compilers.
+!
+! This configuration file works with gfortran 4.3.2 and newer
+! Note: older gfortran versions should include
+! flags "-static-libgfortran" or "-static"
+!
+! MAKE SURE YOU HAVE gfortran VERSION 4.1.1 OR NEWER
+!
+!!!!!!!!!!!!!!!!!!! WARNING !!!!!!!!!!!!!!!!!!!!
+'
+
+# Fortran compiler and flags
+FC='gfortran'
+FFLAGS='-g -ffpe-trap=invalid,zero,overflow -fdefault-real-8 -fdefault-double-8 -fconvert=big-endian -frecord-marker=4 -fbounds-check -Wall -Wextra'
+FFFLAGS='-g -ffpe-trap=invalid,zero,overflow -fdefault-real-8 -fdefault-double-8 -ffixed-form -fconvert=big-endian -frecord-marker=4 -fbounds-check -Wall -Wextra'
+LDFLAGS='-g -ffpe-trap=invalid,zero,overflow -fdefault-real-8 -fdefault-double-8 -fconvert=big-endian -frecord-marker=4 -fbounds-check -Wall -Wextra'
+
+# C compiler
+CC='gcc'
+CFLAGS='-g'
+C_LDFLAGS='-g'
+
+# MPI fortran compiler and flags.
+# Set MPI_FC empty if you don't have/need MPI.
+MPI_FC=
+MPI_FFLAGS="$FFLAGS"
+MPI_LDFLAGS="$LDFLAGS"

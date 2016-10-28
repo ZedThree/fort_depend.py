@@ -15,38 +15,18 @@ HANDLE_UPPER_CASE_MOD_NAMES = ! [ "$(UPPER_MODFILE_NAME)" ] || ! [[ $* = *_m ]] 
 	$(FC) -c $(FFLAGS) $(FMODDIRS:%=$(FCMODINCFLAG)%) $<
 	-@$(HANDLE_UPPER_CASE_MOD_NAMES)
 
-# Rule for building fixed-form fortran from srcdir directory
-%.o %.mod: $(srcdir)/%.f
-	$(FC) -c $(FFFLAGS) $(FMODDIRS:%=$(FCMODINCFLAG)%) $<
-	-@$(HANDLE_UPPER_CASE_MOD_NAMES)
-
 # Rule for building C from srcdir directory
+#
 %.o: $(srcdir)/%.c
 	$(CC) -c $(CFLAGS) $(CINCDIRS:%=-I%) $<
 
-# Rule for creating a build directory, if it doesn't already exist.
-# Also links the corresponding Makefile from the sourcedirectory if
-# it doesn't already exist. Also copies depend.mk from sourcedirectory
-# if it exists.
+# Rule for creating a build directory
+#
 %.mkdir:
 	@[ -d $* ] || mkdir $*
-	@! [ -h $*/Makefile ] || rm -f $*/Makefile 
-	@[ -f $*/Makefile ] || ln -s $(srcdir)/$*/Makefile $*/Makefile
-	@rm -f $*/local_config.mk
-	@echo srcdir=$(if $(filter .,$(srcdir)),.,$(srcdir)/$*) \
-	  > $*/local_config.mk
-
-%: $(srcdir)/%.bash
-	sed 's:^#!/bin/bash:#!'"$(SHELL):" $< > $@
-	chmod 755 $@
-
-%: $(srcdir)/%.py
-	cat $< > $@
-	chmod 755 $@
-
 #
 # Rules for recursion into subdirectories for standard targets.
-# 
+#
 %.all: %.mkdir
 	@cd $* && $(MAKE) all
 

@@ -19,7 +19,7 @@
 !
 
 !
-!     Subroutine LL_TYPE_M
+!     Subroutine FLL_TYPE_M
 !
 !     Date: 2016-10-10
 ! 
@@ -40,7 +40,7 @@
 !     Description
 !
 !
-MODULE LL_TYPE_M
+MODULE FLL_TYPE_M
 !#ifdef f2003
 !use, intrinsic :: iso_fortran_env, only : stdin=>input_unit, &
 !                                          stdout=>output_unit, &
@@ -106,4 +106,4 @@ MODULE LL_TYPE_M
       CHARACTER(LEN=ERR_PATH_LENGTH) :: ERRPATH
   END TYPE FUNC_DATA_SET
 
-END MODULE LL_TYPE_M
+END MODULE FLL_TYPE_M

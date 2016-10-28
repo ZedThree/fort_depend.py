@@ -1,0 +1,20 @@
+# -*-sh-*-
+#
+# For intel ifort 12 compiler.
+#
+
+# Fortran compiler and flags
+FC='ifort'
+FFLAGS='-O2 -msse3 -ip -convert big_endian -r8 -std03 -fpp'
+LDFLAGS='-O2 -msse3 -ip -convert big_endian -r8 -std03 -i-static'
+
+# C compiler
+CC='icc'
+CFLAGS='-O2 -msse3 -ip'
+C_LDFLAGS='-O2 -msse3 -ip -i-static'
+
+# MPI fortran compiler and flags.
+# Set MPI_FC empty if you don't have/need MPI.
+MPI_FC=
+MPI_FFLAGS="$FFLAGS"
+MPI_LDFLAGS="$LDFLAGS"

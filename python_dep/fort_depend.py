@@ -1,4 +1,15 @@
 #!/usr/bin/python
+# 
+#
+#  this is a modification of the original script of D Dickinson @https://github.com/ZedThree/fort_depend.py
+#
+#  the modified version used here can be found @https://github.com/libm3l/fort_depend.py
+#
+#  this is a script which maked fortran project dependecies
+#  it is executed in each directory separately and creates a project.dep file with fortran dependencies
+#  if fortran source uses module from other directory the script will add the module too
+#  the project root directory is specified as an input parameter with an option -r  
+#
 import os
 import re
 import glob
@@ -78,15 +89,7 @@ def get_source(ext=[".f90",".F90"]):
         fil.extend(filter(lambda x: x.endswith(i),tmp))
     return fil
 
-def get_all_files(path):
-    #l=[] 
-    
-    #for filename in glob.iglob('/home/jka/OSS_CFD/trunk/**/*.f90', recursive=True):
-        #print(filename)
-        #l.append(filename)
-        
-    #return l
-    
+def get_all_files(path): 
     matches = []
     for root, dirnames, filenames in os.walk(path):
         for filename in fnmatch.filter(filenames, '*.f90'):
@@ -101,7 +104,8 @@ def check_if_there(use,file):
             if "module" in line.lower():
                 if use in line:
                     return 1
-
+                
+    f.close()
     return 0
 
 
@@ -184,9 +188,9 @@ def get_depends(fob=[],m2f=[], ffiles=[]):
                     if retval > 0:
                         name=os.path.splitext(k)[0]+'.o'
                         tmp.append(name.lower())
-                        print ("\033[031mNote: \033[039m module \033[032m"+j+"\033[039m not defined in any files in this directory")
+                        print ("\033[031mNote: \033[039m module \033[032m"+j+"\033[039m not defined in any file in this directory")
                         print ("\033[031m..... \033[039m module is in \033[032m"+name+"\033[039m file")
-                        print ("\033[031m..... \033[039m adding it to dependency file, not checking its dependency further \033[032m")
+                        print ("\033[031m..... \033[039m adding the module to dependency file, not checking its dependency further \033[032m\033[039m")
 
         deps[i.file_name]=tmp
 

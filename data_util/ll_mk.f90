@@ -19,7 +19,7 @@
 !
 
 !
-!     Subroutine LL_MK
+!     Subroutine FLL_MK
 !
 !     Date: 2016-10-19
 ! 
@@ -43,12 +43,12 @@
 !     Description
 !
 !
-MODULE LL_MK_M
+MODULE FLL_MK_M
 CONTAINS
 
-   FUNCTION LL_MK(NAME,LTYPE,NDIM,NSIZE,FPAR) RESULT(PNEW)
+   FUNCTION FLL_MK(NAME,LTYPE,NDIM,NSIZE,FPAR) RESULT(PNEW)
    
-       USE LL_TYPE_M
+       USE FLL_TYPE_M
        
        IMPLICIT NONE
        TYPE(FUNC_DATA_SET)   :: FPAR
@@ -183,9 +183,9 @@ CONTAINS
      END SELECT
 
     RETURN
-   END FUNCTION LL_MK
+   END FUNCTION FLL_MK
    
    
    
    
-END MODULE LL_MK_M
+END MODULE FLL_MK_M
