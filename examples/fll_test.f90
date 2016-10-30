@@ -61,7 +61,8 @@
    LOGICAL :: OK
    CHARACTER :: FMT_LOC
    INTEGER :: ISTAT
-   INTEGER(LINT) :: POS
+   INTEGER(LINT) :: POS,NNODES
+   REAL(RDOUBLE), POINTER :: PRESS(:)
 !
 !  read TEST file and store it in PNODE
 !
@@ -69,7 +70,7 @@
 !
 ! print Pnode on screen
 !  
-   CALL FLL_CAT(PNODE, 6, FPAR)
+   CALL FLL_CAT(PNODE, 6, .TRUE.,FPAR)
    WRITE(*,*)'------------------------------------------------------1'
 !
 !  read TEST1 file and store it in PNODE1
@@ -78,7 +79,7 @@
 !
 !  print PNODE1 on screen
 !
-  CALL FLL_CAT(PNODE1, 6, FPAR)
+  CALL FLL_CAT(PNODE1, 6, .TRUE.,FPAR)
    WRITE(*,*)'------------------------------------------------------2'
 !
 !  save  PNODE1 as binary and ascii file
@@ -89,7 +90,7 @@
 !   read bindary file and store it in PNODE2
 !   then print it on screed and then delete it
    PNODE2 => FLL_READ('File_2.txt',8,'B',FPAR)
-   CALL FLL_CAT(PNODE2, 6, FPAR)
+   CALL FLL_CAT(PNODE2, 6, .TRUE.,FPAR)
    CALL FLL_RM(PNODE2,FPAR) 
    WRITE(*,*)'------------------------------------------------------3'
 !
@@ -98,7 +99,7 @@
 !
     PNEW1 => FLL_MK("newnone","DIR",0_LINT, 0_LINT,FPAR)
     OK = FLL_MV(PNODE, PNEW1, FPAR)
-   CALL FLL_CAT(PNEW1, 6, FPAR)	
+   CALL FLL_CAT(PNEW1, 6, .TRUE.,FPAR)	
    WRITE(*,*)'------------------------------------------------------4'
 !
 !  COPY PNODE, BECASE THE TARGET IN COPY IS NULL
@@ -106,7 +107,7 @@
 !  AND IS GOING TO BE A NEW NODE
 !
    PNEW => FLL_CP(PNODE, NULL(), FPAR)
-   CALL FLL_CAT(PNEW, 6, FPAR)
+   CALL FLL_CAT(PNEW, 6, .TRUE.,FPAR)
    WRITE(*,*)'------------------------------------------------------5'
 !
 !  REMOVE PNEW1
@@ -117,14 +118,24 @@
 !   ON RETURN, THE FLL_CP WILL GIVE BACK POINTER OF PNEW IN PNODE LIST
 !
    PNEW2 => FLL_CP(PNEW, PNODE1, FPAR)
-   CALL FLL_CAT(PNODE1, 6, FPAR)
+   CALL FLL_CAT(PNODE1, 6, .TRUE.,FPAR)
    WRITE(*,*)'------------------------------------------------------6'
 !
-!  LOCATE 1st subdir IN PNODE1 AND PRINT IT ON THE SCREEN
+!  find number 1st subdir IN PNODE1
+! 
+   NNODES =  FLL_NNODES(PNODE1,'TEST1_Subdir','*',.false.,FPAR)
+   write(*,*)' number of TEST1_Subdir subsets is ', NNODES
 !
-   PTMP => FLL_LOCATE(PNODE1,'subdir',1_lint,'*',.false.,FPAR)
-   CALL FLL_CAT(PTMP, 6, FPAR)
+!   find the first TEST1_Subdir in PNODE1 and print it on the screen
+!
+   PTMP => FLL_LOCATE(PNODE1,'TEST1_Subdir',1_lint,'*',.false.,FPAR)
+   CALL FLL_CAT(PTMP, 6, .TRUE.,FPAR)
    WRITE(*,*)'------------------------------------------------------7'
+!
+!  find the values of pressure subset #1 and print them on screen
+!
+    PRESS => FLL_GETNDATA_D1(PTMP,'pressure',1_LINT,'D',FPAR)
+    write(*,*)' Values of pressure are ',PRESS
 !
 !  CLEANUP ALL MEMORY
 !

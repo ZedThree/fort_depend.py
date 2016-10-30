@@ -26,7 +26,7 @@
 ! 
 !
 !
-!     Description: Finds node in a chain
+!     Description: calculates number of nodes
 ! 
 !
 !     Input parameters:
