@@ -12,7 +12,7 @@ Make a new directory where the compillation procees takes place
 In this directory execute configure file from FLL project source directory.
 For example, if the FLL source is in 
 
-/home/usr/fll_souce/master
+/home/usr/fll_souce/fll-master
 
 and you want to compile and install everyting in 
 

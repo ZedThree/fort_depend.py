@@ -26,6 +26,10 @@ def run(path,files=None,verbose=True,overwrite=None,output=None,macros={},build=
     path = check_path(path=path)
     cwd = check_path(path=cwd)
 
+    print("  ")
+    print("\033[031m Making dependencies in \033[032m"+cwd+"\033[039m directory")
+    print("  ")
+
     ff=get_all_files(path=path) 
     l=create_file_objs(files,macros)
     mod2fil=file_objs_to_mod_dict(file_objs=l)

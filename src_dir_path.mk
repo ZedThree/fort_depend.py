@@ -1,1 +1,1 @@
-srcdir=/home/jiraseka/LL/trunk
+srcdir=$(PROJ_ROOT_PATH)

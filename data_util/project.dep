@@ -1,5 +1,25 @@
 # This file is generated automatically. DO NOT EDIT!
 
+fll_cp.o :  \
+	fll_type.o \
+	fll_cat.o \
+	fll_mv.o \
+	fll_stich.o \
+	fll_rm.o \
+	fll_duplicate.o
+
+fll_sweep.o :  \
+	fll_type.o \
+	fll_locate.o
+
+fll_locate.o :  \
+	fll_type.o \
+	fll_funct_prt.o
+
+fll_deattach.o :  \
+	fll_type.o \
+	fll_stich.o
+
 fll_rm.o :  \
 	fll_type.o \
 	fll_stich.o
@@ -7,73 +27,57 @@ fll_rm.o :  \
 fll_cat.o :  \
 	fll_type.o
 
-fll_read.o :  \
-	fll_mv.o \
-	fll_type.o \
-	fll_funct_prt.o \
-	fll_mk.o
-
 fll_duplicate.o :  \
-	fll_mv.o \
 	fll_type.o \
+	fll_mv.o \
 	fll_mk.o
 
-fll_cp.o :  \
-	fll_stich.o \
-	fll_mv.o \
-	fll_cat.o \
+fll_write.o :  \
+	fll_type.o
+
+fll_getndata.o :  \
 	fll_type.o \
+	fll_locate.o
+
+fll_nnodes.o :  \
+	fll_type.o \
+	fll_funct_prt.o
+
+fll_mk.o :  \
+	fll_type.o
+
+fll_mods.o :  \
+	fll_sweep.o \
+	fll_read.o \
+	fll_locate.o \
+	fll_funct_prt.o \
+	fll_mk.o \
+	fll_type.o \
+	fll_cat.o \
+	fll_mv.o \
+	fll_deattach.o \
+	fll_stich.o \
+	fll_nnodes.o \
 	fll_rm.o \
-	fll_duplicate.o
+	fll_write.o \
+	fll_duplicate.o \
+	fll_cp.o
 
 fll_mv.o :  \
 	fll_type.o \
 	fll_rm.o \
 	fll_stich.o
 
-fll_mk.o :  \
-	fll_type.o
-
-fll_stich.o :  \
-	fll_type.o
+fll_read.o :  \
+	fll_type.o \
+	fll_funct_prt.o \
+	fll_mv.o \
+	fll_mk.o
 
 fll_funct_prt.o :  \
 	fll_type.o
 
-fll_locate.o :  \
-	fll_type.o \
-	fll_funct_prt.o
-
-fll_mods.o :  \
-	fll_nnodes.o \
-	fll_stich.o \
-	fll_mk.o \
-	fll_cat.o \
-	fll_funct_prt.o \
-	fll_mv.o \
-	fll_sweep.o \
-	fll_cp.o \
-	fll_type.o \
-	fll_locate.o \
-	fll_deattach.o \
-	fll_read.o \
-	fll_rm.o \
-	fll_write.o \
-	fll_duplicate.o
-
-fll_sweep.o :  \
-	fll_type.o \
-	fll_locate.o
-
-fll_write.o :  \
-	fll_type.o
-
 fll_type.o : 
 
-fll_nnodes.o :  \
-	fll_type.o \
-	fll_funct_prt.o
-
-fll_deattach.o :  \
-	fll_type.o \
-	fll_stich.o
+fll_stich.o :  \
+	fll_type.o

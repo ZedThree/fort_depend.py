@@ -5,11 +5,11 @@
 #
 #
 include src_dir_path.mk
-include config.mk
+-include config.mk
 
 SUBDIRS= \
 data_util\
-test\
+examples\
 
 ###########################################################################
 
@@ -17,11 +17,6 @@ all: $(SUBDIRS:%=%.all)
 	@echo '************************************************'
 	@echo '*'
 	@echo '* FLL built successfully!'
-	@MAKE=$(MAKE) && \
-	 echo "* Type \"$${MAKE##*/} install\" to install FLL into directory $(bin_dir)"
-	@echo "* "
-	@MAKE=$(MAKE) && \
-	 echo "*   $${MAKE##*/} bin_dir=/usr/local/bin"
 	@echo '*'
 	@echo '************************************************'
 
@@ -30,7 +25,7 @@ include rules.mk
 
 init:
 	echo PROJ_ROOT_PATH=$(PWD) > config.mk
-	echo MAKEDEPEND="$(PROJ_ROOT_PATH)"/python_dep/fort_depend.py >> config.mk
+	echo MAKEDEPEND=$(PWD)/python_dep/fort_depend.py >> config.mk
 
 data_util.all: 
 test.all: data_util.all

@@ -16,7 +16,7 @@ XOFILES=$(wildcard ../data_util/*.o)
 
 ###########################################################################
 
-all: $(EXE).x $(EXE)
+all: $(EXE).x 
 
 include ../rules.mk
 

@@ -42,17 +42,3 @@ HANDLE_UPPER_CASE_MOD_NAMES = ! [ "$(UPPER_MODFILE_NAME)" ] || ! [[ $* = *_m ]] 
 %.install: %.mkdir
 	@cd $* && $(MAKE) install
 
-%.html-doc: %.mkdir
-	@cd $* && $(MAKE) html-doc
-
-%.doc: %.mkdir
-	@cd $* && $(MAKE) doc
-
-%.chk: %.mkdir
-	@cd $* && $(MAKE) chk
-
-chk:
-	$(F95CHK) --dry-run $(FFILES:%=$(srcdir)/%)
-
-chk-fix:
-	$(F95CHK) $(FFILES:%=$(srcdir)/%)
