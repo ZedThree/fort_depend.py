@@ -40,6 +40,8 @@ gmake
 ====================================================
 1. Initialize
 
+in fll-master directory
+
 gmake init
 
 2. If modifying, adding removin or changing project in any way, developers
