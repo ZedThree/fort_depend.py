@@ -64,8 +64,7 @@ CONTAINS
 !   
 !   BODY OF SUBROUTINE
 !
-  
-   POS = 0
+   POS = 1
    FPAR%SUCCESS = .FALSE.
    IF(.NOT.ASSOCIATED(PNODE))THEN
       WRITE(FPAR%MESG,'(A)')' CAT - null node '
@@ -106,6 +105,7 @@ CONTAINS
 !
 !  IF NODE HAS CHILDREN
 !
+    POS = POS + 1
     PCURR => PNODE
 !
 !  IF CHILDREN, PRINT THEM TOO
@@ -122,6 +122,8 @@ CONTAINS
        
        PCURR => PNEXT
     END DO
+    
+    POS = POS - 1 
     
     FPAR%SUCCESS = .TRUE.
     RETURN
@@ -142,53 +144,62 @@ CONTAINS
    INTEGER :: IOUNIT
    INTEGER(LINT) :: POS,I,J,NDIM,NSIZE
    LOGICAL :: SAVED
+   CHARACTER*2048 :: TEXT
+   CHARACTER(2*POS) SPACE
    
    SAVED = .FALSE.
    
    NDIM = 3
    NSIZE = 3
-
-   POS = POS + 1
+   SPACE(:) = ' '
 !
-!   1D ARRAYS
+!   HEADERS
 !
      IF(TRIM(PNODE%LTYPE) == 'DIR' .OR.TRIM(PNODE%LTYPE) == 'N')THEN
-!        WRITE(IOUNIT, *, FORMAT = 100)PNODE%LTYPE, PNODE%LNAME,  PNODE%NDIM
-        WRITE(IOUNIT, *)TRIM(PNODE%LTYPE),'  ', TRIM(PNODE%LNAME),'  ',   PNODE%NDIM
+        WRITE(TEXT,*)"-",TRIM(PNODE%LTYPE),"-",SPACE,TRIM(PNODE%LNAME),'  ',   PNODE%NDIM
+         WRITE(IOUNIT, *)TRIM(TEXT)
      ELSE 
-!        WRITE(IOUNIT, *, FORMAT = 110)PNODE%LTYPE, PNODE%LNAME, PNODE%NDIM, PNODE%NSIZE
-        WRITE(IOUNIT, *)TRIM(PNODE%LTYPE),'  ', TRIM(PNODE%LNAME),'  ', PNODE%NDIM, PNODE%NSIZE
+        WRITE(TEXT,*)"-",TRIM(PNODE%LTYPE),"-  ",SPACE,TRIM(PNODE%LNAME),'  ',   PNODE%NDIM
+         WRITE(IOUNIT, *)TRIM(TEXT)
      END IF
 !
 !  1 D ARRAYS
 !
         IF(ASSOCIATED(PNODE%R1))THEN
-          WRITE(IOUNIT, *)(PNODE%R1(I), I = 1,NDIM)
+          WRITE(TEXT,*)"     ",SPACE,(PNODE%R1(I), I = 1,MAX(NDIM,3_LINT))
+         WRITE(IOUNIT, *)TRIM(TEXT)
           SAVED = .TRUE.
         ELSE IF(ASSOCIATED(PNODE%D1))THEN
-          WRITE(IOUNIT, *)(PNODE%D1(I), I = 1,NDIM)
+          WRITE(TEXT,*)"     ",SPACE,(PNODE%D1(I), I = 1,MAX(NDIM,3_LINT))
+          WRITE(IOUNIT, *)TRIM(TEXT)
           SAVED = .TRUE.
         ELSE IF(ASSOCIATED(PNODE%I1))THEN
-          WRITE(IOUNIT, *)(PNODE%I1(I), I = 1,NDIM)
+          WRITE(TEXT,*)"     ",SPACE,(PNODE%I1(I), I = 1,MAX(NDIM,3_LINT))
+          WRITE(IOUNIT, *)TRIM(TEXT)
           SAVED = .TRUE.
         ELSE IF(ASSOCIATED(PNODE%L1))THEN
-          WRITE(IOUNIT, *)(PNODE%L1(I), I = 1,NDIM)
+          WRITE(TEXT,*)"     ",SPACE,(PNODE%L1(I), I = 1,MAX(NDIM,3_LINT))
+          WRITE(IOUNIT, *)TRIM(TEXT)
           SAVED = .TRUE.
 !
 !  2D ARRAYS
 !
        ELSE IF(ASSOCIATED(PNODE%R2))THEN
-          WRITE(IOUNIT, *)((PNODE%R2(I,J), J = 1,NSIZE), I=1,NDIM)
-           SAVED = .TRUE.
+          WRITE(TEXT,*)"     ",SPACE,((PNODE%R2(I,J), J = 1,MAX(NSIZE,2_LINT)), I=1,MAX(NDIM,2_LINT))
+          WRITE(IOUNIT, *)TRIM(TEXT)
+          SAVED = .TRUE.
       ELSE IF(ASSOCIATED(PNODE%D2))THEN
-          WRITE(IOUNIT, *)((PNODE%D2(I,J), J = 1,NSIZE), I=1,NDIM)
+          WRITE(TEXT,*)"     ",SPACE,((PNODE%D2(I,J), J = 1,MAX(NSIZE,2_LINT)), I=1,MAX(NDIM,2_LINT))
+          WRITE(IOUNIT, *)TRIM(TEXT)
           SAVED = .TRUE.
        ELSE IF(ASSOCIATED(PNODE%I2))THEN
-          WRITE(IOUNIT, *)((PNODE%R2(I,J), J = 1,NSIZE), I=1,NDIM)
+          WRITE(TEXT,*)"     ",SPACE,((PNODE%I2(I,J), J = 1,MAX(NSIZE,2_LINT)), I=1,MAX(NDIM,2_LINT))
+          WRITE(IOUNIT, *)TRIM(TEXT)
           SAVED = .TRUE.
        ELSE IF(ASSOCIATED(PNODE%L2))THEN
-          WRITE(IOUNIT, *)((PNODE%R2(I,J), J = 1,NSIZE), I=1,NDIM)
-           SAVED = .TRUE.
+          WRITE(TEXT,*)"     ",SPACE,((PNODE%L2(I,J), J = 1,MAX(NSIZE,2_LINT)), I=1,MAX(NDIM,2_LINT))
+          WRITE(IOUNIT, *)TRIM(TEXT)
+          SAVED = .TRUE.
       END IF
 !
 !  CHECK IF NODE IS CONSTANT
@@ -196,23 +207,29 @@ CONTAINS
       IF(.NOT.SAVED)THEN
         SELECT CASE(PNODE%LTYPE)
          CASE('R')
-          WRITE(IOUNIT, *)PNODE%R0
+           WRITE(TEXT,*)"     ",SPACE,PNODE%R0
+           WRITE(IOUNIT, *)TRIM(TEXT)
          CASE('D')
-          WRITE(IOUNIT, *)PNODE%D0
-         CASE('I')
-          WRITE(IOUNIT, *)PNODE%I0
+           WRITE(TEXT,*)"     ",SPACE,PNODE%D0
+           WRITE(IOUNIT, *)TRIM(TEXT)         
+        CASE('I')
+           WRITE(TEXT,*)"     ",SPACE,PNODE%I0
+           WRITE(IOUNIT, *)TRIM(TEXT)  
          CASE('L')
-          WRITE(IOUNIT, *)PNODE%L0
+           WRITE(TEXT,*)"     ",SPACE,PNODE%L0
+           WRITE(IOUNIT, *)TRIM(TEXT)  
+        CASE('S')
+           WRITE(TEXT,*)"     ",SPACE,PNODE%S
+           WRITE(IOUNIT, *)TRIM(TEXT) 
 
          CASE DEFAULT 
          
          END SELECT
        END IF
-
-     POS = POS - 1
+       
      RETURN
-!100 FORMAT('-',A,)
-  END SUBROUTINE FLL_PRINT
+
+   END SUBROUTINE FLL_PRINT
  
 
 END MODULE FLL_CAT_M

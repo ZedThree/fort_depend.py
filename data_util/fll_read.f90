@@ -251,7 +251,7 @@ CONTAINS
          IIND =IIND + 1
          IF(IIND > 254)RETURN
       END DO
-      NAME = TRIM_LINE(ISTART:IIND) 
+      NAME = TRIM_LINE(ISTART:IIND)
 
       DO WHILE(TRIM_LINE(IIND:IIND) == ' ')
         IIND =IIND + 1
