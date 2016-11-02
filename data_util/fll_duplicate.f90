@@ -301,7 +301,27 @@ CONTAINS
        RETURN 
      END IF   
 
-   END IF        
+   END IF 
+
+   IF(ASSOCIATED(PNODE%S1))THEN
+     NDIM = SIZE(PNODE%S1, DIM = 1, KIND = LINT)
+
+     IF(ASSOCIATED(PNEW%S1))THEN
+       NNDIM = SIZE(PNEW%S1, DIM = 1, KIND = LINT)
+
+       IF(NDIM /= NNDIM)THEN
+         WRITE(FPAR%MESG,'(A,A,A)')' DUPLICATE - nodes do not have the same array dimensions', TRIM(PNODE%LNAME), TRIM(PNEW%LNAME)
+         FPAR%SUCCESS = .FALSE.
+         RETURN
+       END IF
+
+       PNEW%S1 = PNODE%S1
+     ELSE
+       WRITE(FPAR%MESG,'(A,A,A)')' DUPLICATE - S1 array not allocated',TRIM(PNEW%LNAME)
+       FPAR%SUCCESS = .FALSE.
+       RETURN 
+     END IF 
+   END IF      
 !
 !  2D ARRAYS
 !
@@ -388,6 +408,28 @@ CONTAINS
        PNEW%L2 = PNODE%L2
      ELSE
        WRITE(FPAR%MESG,'(A,A,A)')' DUPLICATE - L2 array not allocated',TRIM(PNEW%LNAME)
+       FPAR%SUCCESS = .FALSE.
+       RETURN 
+     END IF     
+   END IF
+
+   IF(ASSOCIATED(PNODE%S2))THEN
+     NDIM    = SIZE(PNODE%S2, DIM = 1, KIND = LINT)
+     NSIZE   = SIZE(PNODE%S2, DIM = 2, KIND = LINT)
+
+     IF(ASSOCIATED(PNEW%L2))THEN
+        NNDIM    = SIZE(PNODE%S2, DIM = 1, KIND = LINT)
+        NNSIZE   = SIZE(PNODE%S2, DIM = 2, KIND = LINT)
+        
+       IF(NDIM /= NNDIM .OR. NSIZE /= NNSIZE)THEN
+         WRITE(FPAR%MESG,'(A,A,A)')' DUPLICATE - nodes do not have the same array dimensions', TRIM(PNODE%LNAME), TRIM(PNEW%LNAME)
+         FPAR%SUCCESS = .FALSE.
+         RETURN
+       END IF
+
+       PNEW%S2 = PNODE%S2
+     ELSE
+       WRITE(FPAR%MESG,'(A,A,A)')' DUPLICATE - S2 array not allocated',TRIM(PNEW%LNAME)
        FPAR%SUCCESS = .FALSE.
        RETURN 
      END IF     

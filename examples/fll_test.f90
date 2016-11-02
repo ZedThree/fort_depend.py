@@ -51,7 +51,7 @@
 !   SUBROUTINE MOVES NODE
 !
    CHARACTER(LEN=FILE_NAME_LENGTH) FILE
-   TYPE(DNODE), POINTER  :: PNODE,PNEW,PNODE2,PNEW1,PNODE1,PTMP,PNEW2
+   TYPE(DNODE), POINTER  :: PNODE,PNEW,PNODE2,PNEW1,PNODE1,PTMP,PNEW2,PFFA
    TYPE(FUNC_DATA_SET) :: FPAR
    INTEGER :: IOUNIT
    CHARACTER :: FMT
@@ -67,11 +67,18 @@
 !  read TEST file and store it in PNODE
 !
    PNODE => FLL_READ('TEST',8,'A',FPAR)
-!
-! print Pnode on screen
-!  
    CALL FLL_CAT(PNODE, 6, .TRUE.,FPAR)
+   WRITE(*,*)
    WRITE(*,*)'------------------------------------------------------1'
+
+   PFFA => FLL_READ_FFA('case1.ainp',8,'A',FPAR)
+!
+! print Pnode on screen 
+!  
+!   CALL FLL_CAT(PFFA, 6, .TRUE.,FPAR)
+   WRITE(*,*)'------------------------------------------------------1'
+   OK =  FLL_WRITE_FFA(PFFA,'File_1.txt',8,'A',FPAR)
+stop
 !
 !  read TEST1 file and store it in PNODE1
 !
@@ -81,8 +88,8 @@
 !
   CALL FLL_CAT(PNODE1, 6, .TRUE.,FPAR)
    WRITE(*,*)'------------------------------------------------------2'
-!
-!  save  PNODE1 as binary and ascii file
+
+!!  save  PNODE1 as binary and ascii file
 !
    OK =  FLL_WRITE(PNODE1,'File_2.txt',8,'B',FPAR)
    OK =  FLL_WRITE(PNODE1,'File_1.txt',8,'A',FPAR)
@@ -128,7 +135,7 @@
 !
 !   find the first TEST1_Subdir in PNODE1 and print it on the screen
 !
-   PTMP => FLL_LOCATE(PNODE1,'TEST1_Subdir',1_lint,'*',.false.,FPAR)
+   PTMP => FLL_LOCATE(PNODE1,'TEST1_Subdir',1_lint,'*',-1_LINT,.false.,FPAR)
    CALL FLL_CAT(PTMP, 6, .TRUE.,FPAR)
    WRITE(*,*)'------------------------------------------------------7'
 !
