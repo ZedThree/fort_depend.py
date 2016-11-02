@@ -64,7 +64,7 @@ CONTAINS
 ! Body
 !
        IF(LEN_TRIM(LTYPE)<1.OR.LEN_TRIM(LTYPE)>TYPE_LENGTH) THEN
-        WRITE(FPAR%MESG,'(A,A)')' Wrong type: ',TRIM(LTYPE)
+         WRITE(FPAR%MESG,'(A,A)')' Wrong type: ',TRIM(LTYPE)
          RETURN
       END IF
 
@@ -82,6 +82,9 @@ CONTAINS
       IF(ISTAT /= 0)STOP' ERROR ALLOCATING MEMORY ==> ll_mk ERR:82 '
       PNEW%LNAME  = TRIM(NAME)
       PNEW%LTYPE = LTYPE
+      PNEW%NDIM = 0
+      PNEW%NSIZE = 0
+
       IF(TRIM(LTYPE) == 'DIR' .OR. TRIM(LTYPE) == 'N')THEN
         PNEW%NDIM = 0
         PNEW%NSIZE = 0
@@ -98,8 +101,10 @@ CONTAINS
       PNEW%PLINK => NULL()
 
       IF(NDIM < 1 .OR. NSIZE < 1)THEN
-        WRITE(*,*)' WRONG DIMENSIONS '
-        STOP
+        WRITE(FPAR%MESG,'(A,A,I5,I5)')' Wrong dimensions for node ',TRIM(NAME), NDIM, NSIZE
+!        WRITE(*,*)' MK WRONG DIMENSIONS ',TRIM(NAME), NDIM, NSIZE
+!        STOP
+         RETURN
       END IF
 !
 !  ALLOCATE ARRAYS
@@ -173,6 +178,20 @@ CONTAINS
        
        
      CASE('S')
+       IF(NDIM == 1)THEN
+         IF(NSIZE > 1)THEN
+           ALLOCATE(PNEW%S1(NSIZE), STAT=ISTAT)
+           IF(ISTAT /= 0)STOP' ERROR ALLOCATING MEMORY ==> ll_mk ERR:156 '
+         END IF
+       ELSE
+         IF(NSIZE == 1)THEN
+            ALLOCATE(PNEW%S1(NDIM), STAT=ISTAT)
+            IF(ISTAT /= 0)STOP' ERROR ALLOCATING MEMORY ==> ll_mk ERR:161 '
+         ELSE
+            ALLOCATE(PNEW%S2(NDIM,NSIZE), STAT=ISTAT)
+            IF(ISTAT /= 0)STOP' ERROR ALLOCATING MEMORY ==> ll_mk ERR:164 '
+         END IF
+       END IF
      
      CASE('C')
 
