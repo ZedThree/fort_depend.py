@@ -51,7 +51,7 @@
 !   SUBROUTINE MOVES NODE
 !
    CHARACTER(LEN=FILE_NAME_LENGTH) FILE
-   TYPE(DNODE), POINTER  :: PNODE,PNEW,PNODE2,PNEW1,PNODE1,PTMP,PNEW2
+   TYPE(DNODE), POINTER  :: PNODE,PNEW,PNODE2,PNEW1,PNODE1,PTMP,PNEW2,PFFA
    TYPE(FUNC_DATA_SET) :: FPAR
    INTEGER :: IOUNIT
    CHARACTER :: FMT
@@ -63,6 +63,18 @@
    INTEGER :: ISTAT
    INTEGER(LINT) :: POS,NNODES
    REAL(RDOUBLE), POINTER :: PRESS(:)
+
+!
+!  read TEST file and store it in PNODE
+!
+!   PFFA => FLL_READ_FFA('case1.ainp',8,'A',FPAR)
+   PFFA => FLL_READ_FFA('case1.binp',8,'B',FPAR)
+   CALL FLL_CAT(PFFA, 6, .TRUE.,FPAR)
+   WRITE(*,*)
+   WRITE(*,*)'------------------------------------------------------1'
+   OK =  FLL_WRITE_FFA(PFFA,'File_1.txt',8,'A',FPAR)
+
+stop
 !
 !  read TEST file and store it in PNODE
 !
