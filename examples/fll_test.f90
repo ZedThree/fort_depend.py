@@ -51,7 +51,7 @@
 !   SUBROUTINE MOVES NODE
 !
    CHARACTER(LEN=FILE_NAME_LENGTH) FILE
-   TYPE(DNODE), POINTER  :: PNODE,PNEW,PNODE2,PNEW1,PNODE1,PTMP,PNEW2,PFFA
+   TYPE(DNODE), POINTER  :: PNODE,PNEW,PNODE2,PNEW1,PNODE1,PTMP,PNEW2
    TYPE(FUNC_DATA_SET) :: FPAR
    INTEGER :: IOUNIT
    CHARACTER :: FMT
@@ -70,15 +70,6 @@
    CALL FLL_CAT(PNODE, 6, .TRUE.,FPAR)
    WRITE(*,*)
    WRITE(*,*)'------------------------------------------------------1'
-
-   PFFA => FLL_READ_FFA('case1.ainp',8,'A',FPAR)
-!
-! print Pnode on screen 
-!  
-!   CALL FLL_CAT(PFFA, 6, .TRUE.,FPAR)
-   WRITE(*,*)'------------------------------------------------------1'
-   OK =  FLL_WRITE_FFA(PFFA,'File_1.txt',8,'A',FPAR)
-stop
 !
 !  read TEST1 file and store it in PNODE1
 !

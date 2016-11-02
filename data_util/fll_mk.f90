@@ -64,7 +64,7 @@ CONTAINS
 ! Body
 !
        IF(LEN_TRIM(LTYPE)<1.OR.LEN_TRIM(LTYPE)>TYPE_LENGTH) THEN
-        WRITE(FPAR%MESG,'(A,A)')' Wrong type: ',TRIM(LTYPE)
+         WRITE(FPAR%MESG,'(A,A)')' Wrong type: ',TRIM(LTYPE)
          RETURN
       END IF
 

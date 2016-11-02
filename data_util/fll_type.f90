@@ -71,6 +71,7 @@ MODULE FLL_TYPE_M
   TYPE DNODE
     CHARACTER(LEN=NAME_LENGTH)   :: LNAME = '' ! name the list
     CHARACTER(LEN=TYPE_LENGTH)     :: LTYPE = ''  ! type of the list
+    CHARACTER(LEN=TYPE_LENGTH)     :: FTYPE = ''  ! type of the list
     INTEGER(LINT) :: NDIM  = 0, NSIZE = 0, NLINK = 0
     INTEGER(LINT) :: POS  = 0, LENGTH = 0 
 
@@ -92,7 +93,7 @@ MODULE FLL_TYPE_M
     REAL(RDOUBLE) :: D0
     INTEGER(SINT)  :: I0
     INTEGER(LINT)  :: L0
-    CHARACTER(LEN=STRING_LENGHT) :: S    
+    CHARACTER(LEN=STRING_LENGHT) :: S
     CHARACTER :: C
 
 

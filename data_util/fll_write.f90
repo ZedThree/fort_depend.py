@@ -356,7 +356,9 @@ CONTAINS
           SAVED = .TRUE.
         ELSE IF(ASSOCIATED(PNODE%S1))THEN
           NDIM = SIZE(PNODE%S1, DIM =1, KIND = LINT)
-          WRITE(IOUNIT)(PNODE%S1(I), I = 1,NDIM)
+          DO I = 1,NDIM
+            WRITE(IOUNIT, *)"'",PNODE%S1(I),"'"
+          END DO          
           SAVED = .TRUE.
 !
 !  2D ARRAYS
@@ -384,8 +386,10 @@ CONTAINS
        ELSE IF(ASSOCIATED(PNODE%S2))THEN
           NDIM  = SIZE(PNODE%S2, DIM =1, KIND = LINT)
           NSIZE = SIZE(PNODE%S2, DIM =2, KIND = LINT)
-          WRITE(IOUNIT)((PNODE%S2(I,J), J = 1,NSIZE), I=1,NDIM)
-           SAVED = .TRUE.
+          DO J=1,NSIZE
+            WRITE(IOUNIT, *)("'",PNODE%S2(I,J),"' ", I = 1,NDIM)
+          END DO           
+          SAVED = .TRUE.
       END IF
 !
 !  CHECK IF NODE IS CONSTANT
@@ -401,7 +405,7 @@ CONTAINS
          CASE('L')
             WRITE(IOUNIT)PNODE%L0
          CASE('S')
-            WRITE(IOUNIT)PNODE%S
+            WRITE(IOUNIT)"'",PNODE%S,"'"
 
          CASE DEFAULT 
          

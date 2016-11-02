@@ -225,6 +225,7 @@ CONTAINS
    INTEGER(LINT) :: I,J,NDIM,NSIZE
    LOGICAL :: SAVED
    CHARACTER(LEN=TYPE_LENGTH) :: LTYPE
+   CHARACTER * 16 :: SHTEXT
    
    SAVED = .FALSE.
 !
@@ -233,18 +234,23 @@ CONTAINS
      LTYPE = PNODE%LTYPE
      IF(TRIM(PNODE%LTYPE) == 'DIR' .OR.TRIM(PNODE%LTYPE) == 'N')THEN
         IF(PNODE%NLINK > 0)THEN 
-          WRITE(IOUNIT, *)TRIM(PNODE%LNAME),',L, 1, 1,',PNODE%NDIM
-	  WRITE(IOUNIT, *)"'",PNODE%S,"'"
+          WRITE(IOUNIT, *)TRIM(PNODE%LNAME),",",TRIM(PNODE%FTYPE),' ,1, 1,',PNODE%NDIM
+           LTYPE = PNODE%FTYPE
         ELSE
           WRITE(IOUNIT, *)TRIM(PNODE%LNAME),',N, 0, 0,',PNODE%NDIM
         END IF
      ELSE 
         IF(TRIM(LTYPE) == 'S') THEN
-          LTYPE ='L'
+          IF(LTYPE == 'S')THEN
+            LTYPE = 'S'
+          ELSE
+            LTYPE ='L'
+          END IF
         ELSE IF(TRIM(LTYPE) == 'L') THEN
           LTYPE ='J'
         END IF
- 
+        LTYPE = PNODE%FTYPE
+
         WRITE(IOUNIT, *)TRIM(PNODE%LNAME),',', TRIM(LTYPE),',', PNODE%NSIZE, ',',PNODE%NDIM,',',0
      END IF
 !
@@ -278,36 +284,36 @@ CONTAINS
        ELSE IF(ASSOCIATED(PNODE%R2))THEN
           NDIM  = SIZE(PNODE%R2, DIM =1, KIND = LINT)
           NSIZE = SIZE(PNODE%R2, DIM =2, KIND = LINT)
-          DO I=1,NDIM
-            WRITE(IOUNIT, *)(PNODE%R2(I,J), J = 1,NSIZE)
+          DO J=1,NSIZE
+            WRITE(IOUNIT, *)(PNODE%R2(I,J), I = 1,NDIM)
           END DO
-           SAVED = .TRUE.
+        SAVED = .TRUE.
       ELSE IF(ASSOCIATED(PNODE%D2))THEN
           NDIM  = SIZE(PNODE%D2, DIM =1, KIND = LINT)
           NSIZE = SIZE(PNODE%D2, DIM =2, KIND = LINT)
-          DO I=1,NDIM
-            WRITE(IOUNIT, *)(PNODE%D2(I,J), J = 1,NSIZE)
+          DO J=1,NSIZE
+            WRITE(IOUNIT, *)(PNODE%D2(I,J), I = 1,NDIM)
           END DO
           SAVED = .TRUE.
        ELSE IF(ASSOCIATED(PNODE%I2))THEN
           NDIM  = SIZE(PNODE%I2, DIM =1, KIND = LINT)
           NSIZE = SIZE(PNODE%I2, DIM =2, KIND = LINT)
-          DO I=1,NDIM
-            WRITE(IOUNIT, *)(PNODE%I2(I,J), J = 1,NSIZE)
+          DO J=1,NSIZE
+            WRITE(IOUNIT, *)(PNODE%I2(I,J), I = 1,NDIM)
           END DO
           SAVED = .TRUE.
        ELSE IF(ASSOCIATED(PNODE%L2))THEN
           NDIM  = SIZE(PNODE%L2, DIM =1, KIND = LINT)
           NSIZE = SIZE(PNODE%L2, DIM =2, KIND = LINT)
-          DO I=1,NDIM
-            WRITE(IOUNIT, *)(PNODE%L2(I,J), J = 1,NSIZE)
+          DO J=1,NSIZE
+            WRITE(IOUNIT, *)(PNODE%L2(I,J), I = 1,NDIM)
           END DO
           SAVED = .TRUE.
        ELSE IF(ASSOCIATED(PNODE%S2))THEN
           NDIM  = SIZE(PNODE%S2, DIM =1, KIND = LINT)
           NSIZE = SIZE(PNODE%S2, DIM =2, KIND = LINT)
-          DO I = 1,NDIM
-            WRITE(IOUNIT, *)("'",PNODE%S2(I,J),"' ", J = 1,NSIZE)
+          DO J=1,NSIZE
+            WRITE(IOUNIT, *)("'",PNODE%S2(I,J),"' ", I = 1,NDIM)
           END DO
           SAVED = .TRUE.
       END IF
@@ -315,21 +321,23 @@ CONTAINS
 !  CHECK IF NODE IS CONSTANT
 !
       IF(.NOT.SAVED)THEN
-        SELECT CASE(PNODE%LTYPE)
-         CASE('R')
-          WRITE(IOUNIT, *)PNODE%R0
-         CASE('D')
-          WRITE(IOUNIT, *)PNODE%D0
-         CASE('I')
-          WRITE(IOUNIT, *)PNODE%I0
-         CASE('L')
-          WRITE(IOUNIT, *)PNODE%L0
-        CASE('S')
-          WRITE(IOUNIT,*)"'",PNODE%S,"'"
+         IF(PNODE%NSIZE*PNODE%NDIM /= 0 .OR. PNODE%NLINK >0)THEN
+          SELECT CASE(LTYPE)
+           CASE('R')
+              WRITE(IOUNIT,*)PNODE%R0
+           CASE('D')
+              WRITE(IOUNIT,*)PNODE%D0
+           CASE('I')
+              WRITE(IOUNIT,*)PNODE%I0
+           CASE('J')
+              WRITE(IOUNIT,*)PNODE%L0
+           CASE('S','L')
+               WRITE(IOUNIT,*)"'",PNODE%S,"'"
 
-         CASE DEFAULT 
+           CASE DEFAULT 
          
-         END SELECT
+           END SELECT
+        END IF
        END IF
 
 
@@ -384,7 +392,7 @@ CONTAINS
        ELSE IF(ASSOCIATED(PNODE%R2))THEN
           NDIM  = SIZE(PNODE%R2, DIM =1, KIND = LINT)
           NSIZE = SIZE(PNODE%R2, DIM =2, KIND = LINT)
-          WRITE(IOUNIT)((PNODE%R2(I,J), J = 1,NSIZE), I=1,NDIM)
+          WRITE(IOUNIT)((PNODE%R2(I,J), I = 1,NSIZE), I=1,NDIM)
            SAVED = .TRUE.
       ELSE IF(ASSOCIATED(PNODE%D2))THEN
           NDIM  = SIZE(PNODE%D2, DIM =1, KIND = LINT)
