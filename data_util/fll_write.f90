@@ -256,7 +256,7 @@ CONTAINS
         ELSE IF(ASSOCIATED(PNODE%S1))THEN
           NDIM = SIZE(PNODE%S1, DIM =1, KIND = LINT)
           DO I = 1,NDIM
-            WRITE(IOUNIT, *)"'",PNODE%S1(I),"'"
+            WRITE(IOUNIT, *)"'",TRIM(PNODE%S1(I)),"'"
           END DO
           SAVED = .TRUE.
 !
@@ -286,9 +286,8 @@ CONTAINS
           NDIM  = SIZE(PNODE%S2, DIM =1, KIND = LINT)
           NSIZE = SIZE(PNODE%S2, DIM =2, KIND = LINT)
           DO I = 1,NDIM
-            WRITE(IOUNIT, *)("'",PNODE%S2(I,J),"' ", J = 1,NSIZE)
+            WRITE(IOUNIT, *)("'",TRIM(PNODE%S2(I,J)),"' ", J = 1,NSIZE)
           END DO
-!          WRITE(IOUNIT, *)(("'",PNODE%S2(I,J),"' ", J = 1,NSIZE), I=1,NDIM)
           SAVED = .TRUE.
       END IF
 !
@@ -305,7 +304,7 @@ CONTAINS
          CASE('L')
           WRITE(IOUNIT, *)PNODE%L0
         CASE('S')
-          WRITE(IOUNIT,*)"'",PNODE%S,"'"
+          WRITE(IOUNIT,*)"'",TRIM(PNODE%S),"'"
 
          CASE DEFAULT 
          
@@ -357,7 +356,7 @@ CONTAINS
         ELSE IF(ASSOCIATED(PNODE%S1))THEN
           NDIM = SIZE(PNODE%S1, DIM =1, KIND = LINT)
           DO I = 1,NDIM
-            WRITE(IOUNIT, *)"'",PNODE%S1(I),"'"
+            WRITE(IOUNIT)"'",PNODE%S1(I),"'"
           END DO          
           SAVED = .TRUE.
 !
@@ -387,7 +386,7 @@ CONTAINS
           NDIM  = SIZE(PNODE%S2, DIM =1, KIND = LINT)
           NSIZE = SIZE(PNODE%S2, DIM =2, KIND = LINT)
           DO J=1,NSIZE
-            WRITE(IOUNIT, *)("'",PNODE%S2(I,J),"' ", I = 1,NDIM)
+            WRITE(IOUNIT)("'",PNODE%S2(I,J),"' ", I = 1,NDIM)
           END DO           
           SAVED = .TRUE.
       END IF
