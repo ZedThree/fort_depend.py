@@ -13,5 +13,5 @@ TEST1_DIR DIR 3
    TEST1_Subdir  DIR 2
        times  D 1 1
          1
-       some_name S 1 1 
-       Text-name
+       some_name S 2 1 
+       ' Text-name '  'My name'
