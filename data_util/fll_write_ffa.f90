@@ -250,7 +250,14 @@ CONTAINS
           LTYPE ='J'
         END IF
         LTYPE = PNODE%FTYPE
-
+        
+        IF( (PNODE%NSIZE * PNODE%NDIM > 1) )THEN
+          SELECT CASE(LTYPE)
+            CASE('D','R','I','J')
+             LTYPE(2:2) = 'F'
+          END SELECT
+        END IF
+        
         WRITE(IOUNIT, *)TRIM(PNODE%LNAME),',', TRIM(LTYPE),',', PNODE%NSIZE, ',',PNODE%NDIM,',',0
      END IF
 !
