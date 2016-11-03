@@ -16,43 +16,53 @@
 !     
 !     contact: libm3l@gmail.com
 ! 
-!
-
-!
-!     Subroutine FLL_MV
-!
-!     Date: 2016-10-10
-! 
-! 
-!
-!
-!     Description: moves or copies node 
-!
-!
-!     Input parameters:
-! 
-!
-!     Return value:
-! 
-! 
-!
-!     Modifications:
-!     Date		Version		Patch number		CLA 
-!
-!
-!     Description
-!
-!
 MODULE FLL_MV_M
-CONTAINS
-
+!
+! Description: Contains function fll_mv
+!
+! 
+! History:
+! Version   Date       Patch number  CLA     Comment
+! -------   --------   --------      ---     -------
+! 1.1       10/10/16                         Initial implementation
+!
+!
+! External Modules used
+!
+CONTAINS 
    FUNCTION FLL_MV(PWHAT,PWHERE,FPAR) RESULT(OK)
+!
+! Description: Module moves PWHAT pointer to PWHERE pointer
+!
+!              if PWHERE is DIR on N type, PWHAT is added
+!              to it as a new sub-data set
+!
+!              if PWHERE is a data type of nodes
+!              PWHAT overwrites it
+!
+! External Modules used
+!
        USE FLL_TYPE_M
        IMPLICIT NONE
+!
+! Declarations
+!
+! Arguments description
+! Name         In/Out     Function
+! PWHAT        In         pointer which is to be copied
+! PWHERE       In         pointer which is to be copied
+! FPAR         In/Out     structure containing function specific data
+! OK           Out        if .TRUE. succes, of .FALSE. fail
+!
+! Arguments declaration
+!
        TYPE(DNODE), POINTER  :: PWHAT,PWHERE
-       TYPE(FUNC_DATA_SET) :: FPAR
-       TYPE(DNODE), POINTER  :: PSOURCETMP
+       TYPE(FUNC_DATA_SET)   :: FPAR
        LOGICAL OK
+!
+! Local declarations
+!
+       TYPE(DNODE), POINTER  :: PSOURCETMP    
     
        PSOURCETMP => FLL_MVCP(PWHAT,PWHERE,'M',FPAR) 
        OK = FPAR%SUCCESS
@@ -61,7 +71,14 @@ CONTAINS
    END FUNCTION FLL_MV
 
    FUNCTION  FLL_MVCP(PWHAT,PWHERE,MODE,FPAR) RESULT(PSOURCETMP)
-   
+!
+! Description: Module moves or copies PWHAT pointer to PWHERE pointer
+!              depending on MODE values (C or M)
+!              If PWHERE pointer == NULL, PWHAT is a duplicate 
+!              of PWHAT with PWHAT%Ppar == NULL
+!
+! External Modules used
+! 
     USE FLL_TYPE_M
     USE FLL_RM_M
     USE FLL_STICH_M
@@ -74,8 +91,18 @@ CONTAINS
    TYPE(FUNC_DATA_SET) :: FPAR
    CHARACTER :: MODE    ! 'C' - COPY,   'M' - MOVE
 !
-!   LOCAL TYPES
+! Declarations
 !
+! Arguments description
+! Name         In/Out     Function
+! PWHAT        In         pointer which is to be copied
+! PWHERE       In         pointer which is to be copied
+! MODE         In         if C - copy mode, if M - move mode
+! PSOURCETMP   Out        pointer to new copy of PWHAT
+! FPAR         In/Out     structure containing function specific data
+!
+! Arguments declaration
+! 
    TYPE(DNODE), POINTER  :: PTNEXT, PTPREV,PTPAR,&
      PLAST, PSOURCETMP,PCHILD,PNEW
 !   

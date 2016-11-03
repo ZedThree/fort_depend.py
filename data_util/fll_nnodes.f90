@@ -17,56 +17,59 @@
 !     contact: libm3l@gmail.com
 ! 
 !
-
-!
-!     Subroutine FLL_NNODES
-!
-!     Date: 2016-10-10
-! 
-! 
-!
-!
-!     Description: calculates number of nodes
-! 
-!
-!     Input parameters:
-! 
-!
-!     Return value:
-! 
-! 
-!
-!     Modifications:
-!     Date		Version		Patch number		CLA 
-!
-!
-!     Description
-!
-!
 MODULE FLL_NNODES_M
+!
+! Description: Contains function fll_nnodes
+!
+! 
+! History:
+! Version   Date       Patch number  CLA     Comment
+! -------   --------   --------      ---     -------
+! 1.1       10/10/16                         Initial implementation
+!
+!
+! External Modules used
+!
 CONTAINS
-
-   RECURSIVE FUNCTION FLL_NNODES(PNODE,NAME,LTYPE,RECURSE,FPAR) RESULT(NUMBER)
-   
+   RECURSIVE FUNCTION FLL_NNODES(PNODE,NAME,LTYPE,DATADIM,RECURSE,FPAR) RESULT(NUMBER)
+!
+! Description: function returns number of nodes specified by 
+!              name, type and dimensions of data
+!              if data dimensions not specified as 0,1 or 2, 
+!              do not care about data dimensions
+!
+! External Modules used
+!     
     USE FLL_TYPE_M
     USE FLL_FUNC_PRT_M
 
     IMPLICIT NONE
 !
-!   FUNCTION FIND NODES WITH SPECIFIED NAME 
+! Declarations
+!
+! Arguments description
+! Name         In/Out     Function
+! PNODE        In         pointer where to search
+! NAME         In         name of pointer
+! LTYPE        Out        type of pointer
+! DATADIM      Out        dimensions of data set of pointer
+! RECURSE      Out        serach recursively
+! FPAR         In/Out     structure containing function specific data
+!
+! Arguments declaration
 !
    TYPE(FUNC_DATA_SET) :: FPAR
-   TYPE(DNODE), POINTER  :: PNODE,PFIND
+   TYPE(DNODE), POINTER  :: PNODE
    CHARACTER(*) :: NAME
    CHARACTER(*) :: LTYPE
-   INTEGER(LINT) :: NUMBER
+   INTEGER(LINT) :: NUMBER,DATADIM
    LOGICAL :: RECURSE
 !
-!   LOCAL TYPES
+! local declarations
 !
    CHARACTER(LEN=TYPE_LENGTH) :: TLTYPE
-   TYPE(DNODE), POINTER  :: PCURR, PCHLD
-   INTEGER(LINT) :: I
+   TYPE(DNODE), POINTER  :: PCURR, PCHLD, PFIND
+   INTEGER(LINT) :: I,NDIM,NSIZE
 !   
 !   BODY OF FUNCTION
 !
@@ -98,7 +101,7 @@ CONTAINS
 !
      IF(RECURSE .AND. ASSOCIATED(PCURR%PCHILD))THEN
        PCHLD => PCURR%PCHILD
-       NUMBER = NUMBER + FLL_NNODES(PCHLD,NAME,LTYPE,RECURSE,FPAR)
+       NUMBER = NUMBER + FLL_NNODES(PCHLD,NAME,LTYPE,DATADIM,RECURSE,FPAR)
        IF(ASSOCIATED(PFIND))THEN
          FPAR%SUCCESS = .TRUE.
          RETURN 
@@ -110,7 +113,19 @@ CONTAINS
       IF(   TRIM(PCURR%LNAME) == TRIM(NAME)  .AND.  &
           (TRIM(TLTYPE) == TRIM(PCURR%LTYPE)   .OR.  TLTYPE(1:1) == '*' ) )THEN
 
-          NUMBER = NUMBER + 1
+	   NDIM  = PCURR%NDIM
+           NSIZE = PCURR%NSIZE
+
+          SELECT CASE(DATADIM)
+          CASE(0)
+            IF(NDIM == 1 .AND. NSIZE == 1)NUMBER = NUMBER + 1
+          CASE(1)
+            IF(NDIM > 1 .OR. NSIZE > 1)NUMBER = NUMBER + 1
+          CASE(2)
+            IF(NDIM > 1 .AND. NSIZE > 1)NUMBER = NUMBER + 1
+          CASE DEFAULT 
+            NUMBER = NUMBER + 1
+          END SELECT
 
      END IF
      PCURR => PCURR%PNEXT

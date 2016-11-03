@@ -133,7 +133,7 @@ stop
 !
 !  find number 1st subdir IN PNODE1
 ! 
-   NNODES =  FLL_NNODES(PNODE1,'TEST1_Subdir','*',.false.,FPAR)
+   NNODES =  FLL_NNODES(PNODE1,'TEST1_Subdir','*',-1_lint,.false.,FPAR)
    write(*,*)' number of TEST1_Subdir subsets is ', NNODES
 !
 !   find the first TEST1_Subdir in PNODE1 and print it on the screen

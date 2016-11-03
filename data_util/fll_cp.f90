@@ -40,6 +40,12 @@ CONTAINS
 !              If PWHERE pointer == NULL, PWHAT is a duplicate 
 !              of PWHAT with PWHAT%Ppar == NULL
 !
+!              if PWHERE is DIR on N type, PWHAT is added
+!              to it as a new sub-data set
+!
+!              if PWHERE is a data type of nodes
+!              PWHAT overwrites it
+!
 ! External Modules used
 !                     
        USE FLL_TYPE_M
