@@ -16,48 +16,50 @@
 !     
 !     contact: libm3l@gmail.com
 ! 
-!
-
-!
-!     Subroutine FLL_RM
-!
-!     Date: 2016-10-10
-! 
-! 
-!
-!
-!     Description: removes node and all its children
-! 
-!
-!     Input parameters:
-! 
-!
-!     Return value:
-! 
-! 
-!
-!     Modifications:
-!     Date		Version		Patch number		CLA 
-!
-!
-!     Description
-!
-!
 MODULE FLL_RM_M
+!
+! Description: Contains function fll_rm
+!
+! 
+! History:
+! Version   Date       Patch number  CLA     Comment
+! -------   --------   --------      ---     -------
+! 1.1       10/10/16                         Initial implementation
+!
+!
+! External Modules used
+!
 CONTAINS
-
    SUBROUTINE FLL_RM(PNODE,FPAR)
-   
+!
+! Description: function removes PNODE
+!
+! 
+! History:
+! Version   Date       Patch number  CLA     Comment
+! -------   --------   --------      ---     -------
+! 1.1       10/10/16                         Initial implementation
+!
+!
+! External Modules used
+!
     USE FLL_TYPE_M
     USE FLL_STICH_M
     IMPLICIT NONE
 !
-!   SUBROUTINE REMOVES NODE
+! Declarations
+!
+! Arguments description
+! Name         In/Out     Function
+! PNODE        In         pointer which is to be removed
+! FPAR         In/Out     structure containing function specific data
+!
+! Arguments declaration
 !
    TYPE(DNODE), POINTER  :: PNODE,PCHILD
    TYPE(FUNC_DATA_SET) :: FPAR
 !
-!   LOCAL TYPES
+! Local declarations
 !
    INTEGER :: ISTAT
 !   
@@ -96,15 +98,36 @@ CONTAINS
 !  DELETE CHID WITH ALL ITS CHILDREN
 !
   RECURSIVE SUBROUTINE FLL_RM_RECURSIVE_NODE(PNODE,FPAR)
+!
+! Description: recursive function removes PNODE
+!
+! 
+! History:
+! Version   Date       Patch number  CLA     Comment
+! -------   --------   --------      ---     -------
+! 1.1       10/10/16                         Initial implementation
+!
+!
+! External Modules used
+!
   
      USE FLL_TYPE_M
      IMPLICIT NONE
 !
-!   SUBROUTINE REMOVES NODE
-! 
+! Declarations
+!
+! Arguments description
+! Name         In/Out     Function
+! PNODE        In         pointer which is to be removed
+! FPAR         In/Out     structure containing function specific data
+!
+! Arguments declaration
+!
     TYPE(DNODE), POINTER  :: PNODE
-    TYPE(FUNC_DATA_SET) :: FPAR
-    
+    TYPE(FUNC_DATA_SET)   :: FPAR
+!
+!  Local declarations
+!
     TYPE(DNODE), POINTER  :: PCURR, PNEXT
     INTEGER :: ISTAT
 !
@@ -156,14 +179,35 @@ CONTAINS
 !  FREE MEMORY FOR NODE
 !
   SUBROUTINE FLL_DEALLOC_DATA(PNODE,FPAR)
+!
+! Description: function deallocates data from associated with PNODE
+!
+! 
+! History:
+! Version   Date       Patch number  CLA     Comment
+! -------   --------   --------      ---     -------
+! 1.1       10/10/16                         Initial implementation
+!
+!
+! External Modules used
+!
     USE FLL_TYPE_M
     IMPLICIT NONE
 !
-!   SUBROUTINE REMOVES NODE
+! Declarations
+!
+! Arguments description
+! Name         In/Out     Function
+! PNODE        In         pointer which is to be removed
+! FPAR         In/Out     structure containing function specific data
+!
+! Arguments declaration
 !
    TYPE(DNODE), POINTER  :: PNODE
    TYPE(FUNC_DATA_SET) :: FPAR
-   
+!
+! local declarations
+!   
    INTEGER :: ISTAT
 !
 !   1D ARRAYS
@@ -251,6 +295,5 @@ CONTAINS
            END IF
   
   END SUBROUTINE FLL_DEALLOC_DATA
- 
 
 END MODULE FLL_RM_M

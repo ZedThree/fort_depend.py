@@ -16,48 +16,47 @@
 !     
 !     contact: libm3l@gmail.com
 ! 
-!
-
-!
-!     Subroutine FLL_MV
-!
-!     Date: 2016-10-10
-! 
-! 
-!
-!
-!     Description: stiches list
-!
-!
-!     Input parameters:
-! 
-!
-!     Return value:
-! 
-! 
-!
-!     Modifications:
-!     Date		Version		Patch number		CLA 
-!
-!
-!     Description
-!
-!
 MODULE FLL_STICH_M
+!
+! Description: Contains function fll_stich
+!
+! 
+! History:
+! Version   Date       Patch number  CLA     Comment
+! -------   --------   --------      ---     -------
+! 1.1       10/10/16                         Initial implementation
+!
+!
+! External Modules used
+!
 CONTAINS
-
    SUBROUTINE FLL_STICH(PNODE,FPAR)
+!
+! Description: subroutine stiches list after PNODE
+!              is taken away
+!
+! External Modules used
+!
    
     USE FLL_TYPE_M
     
     IMPLICIT NONE
 !
-!   STICHES THE LIST AFTER REMOVING NODES
+! Declarations
+!
+! Arguments description
+! Name         In/Out     Function
+! PNODE        In         pointer which is to be take away from the list
+!                         the list has to be stiched in place where the 
+!                         node PNODE will be missing
+! FPAR         In/Out     structure containing function specific data
+!
+! Arguments declaration
 !
     TYPE(DNODE), POINTER  :: PNODE
     TYPE(FUNC_DATA_SET) :: FPAR
 !
-!   LOCAL TYPES
+! Local declarations
 !
     TYPE(DNODE), POINTER  :: PNEXT=>NULL(), PPREV=>NULL(),PPAR=>NULL()
 !   

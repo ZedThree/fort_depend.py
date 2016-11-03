@@ -16,45 +16,50 @@
 !     
 !     contact: libm3l@gmail.com
 ! 
-!
-
-!
-!     Subroutine FLL_SWEEP
-!
-!     Date: 2016-10-10
-! 
-! 
-!
-!
-!     Description: sweep through list
-! 
-!
-!     Input parameters:
-! 
-!
-!     Return value:
-! 
-! 
-!
-!     Modifications:
-!     Date		Version		Patch number		CLA 
-!
-!
-!     Description
-!
-!
 MODULE FLL_SWEEP_M
+!
+! Description: Contains function fll_sweek
+!
+! 
+! History:
+! Version   Date       Patch number  CLA     Comment
+! -------   --------   --------      ---     -------
+! 1.1       10/10/16                         Initial implementation
+!
+!
+! External Modules used
+!
 CONTAINS
-
    FUNCTION FLL_SWEEP(PNODE,NAME,LTYPE,RECURSE,FPAR) RESULT(PFIND)
-   
+!
+! Description: Function sweep through list return each node   -------------  NOT FINISHED YET
+!
+! 
+! History:
+! Version   Date       Patch number  CLA     Comment
+! -------   --------   --------      ---     -------
+! 1.1       10/10/16                         Initial implementation
+!
+!
+! External Modules used
+!  
     USE FLL_TYPE_M
     USE FLL_LOCATE_M
 
     IMPLICIT NONE
 !
-!   FUNCTION FIND ALL NODES WITH SPECIFIED NAME OR TYPE 
+! Description: Module copies PWHAT pointer to PWHERE pointer
+!              If PWHERE pointer == NULL, PWHAT is a duplicate 
+!              of PWHAT with PWHAT%Ppar == NULL
 !
+!              if PWHERE is DIR on N type, PWHAT is added
+!              to it as a new sub-data set
+!
+!              if PWHERE is a data type of nodes
+!              PWHAT overwrites it
+!
+! External Modules used
+! 
    TYPE(FUNC_DATA_SET) :: FPAR
    TYPE(DNODE), POINTER  :: PNODE,PFIND
    CHARACTER(*) :: NAME
