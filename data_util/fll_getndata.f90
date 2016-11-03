@@ -78,7 +78,7 @@ CONTAINS
    IF(.NOT.ASSOCIATED(PNODE))THEN
       FPAR%SUCCESS = .FALSE.
       WRITE(FPAR%MESG,'(A)')'FLL_GETNDATA_R0 - Null node '
-      STOP
+      
       RETURN      
    END IF
 
@@ -87,7 +87,7 @@ CONTAINS
    IF(.NOT.ASSOCIATED(PFIND))THEN
       FPAR%SUCCESS = .FALSE.
       WRITE(FPAR%MESG,'(A,A,A)')'FLL_GETNDATA_R0 - Node',TRIM(PNODE%LNAME),' does not contain specified data'
-      STOP
+      
       RETURN
    END IF
 
@@ -143,7 +143,7 @@ CONTAINS
    IF(.NOT.ASSOCIATED(PNODE))THEN
       FPAR%SUCCESS = .FALSE.
       WRITE(FPAR%MESG,'(A)')'FLL_GETNDATA_R1 - Null node '
-      STOP
+      
       RETURN      
    END IF
 
@@ -152,7 +152,7 @@ CONTAINS
    IF(.NOT.ASSOCIATED(PFIND))THEN
       FPAR%SUCCESS = .FALSE.
       WRITE(FPAR%MESG,'(A,A,A)')'FLL_GETNDATA_R1 - Node',TRIM(PNODE%LNAME),' does not contain specified data'
-      STOP
+      
       RETURN
    END IF
 
@@ -207,7 +207,7 @@ CONTAINS
    IF(.NOT.ASSOCIATED(PNODE))THEN
       FPAR%SUCCESS = .FALSE.
       WRITE(FPAR%MESG,'(A)')'FLL_GETNDATA_R2 - Null node '
-      STOP
+      
       RETURN      
    END IF
 
@@ -216,7 +216,7 @@ CONTAINS
    IF(.NOT.ASSOCIATED(PFIND))THEN
       FPAR%SUCCESS = .FALSE.
       WRITE(FPAR%MESG,'(A,A,A)')'FLL_GETNDATA_R2 - Node',TRIM(PNODE%LNAME),' does not contain specified data'
-      STOP
+      
       RETURN
    END IF
 
@@ -274,7 +274,7 @@ CONTAINS
    IF(.NOT.ASSOCIATED(PNODE))THEN
       FPAR%SUCCESS = .FALSE.
       WRITE(FPAR%MESG,'(A)')'FLL_GETNDATA_D0 - Null node '
-      STOP
+      
       RETURN      
    END IF
 
@@ -283,7 +283,7 @@ CONTAINS
    IF(.NOT.ASSOCIATED(PFIND))THEN
       FPAR%SUCCESS = .FALSE.
       WRITE(FPAR%MESG,'(A,A,A)')'FLL_GETNDATA_D0 - Node',TRIM(PNODE%LNAME),' does not contain specified data'
-      STOP
+      
       RETURN
    END IF
 
@@ -337,11 +337,9 @@ CONTAINS
    TYPE(DNODE), POINTER  :: PFIND
    LOGICAL :: RECURSE
 
-
    IF(.NOT.ASSOCIATED(PNODE))THEN
       FPAR%SUCCESS = .FALSE.
       WRITE(FPAR%MESG,'(A)')'FLL_GETNDATA_D1 - Null node '
-      STOP
       RETURN      
    END IF
 
@@ -350,7 +348,6 @@ CONTAINS
    IF(.NOT.ASSOCIATED(PFIND))THEN
       FPAR%SUCCESS = .FALSE.
       WRITE(FPAR%MESG,'(A,A,A)')'FLL_GETNDATA_D1 - Node',TRIM(PNODE%LNAME),' does not contain specified data'
-      STOP
       RETURN
    END IF
 
@@ -407,7 +404,7 @@ CONTAINS
    IF(.NOT.ASSOCIATED(PNODE))THEN
       FPAR%SUCCESS = .FALSE.
       WRITE(FPAR%MESG,'(A)')'FLL_GETNDATA_D2 - Null node '
-      STOP
+      
       RETURN      
    END IF
 
@@ -416,7 +413,7 @@ CONTAINS
    IF(.NOT.ASSOCIATED(PFIND))THEN
       FPAR%SUCCESS = .FALSE.
       WRITE(FPAR%MESG,'(A,A,A)')'FLL_GETNDATA_D2 - Node',TRIM(PNODE%LNAME),' does not contain specified data'
-      STOP
+      
       RETURN
    END IF
 
@@ -473,7 +470,6 @@ CONTAINS
    IF(.NOT.ASSOCIATED(PNODE))THEN
       FPAR%SUCCESS = .FALSE.
       WRITE(FPAR%MESG,'(A)')'FLL_GETNDATA_I0 - Null node '
-      STOP
       RETURN      
    END IF
 
@@ -482,7 +478,7 @@ CONTAINS
    IF(.NOT.ASSOCIATED(PFIND))THEN
       FPAR%SUCCESS = .FALSE.
       WRITE(FPAR%MESG,'(A,A,A)')'FLL_GETNDATA_I0 - Node',TRIM(PNODE%LNAME),' does not contain specified data'
-      STOP
+      
       RETURN
    END IF
 
@@ -539,7 +535,7 @@ CONTAINS
    IF(.NOT.ASSOCIATED(PNODE))THEN
       FPAR%SUCCESS = .FALSE.
       WRITE(FPAR%MESG,'(A)')'FLL_GETNDATA_I1 - Null node '
-      STOP
+      
       RETURN      
    END IF
 
@@ -548,7 +544,7 @@ CONTAINS
    IF(.NOT.ASSOCIATED(PFIND))THEN
       FPAR%SUCCESS = .FALSE.
       WRITE(FPAR%MESG,'(A,A,A)')'FLL_GETNDATA_I1 - Node',TRIM(PNODE%LNAME),' does not contain specified data'
-      STOP
+      
       RETURN
    END IF
 
@@ -603,7 +599,7 @@ CONTAINS
    IF(.NOT.ASSOCIATED(PNODE))THEN
       FPAR%SUCCESS = .FALSE.
       WRITE(FPAR%MESG,'(A)')'FLL_GETNDATA_I2 - Null node '
-      STOP
+      
       RETURN      
    END IF
 
@@ -612,7 +608,7 @@ CONTAINS
    IF(.NOT.ASSOCIATED(PFIND))THEN
       FPAR%SUCCESS = .FALSE.
       WRITE(FPAR%MESG,'(A,A,A)')'FLL_GETNDATA_I2 - Node',TRIM(PNODE%LNAME),' does not contain specified data'
-      STOP
+      
       RETURN
    END IF
 
@@ -669,7 +665,7 @@ CONTAINS
    IF(.NOT.ASSOCIATED(PNODE))THEN
       FPAR%SUCCESS = .FALSE.
       WRITE(FPAR%MESG,'(A)')'FLL_GETNDATA_L0 - Null node '
-      STOP
+      
       RETURN      
    END IF
 
@@ -678,7 +674,7 @@ CONTAINS
    IF(.NOT.ASSOCIATED(PFIND))THEN
       FPAR%SUCCESS = .FALSE.
       WRITE(FPAR%MESG,'(A,A,A)')'FLL_GETNDATA_L0 - Node',TRIM(PNODE%LNAME),' does not contain specified data'
-      STOP
+      
       RETURN
    END IF
 
@@ -724,7 +720,7 @@ CONTAINS
    IF(.NOT.ASSOCIATED(PNODE))THEN
       FPAR%SUCCESS = .FALSE.
       WRITE(FPAR%MESG,'(A)')'FLL_GETNDATA_L1 - Null node '
-      STOP
+      
       RETURN      
    END IF
 
@@ -733,7 +729,7 @@ CONTAINS
    IF(.NOT.ASSOCIATED(PFIND))THEN
       FPAR%SUCCESS = .FALSE.
       WRITE(FPAR%MESG,'(A,A,A)')'FLL_GETNDATA_L1 - Node',TRIM(PNODE%LNAME),' does not contain specified data'
-      STOP
+      
       RETURN
    END IF
 
@@ -788,7 +784,7 @@ CONTAINS
    IF(.NOT.ASSOCIATED(PNODE))THEN
       FPAR%SUCCESS = .FALSE.
       WRITE(FPAR%MESG,'(A)')'FLL_GETNDATA_L2 - Null node '
-      STOP
+      
       RETURN      
    END IF
 
@@ -797,7 +793,7 @@ CONTAINS
    IF(.NOT.ASSOCIATED(PFIND))THEN
       FPAR%SUCCESS = .FALSE.
       WRITE(FPAR%MESG,'(A,A,A)')'FLL_GETNDATA_L2 - Node',TRIM(PNODE%LNAME),' does not contain specified data'
-      STOP
+      
       RETURN
    END IF
 
@@ -852,7 +848,7 @@ CONTAINS
    IF(.NOT.ASSOCIATED(PNODE))THEN
       FPAR%SUCCESS = .FALSE.
       WRITE(FPAR%MESG,'(A)')'FLL_GETNDATA_L0 - Null node '
-      STOP
+      
       RETURN      
    END IF
 
@@ -861,7 +857,7 @@ CONTAINS
    IF(.NOT.ASSOCIATED(PFIND))THEN
       FPAR%SUCCESS = .FALSE.
       WRITE(FPAR%MESG,'(A,A,A)')'FLL_GETNDATA_L0 - Node',TRIM(PNODE%LNAME),' does not contain specified data'
-      STOP
+      
       RETURN
    END IF
 
@@ -916,7 +912,7 @@ FUNCTION FLL_GETNDATA_S1(PNODE,NAME,NUMBER,LTYPE,FPAR) RESULT(STRING)
    IF(.NOT.ASSOCIATED(PNODE))THEN
       FPAR%SUCCESS = .FALSE.
       WRITE(FPAR%MESG,'(A)')'FLL_GETNDATA_L0 - Null node '
-      STOP
+      
       RETURN      
    END IF
 
@@ -925,7 +921,7 @@ FUNCTION FLL_GETNDATA_S1(PNODE,NAME,NUMBER,LTYPE,FPAR) RESULT(STRING)
    IF(.NOT.ASSOCIATED(PFIND))THEN
       FPAR%SUCCESS = .FALSE.
       WRITE(FPAR%MESG,'(A,A,A)')'FLL_GETNDATA_L0 - Node',TRIM(PNODE%LNAME),' does not contain specified data'
-      STOP
+      
       RETURN
    END IF
 
@@ -980,7 +976,7 @@ FUNCTION FLL_GETNDATA_S1(PNODE,NAME,NUMBER,LTYPE,FPAR) RESULT(STRING)
    IF(.NOT.ASSOCIATED(PNODE))THEN
       FPAR%SUCCESS = .FALSE.
       WRITE(FPAR%MESG,'(A)')'FLL_GETNDATA_L0 - Null node '
-      STOP
+      
       RETURN      
    END IF
 
@@ -989,7 +985,7 @@ FUNCTION FLL_GETNDATA_S1(PNODE,NAME,NUMBER,LTYPE,FPAR) RESULT(STRING)
    IF(.NOT.ASSOCIATED(PFIND))THEN
       FPAR%SUCCESS = .FALSE.
       WRITE(FPAR%MESG,'(A,A,A)')'FLL_GETNDATA_L0 - Node',TRIM(PNODE%LNAME),' does not contain specified data'
-      STOP
+      
       RETURN
    END IF
 

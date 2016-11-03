@@ -51,9 +51,9 @@
 !   SUBROUTINE MOVES NODE
 !
    CHARACTER(LEN=FILE_NAME_LENGTH) FILE
-   TYPE(DNODE), POINTER  :: PNODE,PNEW,PNODE2,PNEW1,PNODE1,PTMP,PNEW2,PFFA
+   TYPE(DNODE), POINTER  :: PNODE,PNEW,PNEW1,PNODE1,PTMP,PNEW2
    TYPE(FUNC_DATA_SET) :: FPAR
-   INTEGER :: IOUNIT
+   INTEGER :: IOUNIT,I
    CHARACTER :: FMT
 !
 !   LOCAL TYPES
@@ -62,55 +62,89 @@
    CHARACTER :: FMT_LOC
    INTEGER :: ISTAT
    INTEGER(LINT) :: POS,NNODES
-   REAL(RDOUBLE), POINTER :: PRESS(:)
+   REAL(RDOUBLE), POINTER :: PRESS(:),HUMID(:)
 
 !
 !  read TEST file and store it in PNODE
-!
-!   PFFA => FLL_READ_FFA('case1.ainp',8,'A',FPAR)
-   PFFA => FLL_READ_FFA('case1.binp',8,'B',FPAR)
-   CALL FLL_CAT(PFFA, 6, .TRUE.,FPAR)
-   WRITE(*,*)
-   WRITE(*,*)'------------------------------------------------------1'
-   OK =  FLL_WRITE_FFA(PFFA,'File_1.txt',8,'A',FPAR)
-
-stop
-!
-!  read TEST file and store it in PNODE
+!  file is an ASCII file
 !
    PNODE => FLL_READ('TEST',8,'A',FPAR)
+!
+!  print node on the screen
+!
    CALL FLL_CAT(PNODE, 6, .TRUE.,FPAR)
    WRITE(*,*)
    WRITE(*,*)'------------------------------------------------------1'
 !
-!  read TEST1 file and store it in PNODE1
+!  read TEST1 ASCII file and store it in PNODE1
 !
    PNODE1 => FLL_READ('TEST1',8,'A',FPAR)
 !
 !  print PNODE1 on screen
 !
   CALL FLL_CAT(PNODE1, 6, .TRUE.,FPAR)
+   WRITE(*,*)
    WRITE(*,*)'------------------------------------------------------2'
-
-!!  save  PNODE1 as binary and ascii file
+!
+!  save  PNODE1 as binary and ascii file
 !
    OK =  FLL_WRITE(PNODE1,'File_2.txt',8,'B',FPAR)
    OK =  FLL_WRITE(PNODE1,'File_1.txt',8,'A',FPAR)
-!
-!   read bindary file and store it in PNODE2
-!   then print it on screed and then delete it
-   PNODE2 => FLL_READ('File_2.txt',8,'B',FPAR)
-   CALL FLL_CAT(PNODE2, 6, .TRUE.,FPAR)
-   CALL FLL_RM(PNODE2,FPAR) 
+
    WRITE(*,*)'------------------------------------------------------3'
 !
-!  MAKE A NEW NODE AND MOVE ENTIRE PNODE INTO IT
+!  MAKE A NEW NODE CALLED new_node AND MOVE ENTIRE PNODE INTO IT
+!  THE NODE IS GOING TO CONTAIN OTHER NODESM, IT IS A DIR TYPE OF NODE
 !  PRINT IT ON THE SCREEN
 !
-    PNEW1 => FLL_MK("newnone","DIR",0_LINT, 0_LINT,FPAR)
-    OK = FLL_MV(PNODE, PNEW1, FPAR)
+   PNEW1 => FLL_MK("new_node","DIR",0_LINT, 0_LINT,FPAR)
+!
+!  create a data node and add it to a PNEW1
+!  the node will be called Humidity, will contain doubles, array of 10
+!
+   PTMP => FLL_MK('Humidity','D', 10_LINT, 1_LINT, FPAR)
+   OK = FLL_MV(PTMP, PNEW1, FPAR)
+   CALL FLL_CAT(PNEW1, 6, .TRUE.,FPAR)
+!
+!  ACCESS DATA OF NODE Humidity
+!
+!  can be done as
+!  1. HUMID => 	PTMP%D1
+!  2. Locating the node in PNEW1
+
+   HUMID => FLL_GETNDATA_D1(PNEW1,'Humidity',1_LINT,'D',FPAR)
+
+   IF(.NOT.ASSOCIATED(HUMID))THEN
+      STOP' DID NOT FIND HUMID'
+   ELSE
+!
+!   with this array you can work as with a normal array
+!
+!  find dimensions
+!  1. NDIM = PTMP%NDIM
+!  2. SIZE FUNCTION
+!
+     WRITE(*,*)
+     WRITE(*,*)'SIZE OF ARRAY IS ',SIZE(HUMID)
+     WRITE(*,*)
+   END IF
+!
+!  fill it with some data
+!
+   DO I=1,10
+     HUMID(I) = 3.1415926*I
+   END DO
+!
+!  add PNODE to PNEW1
+!  now the node contains Humidity and entire PNODE
+!
+   OK = FLL_MV(PNODE, PNEW1, FPAR)
    CALL FLL_CAT(PNEW1, 6, .TRUE.,FPAR)	
    WRITE(*,*)'------------------------------------------------------4'
+!
+!  SOME ADDITIONAL OPERATIONS
+!
+
 !
 !  COPY PNODE, BECASE THE TARGET IN COPY IS NULL
 !  THE PNEW IS GOING TO BE A DUPLICATE OF PNODE
@@ -120,21 +154,12 @@ stop
    CALL FLL_CAT(PNEW, 6, .TRUE.,FPAR)
    WRITE(*,*)'------------------------------------------------------5'
 !
-!  REMOVE PNEW1
-!
-   CALL FLL_RM(PNEW1,FPAR) 
-!
-!   COPY PNODE TO PNEW
-!   ON RETURN, THE FLL_CP WILL GIVE BACK POINTER OF PNEW IN PNODE LIST
-!
-   PNEW2 => FLL_CP(PNEW, PNODE1, FPAR)
-   CALL FLL_CAT(PNODE1, 6, .TRUE.,FPAR)
-   WRITE(*,*)'------------------------------------------------------6'
-!
 !  find number 1st subdir IN PNODE1
 ! 
    NNODES =  FLL_NNODES(PNODE1,'TEST1_Subdir','*',-1_lint,.false.,FPAR)
-   write(*,*)' number of TEST1_Subdir subsets is ', NNODES
+   WRITE(*,*)
+   WRITE(*,*)' number of TEST1_Subdir subsets is ', NNODES
+   WRITE(*,*)
 !
 !   find the first TEST1_Subdir in PNODE1 and print it on the screen
 !
@@ -142,7 +167,7 @@ stop
    CALL FLL_CAT(PTMP, 6, .TRUE.,FPAR)
    WRITE(*,*)'------------------------------------------------------7'
 !
-!  find the values of pressure subset #1 and print them on screen
+!  find the values of pressure subset #1 and print the data on screen
 !
     PRESS => FLL_GETNDATA_D1(PTMP,'pressure',1_LINT,'D',FPAR)
     write(*,*)' Values of pressure are ',PRESS
@@ -151,13 +176,14 @@ stop
 !
    WRITE(*,*)' REMOVE ===========================' 
 !
-!  WE HAVE TO REMOVE PNODE1 AND PNEW WHICH WAS CREATED ON LINE 107
+!  WE HAVE TO REMOVE PNODE1 AND PNEW WHICH WAS CREATED ON LINE 153
 !  PNODE WAS DELETED AS PART OF PNEW1 WHERE IT WAS MOVED
-!  PNODE2 WAS DELETED RIGHT AFTER BEING RETURN FROM READ
+
 !  PNEW2 IS NOT A NEW NODE, IT POINTS TO A COPY SO DOES NOT NEED TO BE FREED
 !
    CALL FLL_RM(PNEW,FPAR)
    CALL FLL_RM(PNODE1,FPAR)
+   CALL FLL_RM(PNODE,FPAR)
 
   
 END PROGRAM
