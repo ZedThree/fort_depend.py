@@ -246,7 +246,7 @@ CONTAINS
         OK = TEST_IOSTAT(IOSTAT,FPAR)
         IF(.NOT.OK) RETURN
       END DO
-      
+            
       TRIM_LINE = TRIM(TEXT_LINE)
 !
 !  GET NAME
@@ -366,7 +366,8 @@ CONTAINS
           READ(IOUNIT,IOSTAT=IOSTAT)VER
           READ(IOUNIT,IOSTAT=IOSTAT)NAME,LTYPE,NSIZE,NDIM,NLINK
        END IF
-
+       
+       LTYPE(2:) = ' '
        FTYPE = LTYPE
        NSIZEO = NSIZE
        NDIMO = NDIM
@@ -375,9 +376,9 @@ CONTAINS
          NDIM   = NLINK
        ELSE
       
-         IF(TRIM(LTYPE) == 'L')THEN 
+         IF(TRIM(LTYPE(1:1)) == 'L')THEN 
            LTYPE ='S'
-         ELSE IF(TRIM(LTYPE) == 'J')THEN 
+         ELSE IF(TRIM(LTYPE(1:1)) == 'J')THEN 
            LTYPE ='L'
          END IF
       
@@ -426,7 +427,7 @@ CONTAINS
 !  BODY
 !
     IF(NDIM*NSIZE == 0)RETURN
-    SELECT CASE(LTYPE)
+    SELECT CASE(LTYPE(1:1))
      CASE('R')
        IF(NDIM == 1)THEN
          IF(NSIZE > 1)THEN
@@ -550,7 +551,7 @@ CONTAINS
 !  BODY
 !
     IF(NDIM*NSIZE == 0)RETURN
-    SELECT CASE(LTYPE)
+    SELECT CASE(LTYPE(1:1))
      CASE('R')
        IF(NDIM == 1)THEN
          IF(NSIZE > 1)THEN
