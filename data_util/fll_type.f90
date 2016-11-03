@@ -39,15 +39,15 @@ MODULE FLL_TYPE_M
 !
 !  define std I/O desriptors
 
-#ifdef f2008
-use, intrinsic :: iso_fortran_env, only : stdin=>input_unit, &
-                                          stdout=>output_unit, &
-                                          stderr=>error_unit
-#else
+!#ifdef f2008
+!use, intrinsic :: iso_fortran_env, only : stdin=>input_unit, &
+!                                          stdout=>output_unit, &
+!                                          stderr=>error_unit
+!#else
 #define stdin  5
 #define stdout 6
 #define stderr 0
-#endif
+!#endif
 
 !
 ! Declarations

@@ -18,10 +18,8 @@ fll_sweep.o :  \
 	fll_locate.o \
 	fll_type.o
 
-fll_read_ffa.o :  \
-	fll_mv.o \
+fll_locate.o :  \
 	fll_funct_prt.o \
-	fll_mk.o \
 	fll_type.o
 
 fll_cp.o :  \
@@ -32,8 +30,10 @@ fll_cp.o :  \
 	fll_stich.o \
 	fll_type.o
 
-fll_locate.o :  \
+fll_read_ffa.o :  \
+	fll_mv.o \
 	fll_funct_prt.o \
+	fll_mk.o \
 	fll_type.o
 
 fll_duplicate.o :  \
