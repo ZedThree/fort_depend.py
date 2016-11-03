@@ -20,38 +20,60 @@
 
 !
 !     Subroutine FLL_TYPE_M
-!
-!     Date: 2016-10-10
 ! 
-!     Description: Definition of the data set type for linked list
-! 
-!
-!     Input parameters:
-! 
-!
-!     Return value:
-! 
-! 
-!
-!     Modifications:
-!     Date		Version		Patch number		CLA 
-!
-!
-!     Description
-!
 !
 MODULE FLL_TYPE_M
-!#ifdef f2003
-!use, intrinsic :: iso_fortran_env, only : stdin=>input_unit, &
-!                                          stdout=>output_unit, &
-!                                          stderr=>error_unit
-!#else
-!#define stdin  5
-!#define stdout 6
-!#define stderr 0
-!#endif
 !
-!     MODULE SPECIFIC VARIABLES
+! Description: efinition of the data set type for linked list and other related data
+!
+! 
+! History:
+! Version   Date       Patch number  CLA     Comment
+! -------   --------   --------      ---     -------
+! 1.1       10/10/16                         Initial implementation
+!
+!
+! External Modules used
+!
+
+!
+!  define std I/O desriptors
+
+#ifdef f2008
+use, intrinsic :: iso_fortran_env, only : stdin=>input_unit, &
+                                          stdout=>output_unit, &
+                                          stderr=>error_unit
+#else
+#define stdin  5
+#define stdout 6
+#define stderr 0
+#endif
+
+!
+! Declarations
+!
+! Arguments description
+! Name                    Function
+! PWHAT                   pointer which is to be copied
+! PWHERE                  pointer which is to be copied
+! PNEW                    pointer to new copy of PWHAT
+! FPAR                   structure containing function specific data
+!
+!  RSINGLE    ! real kind
+!  RDOUBLE    ! double kind
+!  SINT       ! integer kind
+!  LINT       ! long integer kind
+!
+!  NAME_LENGTH           length of string for names
+!  TYPE_LENGTH           length of string for type
+!  ERR_MSG_LENGTH        length of string for error message
+!  ERR_PATH_LENGTH       length of string for path of in err message
+!  FILE_NAME_LENGTH      length of string for file names
+!  STRING_LENGHT         length of long string 
+
+!  MAX_SUB               maximum number of subsets in each node
+!
+! Arguments declaration
 !
   IMPLICIT NONE
   INTEGER, PARAMETER  :: RSINGLE = SELECTED_REAL_KIND(P=6,R=37)
@@ -71,7 +93,7 @@ MODULE FLL_TYPE_M
 ! DEFINITION OF THE DATA SET OF THE NODE IN LINKED LIST
 !
   TYPE DNODE
-    CHARACTER(LEN=NAME_LENGTH)   :: LNAME = '' ! name the list
+    CHARACTER(LEN=NAME_LENGTH)   :: LNAME = ''    ! name the list
     CHARACTER(LEN=TYPE_LENGTH)     :: LTYPE = ''  ! type of the list
     CHARACTER(LEN=TYPE_LENGTH)     :: FTYPE = ''  ! type of the list
     INTEGER(LINT) :: NDIM  = 0, NSIZE = 0, NLINK = 0
@@ -79,34 +101,34 @@ MODULE FLL_TYPE_M
 
     TYPE (DNODE), POINTER :: &
          PPAR     =>NULL(),&     ! Pointer to parent list
-         PCHILD  =>NULL(),&     ! Pointer to first child list
-         PNEXT   =>NULL(),&     ! Pointer to next list
-         PPREV   =>NULL(),&     ! Pointer to previous list
-         PLINK     =>NULL()        ! Pointer to link target
+         PCHILD  =>NULL(),&      ! Pointer to first child list
+         PNEXT   =>NULL(),&      ! Pointer to next list
+         PPREV   =>NULL(),&      ! Pointer to previous list
+         PLINK     =>NULL()      ! Pointer to link target
          
-    REAL(RSINGLE)   , POINTER, CONTIGUOUS :: R1(:) =>NULL(), R2(:,:) =>NULL()
-    REAL(RDOUBLE)   , POINTER, CONTIGUOUS :: D1(:) =>NULL(), D2(:,:) =>NULL()
-    INTEGER(SINT)   , POINTER, CONTIGUOUS :: I1(:) =>NULL(), I2(:,:) =>NULL()
-    INTEGER(LINT)   , POINTER, CONTIGUOUS :: L1(:) =>NULL(), L2(:,:) =>NULL()
-    CHARACTER(LEN=STRING_LENGHT), POINTER, CONTIGUOUS  :: S1(:)=>NULL()
-    CHARACTER(LEN=STRING_LENGHT), POINTER, CONTIGUOUS  :: S2(:,:)=>NULL()
+    REAL(RSINGLE)   , POINTER, CONTIGUOUS :: R1(:) =>NULL(), R2(:,:) =>NULL()  ! real arrays
+    REAL(RDOUBLE)   , POINTER, CONTIGUOUS :: D1(:) =>NULL(), D2(:,:) =>NULL()  ! double arrays
+    INTEGER(SINT)   , POINTER, CONTIGUOUS :: I1(:) =>NULL(), I2(:,:) =>NULL()  ! integer arrays
+    INTEGER(LINT)   , POINTER, CONTIGUOUS :: L1(:) =>NULL(), L2(:,:) =>NULL()  ! long integer arrays
+    CHARACTER(LEN=STRING_LENGHT), POINTER, CONTIGUOUS  :: S1(:)=>NULL()        ! 1D array of strings
+    CHARACTER(LEN=STRING_LENGHT), POINTER, CONTIGUOUS  :: S2(:,:)=>NULL()      ! 2D array of strings
     
-    REAL(RSINGLE) :: R0
-    REAL(RDOUBLE) :: D0
-    INTEGER(SINT)  :: I0
-    INTEGER(LINT)  :: L0
-    CHARACTER(LEN=STRING_LENGHT) :: S
-    CHARACTER(LEN=NAME_LENGTH) :: T
-    CHARACTER :: C
-
-
+    REAL(RSINGLE) :: R0   ! real 
+    REAL(RDOUBLE) :: D0   ! double
+    INTEGER(SINT)  :: I0  ! integer
+    INTEGER(LINT)  :: L0  ! long integer
+    CHARACTER(LEN=STRING_LENGHT) :: S  ! string
+    CHARACTER(LEN=NAME_LENGTH) :: T    ! short string
+    CHARACTER :: C                     ! character
     
   END TYPE DNODE
-  
+!
+! type used for diagnostic data set passed to subroutines and functions
+!
   TYPE FUNC_DATA_SET
-      LOGICAL :: SUCCESS, ERRMSG
-      CHARACTER(LEN=ERR_MSG_LENGTH)  :: MESG
-      CHARACTER(LEN=ERR_PATH_LENGTH) :: ERRPATH
+      LOGICAL :: SUCCESS                         ! if .TRUE.=success, .FALSE. = fail
+      CHARACTER(LEN=ERR_MSG_LENGTH)  :: MESG     ! error message
+      CHARACTER(LEN=ERR_PATH_LENGTH) :: ERRPATH  ! path 
   END TYPE FUNC_DATA_SET
 
 END MODULE FLL_TYPE_M

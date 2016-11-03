@@ -22,48 +22,54 @@
 !     Subroutine FLL_CP
 !
 !     Date: 2016-10-10
-! 
-! 
-!
-!
-!     Description: moves or copies node 
-!
-!
-!     Input parameters:
-! 
-!
-!     Return value:
-! 
-! 
-!
-!     Modifications:
-!     Date		Version		Patch number		CLA 
-!
-!
-!     Description
 !
 !
 MODULE FLL_CP_M
+!
+! Description: Contains function fll_cp
+!
+! 
+! History:
+! Version   Date       Patch number  CLA     Comment
+! -------   --------   --------      ---     -------
+! 1.1       10/10/16                         Initial implementation
+!
+!
+! External Modules used
+!
+
 CONTAINS
-   
    FUNCTION FLL_CP(PWHAT,PWHERE,FPAR) RESULT(PNEW)
 !
-!  FUNCTIONS COPIES PHAT TO PWHERE. 
-!  IF PWHERE IS NULL, PWHAT WILL 
+! Description: Module copies PWHAT pointer to PWHERE pointer
+!              If PWHERE pointer == NULL, PWHAT is a duplicate 
+!              of PWHAT with PWHAT%Ppar == NULL
 !
-!
-!  INPUT PARAMETERS:
-!                      
+! External Modules used
+!                     
        USE FLL_TYPE_M
        USE FLL_MV_M
        USE FLL_DUPLICATE_M
        USE FLL_CAT_M
-
+!
+! Declarations
+!
+! Arguments description
+! Name         In/Out     Function
+! PWHAT        In         pointer which is to be copied
+! PWHERE       In         pointer which is to be copied
+! PNEW         Out        pointer to new copy of PWHAT
+! FPAR         In/Out     structure containing function specific data
+!
+! Arguments declaration
+!
        IMPLICIT NONE
        TYPE(DNODE), POINTER  :: PWHAT,PWHERE
        TYPE(FUNC_DATA_SET) :: FPAR
        TYPE(DNODE), POINTER  :: PNEW
-       
+!
+!  initialize PNEW pointer and check that PWHAT is not NULL
+!
        NULLIFY(PNEW)
        
        IF(.NOT.ASSOCIATED(PWHAT))THEN
@@ -81,7 +87,7 @@ CONTAINS
          PNEW => FLL_DUPLICATE(PWHAT, FPAR)
        ELSE
 !
-!  DUPLICATE NODE AND MOVE IT 
+!  OTHERWISE DUPLICATE NODE AND MOVE IT 
 !  TO PWHERE
 !
          PNEW => FLL_CP_R(PWHAT,PWHERE,'C',FPAR) 
@@ -92,16 +98,32 @@ CONTAINS
 
 
    FUNCTION  FLL_CP_R(PWHAT,PWHERE,MODE,FPAR) RESULT(PSOURCETMP)
-   
+!
+! Description: Module copies PWHAT pointer to PWHERE pointer
+!              If PWHERE pointer == NULL, PWHAT is a duplicate 
+!              of PWHAT with PWHAT%Ppar == NULL
+!
+! External Modules used
+!   
     USE FLL_TYPE_M
     USE FLL_RM_M
     USE FLL_STICH_M
     USE FLL_DUPLICATE_M
-    
+!
+! Declarations
+!
+! Arguments description
+! Name         In/Out     Function
+! PWHAT        In         pointer which is to be copied
+! PWHERE       In         pointer which is to be copied
+! MODE         In         if C - copy mode, if M - move mode
+! PSOURCETMP   Out        pointer to new copy of PWHAT
+! FPAR         In/Out     structure containing function specific data
+!
+! Arguments declaration
+!    
     IMPLICIT NONE
-!
-!   SUBROUTINE MOVES NODE
-!
+
    TYPE(DNODE), POINTER  :: PWHAT,PWHERE
    TYPE(FUNC_DATA_SET) :: FPAR
    CHARACTER :: MODE    ! 'C' - COPY,   'M' - MOVE
@@ -114,7 +136,9 @@ CONTAINS
 !   BODY OF SUBROUTINE
 !   
    PSOURCETMP => NULL()
-   
+!
+!  check that node is not null
+!
    FPAR%SUCCESS = .FALSE.
    IF(.NOT.ASSOCIATED(PWHAT))THEN
       WRITE(*,*)' Cp - SOURCE IS NULL NODE'
@@ -122,7 +146,9 @@ CONTAINS
       FPAR%SUCCESS = .FALSE.
       RETURN
    END IF
-   
+!
+!  check that pwhere is associated
+!
    IF(.NOT.ASSOCIATED(PWHERE))THEN
       WRITE(FPAR%MESG,'(A,A)')' Mv, Cp  - null node '
       FPAR%SUCCESS = .FALSE.
