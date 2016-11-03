@@ -557,7 +557,6 @@ CONTAINS
            READ(IOUNIT,IOSTAT=IOSTAT)NINTEG,(PNODE%R1(I),I=1,NSIZE)
          ELSE
            READ(IOUNIT,IOSTAT=IOSTAT)NINTEG,PNODE%R0
-           write(*,*)PNODE%R0
          END IF
        ELSE
          IF(NSIZE == 1)THEN

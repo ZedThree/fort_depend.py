@@ -61,6 +61,7 @@ CONTAINS
    INTEGER :: IOUNIT
    CHARACTER :: FMT
    LOGICAL OK
+   CHARACTER(32) :: FFVERSION='FFA-format-v2'
 !
 !   LOCAL TYPES
 !
@@ -91,6 +92,7 @@ CONTAINS
     CASE('B')
       OPEN(UNIT=IOUNIT,STATUS='UNKNOWN',FILE=TRIM(FILE),FORM='UNFORMATTED',&
            ACCESS='STREAM',IOSTAT=ISTAT)
+       WRITE(IOUNIT)FFVERSION
     CASE('A')
       OPEN(UNIT=IOUNIT,STATUS='UNKNOWN',FILE=TRIM(FILE),FORM='FORMATTED',&
            IOSTAT=ISTAT,ACTION='WRITE')
@@ -225,7 +227,6 @@ CONTAINS
    INTEGER(LINT) :: I,J,NDIM,NSIZE
    LOGICAL :: SAVED
    CHARACTER(LEN=TYPE_LENGTH) :: LTYPE
-   CHARACTER * 16 :: SHTEXT
    
    SAVED = .FALSE.
 !
@@ -238,6 +239,7 @@ CONTAINS
            LTYPE = PNODE%FTYPE
         ELSE
           WRITE(IOUNIT, *)TRIM(PNODE%LNAME),',N, 0, 0,',PNODE%NDIM
+          RETURN
         END IF
      ELSE 
         IF(TRIM(LTYPE) == 'S') THEN
@@ -358,33 +360,64 @@ CONTAINS
    INTEGER(LINT) :: I,J,NDIM,NSIZE,POS
    LOGICAL :: SAVED
    
+   CHARACTER(LEN=TYPE_LENGTH) :: NTYPE ='N', LTYPE
+   CHARACTER(LEN=NAME_LENGTH) :: SHTEXT
+   
    SAVED = .FALSE.
-!
-!   1D ARRAYS
-!
-        WRITE(IOUNIT)PNODE%LNAME,PNODE%LTYPE, PNODE%NDIM,PNODE%NSIZE
+   LTYPE = PNODE%LTYPE
+   
+   IF(TRIM(PNODE%LTYPE) == 'DIR' .OR.TRIM(PNODE%LTYPE) == 'N')THEN
+      IF(PNODE%NLINK > 0)THEN 
+         WRITE(IOUNIT)PNODE%LNAME,PNODE%FTYPE,1_LINT,1_LINT,PNODE%NDIM
+          LTYPE = PNODE%FTYPE
+      ELSE
+         WRITE(IOUNIT)PNODE%LNAME,NTYPE,0_LINT,0_LINT,PNODE%NDIM
+         RETURN
+      END IF
+   ELSE 
+      IF(TRIM(LTYPE) == 'S') THEN
+        IF(LTYPE == 'S')THEN
+           LTYPE = 'S'
+        ELSE
+           LTYPE ='L'
+        END IF
+      ELSE IF(TRIM(LTYPE) == 'L') THEN
+        LTYPE ='J'
+       END IF
+       LTYPE = PNODE%FTYPE
+
+        WRITE(IOUNIT)PNODE%LNAME,LTYPE,PNODE%NSIZE, PNODE%NDIM,0_LINT
+     END IF
 !
 !  1 D ARRAYS
 !
         IF(ASSOCIATED(PNODE%R1))THEN
           NDIM = SIZE(PNODE%R1, DIM =1, KIND = LINT)
-          WRITE(IOUNIT)(PNODE%R1(I), I = 1,NDIM)
+          WRITE(IOUNIT)NDIM,(PNODE%R1(I), I = 1,NDIM)
           SAVED = .TRUE.
         ELSE IF(ASSOCIATED(PNODE%D1))THEN
           NDIM = SIZE(PNODE%D1, DIM =1, KIND = LINT)
-          WRITE(IOUNIT)(PNODE%D1(I), I = 1,NDIM)
+          WRITE(IOUNIT)NDIM,(PNODE%D1(I), I = 1,NDIM)
           SAVED = .TRUE.
         ELSE IF(ASSOCIATED(PNODE%I1))THEN
           NDIM = SIZE(PNODE%I1, DIM =1, KIND = LINT)
-          WRITE(IOUNIT)(PNODE%I1(I), I = 1,NDIM)
+          WRITE(IOUNIT)NDIM,(PNODE%I1(I), I = 1,NDIM)
           SAVED = .TRUE.
         ELSE IF(ASSOCIATED(PNODE%L1))THEN
           NDIM = SIZE(PNODE%L1, DIM =1, KIND = LINT)
-          WRITE(IOUNIT)(PNODE%L1(I), I = 1,NDIM)
+          WRITE(IOUNIT)NDIM,(PNODE%L1(I), I = 1,NDIM)
           SAVED = .TRUE.
         ELSE IF(ASSOCIATED(PNODE%S1))THEN
           NDIM = SIZE(PNODE%S1, DIM =1, KIND = LINT)
-          WRITE(IOUNIT)(PNODE%S1(I), I = 1,NDIM)
+          IF(PNODE%FTYPE == 'L')THEN
+            WRITE(IOUNIT)NDIM*STRING_LENGHT,(PNODE%S1(I),I=1,NDIM)
+          ELSE
+            WRITE(IOUNIT)NDIM*NAME_LENGTH
+            DO I = 1,NDIM
+              SHTEXT = PNODE%S1(I)
+              WRITE(IOUNIT)SHTEXT
+            END DO
+          END IF
           SAVED = .TRUE.
 !
 !  2D ARRAYS
@@ -392,48 +425,72 @@ CONTAINS
        ELSE IF(ASSOCIATED(PNODE%R2))THEN
           NDIM  = SIZE(PNODE%R2, DIM =1, KIND = LINT)
           NSIZE = SIZE(PNODE%R2, DIM =2, KIND = LINT)
-          WRITE(IOUNIT)((PNODE%R2(I,J), I = 1,NSIZE), I=1,NDIM)
-           SAVED = .TRUE.
+          WRITE(IOUNIT)NDIM*NSIZE
+          DO J=1,NSIZE
+            WRITE(IOUNIT)(PNODE%R2(I,J), I = 1,NDIM)
+          END DO
+        SAVED = .TRUE.
       ELSE IF(ASSOCIATED(PNODE%D2))THEN
           NDIM  = SIZE(PNODE%D2, DIM =1, KIND = LINT)
           NSIZE = SIZE(PNODE%D2, DIM =2, KIND = LINT)
-          WRITE(IOUNIT)((PNODE%D2(I,J), J = 1,NSIZE), I=1,NDIM)
+          WRITE(IOUNIT)NDIM*NSIZE
+          DO J=1,NSIZE
+            WRITE(IOUNIT)(PNODE%D2(I,J), I = 1,NDIM)
+          END DO
           SAVED = .TRUE.
        ELSE IF(ASSOCIATED(PNODE%I2))THEN
           NDIM  = SIZE(PNODE%I2, DIM =1, KIND = LINT)
           NSIZE = SIZE(PNODE%I2, DIM =2, KIND = LINT)
-          WRITE(IOUNIT)((PNODE%I2(I,J), J = 1,NSIZE), I=1,NDIM)
+          WRITE(IOUNIT)NDIM*NSIZE
+          DO J=1,NSIZE
+            WRITE(IOUNIT)(PNODE%I2(I,J), I = 1,NDIM)
+          END DO
           SAVED = .TRUE.
        ELSE IF(ASSOCIATED(PNODE%L2))THEN
           NDIM  = SIZE(PNODE%L2, DIM =1, KIND = LINT)
           NSIZE = SIZE(PNODE%L2, DIM =2, KIND = LINT)
-          WRITE(IOUNIT)((PNODE%L2(I,J), J = 1,NSIZE), I=1,NDIM)
-           SAVED = .TRUE.
+          WRITE(IOUNIT)NDIM*NSIZE
+          DO J=1,NSIZE
+            WRITE(IOUNIT)(PNODE%L2(I,J), I = 1,NDIM)
+          END DO
+          SAVED = .TRUE.
        ELSE IF(ASSOCIATED(PNODE%S2))THEN
           NDIM  = SIZE(PNODE%S2, DIM =1, KIND = LINT)
           NSIZE = SIZE(PNODE%S2, DIM =2, KIND = LINT)
-          WRITE(IOUNIT)((PNODE%S2(I,J), J = 1,NSIZE), I=1,NDIM)
-           SAVED = .TRUE.
+
+          IF(PNODE%FTYPE == 'L')THEN
+             WRITE(IOUNIT)NDIM*NSIZE*STRING_LENGHT,((PNODE%S2(I,J), I = 1,NDIM),J=1,NSIZE)
+         ELSE   
+           WRITE(IOUNIT)NDIM*NSIZE*NAME_LENGTH
+           DO J=1,NSIZE
+              DO I=1,NDIM
+                SHTEXT = PNODE%S2(I,J)
+                WRITE(IOUNIT)SHTEXT
+              END DO
+            END DO
+         ENDIF 
+         SAVED = .TRUE.
       END IF
 !
 !  CHECK IF NODE IS CONSTANT
 !
       IF(.NOT.SAVED)THEN
-        SELECT CASE(PNODE%LTYPE)
-         CASE('R')
-            WRITE(IOUNIT)PNODE%R0
-         CASE('D')
-            WRITE(IOUNIT)PNODE%D0
-         CASE('I')
-            WRITE(IOUNIT)PNODE%I0
-         CASE('L')
-            WRITE(IOUNIT)PNODE%L0
-         CASE('S')
-            WRITE(IOUNIT)PNODE%S
-
-         CASE DEFAULT 
-         
-         END SELECT
+         IF(PNODE%NSIZE*PNODE%NDIM /= 0 .OR. PNODE%NLINK >0)THEN
+          SELECT CASE(LTYPE)
+           CASE('R')
+              WRITE(IOUNIT)1_LINT,PNODE%R0
+           CASE('D')
+              WRITE(IOUNIT)1_LINT,PNODE%D0
+           CASE('I')
+              WRITE(IOUNIT)1_LINT,PNODE%I0
+           CASE('J')
+              WRITE(IOUNIT)1_LINT,PNODE%L0
+           CASE('L')
+               WRITE(IOUNIT)1_LINT*STRING_LENGHT,PNODE%S
+           CASE('S')
+               WRITE(IOUNIT)1_LINT*NAME_LENGTH,PNODE%S(1:NAME_LENGTH)
+           END SELECT
+        END IF
        END IF
 
 
