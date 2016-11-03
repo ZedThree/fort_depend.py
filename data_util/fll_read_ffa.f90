@@ -230,7 +230,7 @@ CONTAINS
     
     CHARACTER(*)     :: LTYPE,FTYPE
     CHARACTER(*)     :: NAME
-    INTEGER(LINT) :: NDIM, NSIZE,ISTART,IIND,NLINK,TMPINT,NDIMO,NSIZEO
+    INTEGER(LINT) :: NDIM, NSIZE,ISTART,IIND,NLINK,TMPINT,NDIMO,NSIZEO,I
     CHARACTER*255 :: TEXT_LINE,TRIM_LINE
     CHARACTER*32  :: VER
     INTEGER :: IOSTAT
@@ -246,8 +246,12 @@ CONTAINS
         OK = TEST_IOSTAT(IOSTAT,FPAR)
         IF(.NOT.OK) RETURN
       END DO
-      
+            
       TRIM_LINE = TRIM(TEXT_LINE)
+      
+      DO I=1,255
+        IF(TRIM_LINE(I:I) == ',') TRIM_LINE(I:I) =' '
+      END DO
 !
 !  GET NAME
 !
@@ -258,12 +262,11 @@ CONTAINS
       END DO 
       ISTART = IIND
       
-      DO WHILE(TRIM_LINE(IIND:IIND) /= ',' )
+      DO WHILE(TRIM_LINE(IIND:IIND) /= ' ' )
          IIND =IIND + 1
          IF(IIND > 254)RETURN
       END DO
-      NAME = TRIM(TRIM_LINE(ISTART:IIND-1))
-      IIND = IIND + 1
+      NAME = TRIM(TRIM_LINE(ISTART:IIND))
 
       DO WHILE(TRIM_LINE(IIND:IIND) == ' ')
         IIND =IIND + 1
@@ -273,15 +276,15 @@ CONTAINS
 !
 !  GET TYPE
 !
-      DO WHILE(TRIM_LINE(IIND:IIND) /= ',' )
+      DO WHILE(TRIM_LINE(IIND:IIND) /= ' ' )
          IIND =IIND + 1
          IF(IIND > 254)RETURN
       END DO
-      LTYPE = TRIM(TRIM_LINE(ISTART:IIND-1))
-      FTYPE = TRIM(TRIM_LINE(ISTART:IIND-1))
-      IIND = IIND + 1
+      LTYPE = TRIM(TRIM_LINE(ISTART:IIND))
+      LTYPE(2:) = ' '
+      FTYPE = LTYPE
 
-      DO WHILE(TRIM_LINE(IIND:IIND) == ' ' .OR. TRIM_LINE(IIND:IIND) == ',')
+      DO WHILE(TRIM_LINE(IIND:IIND) == ' ')
         IIND =IIND + 1
         IF(IIND > 254)RETURN
       END DO       
@@ -289,15 +292,14 @@ CONTAINS
 !
 !  GET NSIZE
 !
-       DO WHILE(TRIM_LINE(IIND:IIND) /= ',' )
+       DO WHILE(TRIM_LINE(IIND:IIND) /= ' ' )
          IIND =IIND + 1
          IF(IIND > 254)RETURN
       END DO
 
       READ(TRIM_LINE(ISTART:IIND-1),'(I30)',IOSTAT=IOSTAT) NSIZE 
-      IIND = IIND + 1         
       
-      DO WHILE(TRIM_LINE(IIND:IIND) == ' ' .OR. TRIM_LINE(IIND:IIND) == ',')
+      DO WHILE(TRIM_LINE(IIND:IIND) == ' ')
         IIND =IIND + 1
         IF(IIND > 254)RETURN
       END DO       
@@ -305,14 +307,14 @@ CONTAINS
 !
 !  GET NDIM
 !
-       DO WHILE(TRIM_LINE(IIND:IIND) /= ',' )
+       DO WHILE(TRIM_LINE(IIND:IIND) /= ' ' )
          IIND =IIND + 1
          IF(IIND > 254)RETURN
       END DO
       READ(TRIM_LINE(ISTART:IIND-1),'(I30)',IOSTAT=IOSTAT) NDIM
       IIND = IIND + 1     
        
-      DO WHILE(TRIM_LINE(IIND:IIND) == ' ' .OR. TRIM_LINE(IIND:IIND) == ',')
+      DO WHILE(TRIM_LINE(IIND:IIND) == ' ')
         IIND =IIND + 1
         IF(IIND > 254)RETURN
       END DO       
@@ -368,9 +370,8 @@ CONTAINS
           READ(IOUNIT,IOSTAT=IOSTAT)VER
           READ(IOUNIT,IOSTAT=IOSTAT)NAME,LTYPE,NSIZE,NDIM,NLINK
        END IF
-
-       LTYPE(2:4) = ' '
-
+      
+       LTYPE(2:) = ' '
        FTYPE = LTYPE
        NSIZEO = NSIZE
        NDIMO = NDIM
@@ -381,9 +382,9 @@ CONTAINS
          NDIM   = NLINK
        ELSE
       
-         IF(TRIM(LTYPE) == 'L')THEN 
+         IF(TRIM(LTYPE(1:1)) == 'L')THEN 
            LTYPE ='S'
-         ELSE IF(TRIM(LTYPE) == 'J')THEN 
+         ELSE IF(TRIM(LTYPE(1:1)) == 'J')THEN 
            LTYPE ='L'
          END IF
       
@@ -432,7 +433,7 @@ CONTAINS
 !  BODY
 !
     IF(NDIM*NSIZE == 0)RETURN
-    SELECT CASE(LTYPE)
+    SELECT CASE(LTYPE(1:1))
      CASE('R')
        IF(NDIM == 1)THEN
          IF(NSIZE > 1)THEN
@@ -556,14 +557,13 @@ CONTAINS
 !  BODY
 !
     IF(NDIM*NSIZE == 0)RETURN
-    SELECT CASE(LTYPE)
+    SELECT CASE(LTYPE(1:1))
      CASE('R')
        IF(NDIM == 1)THEN
          IF(NSIZE > 1)THEN
            READ(IOUNIT,IOSTAT=IOSTAT)NINTEG,(PNODE%R1(I),I=1,NSIZE)
          ELSE
            READ(IOUNIT,IOSTAT=IOSTAT)NINTEG,PNODE%R0
-           write(*,*)PNODE%R0
          END IF
        ELSE
          IF(NSIZE == 1)THEN
