@@ -46,6 +46,7 @@
     PROGRAM  FLL_TEST
 
     USE FLL_MODS_M
+    USE FLL_TEST_SUBR_N
     IMPLICIT NONE
 !
 !   SUBROUTINE MOVES NODE
@@ -141,47 +142,11 @@
    OK = FLL_MV(PNODE, PNEW1, FPAR)
    CALL FLL_CAT(PNEW1, 6, .TRUE.,FPAR)	
    WRITE(*,*)'------------------------------------------------------4'
-!
-!  SOME ADDITIONAL OPERATIONS
-!
 
-!
-!  COPY PNODE, BECASE THE TARGET IN COPY IS NULL
-!  THE PNEW IS GOING TO BE A DUPLICATE OF PNODE
-!  AND IS GOING TO BE A NEW NODE
-!
-   PNEW => FLL_CP(PNODE, NULL(), FPAR)
-   CALL FLL_CAT(PNEW, 6, .TRUE.,FPAR)
-   WRITE(*,*)'------------------------------------------------------5'
-!
-!  find number 1st subdir IN PNODE1
-! 
-   NNODES =  FLL_NNODES(PNODE1,'TEST1_Subdir','*',-1_lint,.false.,FPAR)
-   WRITE(*,*)
-   WRITE(*,*)' number of TEST1_Subdir subsets is ', NNODES
-   WRITE(*,*)
-!
-!   find the first TEST1_Subdir in PNODE1 and print it on the screen
-!
-   PTMP => FLL_LOCATE(PNODE1,'TEST1_Subdir',1_lint,'*',-1_LINT,.false.,FPAR)
-   CALL FLL_CAT(PTMP, 6, .TRUE.,FPAR)
-   WRITE(*,*)'------------------------------------------------------7'
-!
-!  find the values of pressure subset #1 and print the data on screen
-!
-    PRESS => FLL_GETNDATA_D1(PTMP,'pressure',1_LINT,'D',FPAR)
-    write(*,*)' Values of pressure are ',PRESS
-!
-!  CLEANUP ALL MEMORY
-!
-   WRITE(*,*)' REMOVE ===========================' 
-!
-!  WE HAVE TO REMOVE PNODE1 AND PNEW WHICH WAS CREATED ON LINE 153
-!  PNODE WAS DELETED AS PART OF PNEW1 WHERE IT WAS MOVED
+   CALL FLL_TEST_SUBR(PNODE,PNODE1)
 
-!  PNEW2 IS NOT A NEW NODE, IT POINTS TO A COPY SO DOES NOT NEED TO BE FREED
+   WRITE(*,*)'---BACK FROM SUBROUTINE --------------8'
 !
-   CALL FLL_RM(PNEW,FPAR)
    CALL FLL_RM(PNODE1,FPAR)
    CALL FLL_RM(PNODE,FPAR)
 
