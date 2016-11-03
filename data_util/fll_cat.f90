@@ -15,54 +15,56 @@
 !     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 !     
 !     contact: libm3l@gmail.com
-! 
-!
-
 !
 !     Subroutine FLL_CAT
 !
-!     Date: 2016-10-10
-! 
-! 
-!
-!
-!     Description: prints linked list 
-! 
-!
-!     Input parameters:
-! 
-!
-!     Return value:
-! 
-! 
-!
-!     Modifications:
-!     Date		Version		Patch number		CLA 
-!
-!
-!     Description
-!
 !
 MODULE FLL_CAT_M
+!
+! Description: Contains function fll_cp
+!
+! 
+! History:
+! Version   Date       Patch number  CLA     Comment
+! -------   --------   --------      ---     -------
+! 1.1       10/10/16                         Initial implementation
+!
+!
+! External Modules used
+!
 CONTAINS
 
    SUBROUTINE FLL_CAT(PNODE,IOUNIT,PARENT,FPAR)
-   
+!
+! Description: Module prints the short content of PNODE to IOUNIT
+!
+! External Modules used
+!     
     USE FLL_TYPE_M
     IMPLICIT NONE
 !
-!   SUBROUTINE REMOVES NODE
+! Declarations
 !
-   TYPE(DNODE), POINTER  :: PNODE,PCHILD
+! Arguments description
+! Name         In/Out     Function
+! PNODE        In         pointer to be printed
+! IOUNIR       In         pointer which is to be copied
+! PARENT       In         parameter, if .TRUE. write information about PNODE parent node
+! FPAR         In/Out     structure containing function specific data
+!
+! Arguments declaration
+!
+   TYPE(DNODE), POINTER  :: PNODE
    TYPE(FUNC_DATA_SET) :: FPAR
    INTEGER :: IOUNIT
-   INTEGER(LINT) :: POS
    LOGICAL :: PARENT
 !
-!   LOCAL TYPES
+! Local types
 !
-!   
-!   BODY OF SUBROUTINE
+   TYPE(DNODE), POINTER  :: PCHILD
+   INTEGER(LINT) :: POS
+! 
+! body of subroutine
 !
    POS = 1
    FPAR%SUCCESS = .FALSE.
@@ -87,21 +89,36 @@ CONTAINS
    RETURN
    END SUBROUTINE FLL_CAT
 !
-!  DELETE CHID WITH ALL ITS CHILDREN
+!  print node recursively
 !
   RECURSIVE SUBROUTINE FLL_CAT_RECURSIVE_NODE(PNODE,IOUNIT,POS,FPAR)
-  
+!
+! Description: Module prints the short content of PNODE to IOUNIT
+!
+! External Modules used
+!   
      USE FLL_TYPE_M
      IMPLICIT NONE
 !
-!   SUBROUTINE REMOVES NODE
-! 
+! Declarations
+!
+! Arguments description
+! Name         In/Out     Function
+! PNODE        In         pointer to be printed
+! IOUNIR       In         pointer which is to be copied
+! PARENT       In         parameter, if .TRUE. write information about PNODE parent node
+! FPAR         In/Out     structure containing function specific data
+!
+! Arguments declaration
+!
     TYPE(DNODE), POINTER  :: PNODE
     TYPE(FUNC_DATA_SET) :: FPAR
     INTEGER(LINT) :: POS 
-   
-    TYPE(DNODE), POINTER  :: PCURR, PNEXT, PCHILD
     INTEGER :: IOUNIT
+!
+!  Local variables
+!   
+    TYPE(DNODE), POINTER  :: PCURR, PNEXT, PCHILD
 !
 !  IF NODE HAS CHILDREN
 !
@@ -133,16 +150,34 @@ CONTAINS
 !  FREE MEMORY FOR NODE
 !
   SUBROUTINE FLL_PRINT(PNODE, IOUNIT, POS, FPAR)
+!
+! Description: print content of PNODE
+!
+! External Modules used
+!
     USE FLL_TYPE_M
     IMPLICIT NONE
 !
-!   SUBROUTINE REMOVES NODE
+! Declarations
+!
+! Arguments description
+! Name         In/Out     Function
+! PNODE        In         pointer to be printed
+! IOUNIR       In         pointer which is to be copied
+! PARENT       In         parameter, if .TRUE. write information about PNODE parent node
+! FPAR         In/Out     structure containing function specific data
+! POS          In         level in linked list
+!
+! Arguments declaration
 !
    TYPE(DNODE), POINTER  :: PNODE
    TYPE(FUNC_DATA_SET) :: FPAR
-   
    INTEGER :: IOUNIT
-   INTEGER(LINT) :: POS,I,J,NDIM,NSIZE
+   INTEGER(LINT) :: POS
+!
+!  Local variables
+!
+   INTEGER(LINT) :: I,J,NDIM,NSIZE
    LOGICAL :: SAVED
    CHARACTER*2048 :: TEXT,TEXT1
    CHARACTER*72 :: NDSTR,NSSTR
@@ -154,7 +189,7 @@ CONTAINS
    NSIZE = PNODE%NSIZE
    SPACE(:) = ' '
 !
-!   HEADERS
+!   print headers
 !
      WRITE(NDSTR,'(I10)')PNODE%NDIM
      WRITE(NSSTR,'(I10)')PNODE%NSIZE
@@ -171,7 +206,7 @@ CONTAINS
         WRITE(TEXT1,*)"-",TRIM(PNODE%LTYPE),"-     ",TRIM(ADJUSTL(NDSTR)),'x',TRIM(ADJUSTL(NSSTR)),'      ',SPACE,TRIM(PNODE%LNAME)
      END IF
 !
-!  1 D ARRAYS
+!  print 1D arrays
 !
      IF(ASSOCIATED(PNODE%R1))THEN
        WRITE(TEXT,*)"     ",SPACE,(PNODE%R1(I), I = 1,MIN(NDIM,3_LINT))
@@ -194,7 +229,7 @@ CONTAINS
        WRITE(IOUNIT, *)TRIM(TEXT1),TRIM(TEXT)
        SAVED = .TRUE.
 !
-!  2D ARRAYS
+!  print 2D arrays
 !
      ELSE IF(ASSOCIATED(PNODE%R2))THEN
        WRITE(TEXT,*)"     ",SPACE,((PNODE%R2(I,J), J = 1,MIN(NSIZE,2_LINT)), I=1,MIN(NDIM,2_LINT))
@@ -218,7 +253,8 @@ CONTAINS
        SAVED = .TRUE.
      END IF
 !
-!  CHECK IF NODE IS CONSTANT
+!  if not 1D or 2D arrays, print constants
+!  only for nodes which contain something
 !
      IF(.NOT.SAVED)THEN
        IF(NDIM /= 0 .AND. NSIZE /= 0)THEN

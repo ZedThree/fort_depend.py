@@ -17,54 +17,64 @@
 !     contact: libm3l@gmail.com
 ! 
 !
-
-!
-!     Subroutine FLL_duplicate
-!
-!     Date: 2016-10-10
-! 
-! 
-!
-!
-!     Description: duplicates node with its children
-! 
-!
-!     Input parameters:
-! 
-!
-!     Return value:
-! 
-! 
-!
-!     Modifications:
-!     Date		Version		Patch number		CLA 
-!
-!
-!     Description
 !
 !
 MODULE FLL_DUPLICATE_M
+!
+! Description: Contains duplicates node
+!
+! 
+! History:
+! Version   Date       Patch number  CLA     Comment
+! -------   --------   --------      ---     -------
+! 1.1       10/10/16                         Initial implementation
+!
+!
+! External Modules used
+!
 CONTAINS
-
    FUNCTION FLL_DUPLICATE(PNODE,FPAR) RESULT(PNEW)
-   
+!
+! Description: Contains duplicates node to PNEW mode
+!              the parent, previous and next pointers of PNEW node are NULL
+!
+! 
+! History:
+! Version   Date       Patch number  CLA     Comment
+! -------   --------   --------      ---     -------
+! 1.1       10/10/16                         Initial implementation
+!
+!
+! External Modules used
+!
     USE FLL_TYPE_M
     USE FLL_MK_M
     USE FLL_MV_M
 
     IMPLICIT NONE
 !
-!   SUBROUTINE DUPLICATE NODE
+! Declarations
+!
+! Arguments description
+! Name         In/Out     Function
+! PNODE        In         node to duplicate
+! PNEW         Out        duplicate node
+! FPAR         In/Out     structure containing function specific data
+!
+! Arguments declaration
 !
    TYPE(DNODE), POINTER  :: PNODE,PNEW
    TYPE(FUNC_DATA_SET) :: FPAR
 !
-!   LOCAL TYPES
+! Local declarations
 !
    TYPE(DNODE), POINTER :: PCHILD
 !   
 !   BODY OF SUBROUTINE
 !   
+!
+!  check the node is not null
+!
    PNEW => NULL()
    FPAR%SUCCESS = .FALSE.
    IF(.NOT.ASSOCIATED(PNODE))THEN
@@ -117,17 +127,31 @@ CONTAINS
 !  DELETE CHID WITH ALL ITS CHILDREN
 !
   RECURSIVE SUBROUTINE FLL_DUPLICATE_RECURSIVE_NODE(PNODE,PDUPL,FPAR)
-  
+!
+! Description: makes recursive duplicate of PNODE
+!
+! External Modules used
+!
      USE FLL_TYPE_M
      USE FLL_MK_M
      USE FLL_MV_M
      IMPLICIT NONE
 !
-!   SUBROUTINE REMOVES NODE
+! Declarations
+!
+! Arguments description
+! Name         In/Out     Function
+! PNODE        In         pointer which is to be duplicated
+! PDUPL        Out        duplicate of PNODE
+! FPAR         In/Out     structure containing function specific data
+!
+! Arguments declaration
 ! 
     TYPE(DNODE), POINTER  :: PNODE,PDUPL
     TYPE(FUNC_DATA_SET) :: FPAR
-    
+!
+! Local declarations
+!
     TYPE(DNODE), POINTER  :: PCURR, PNEXT,PNEW,PCHILD
     LOGICAL :: OK
 !
@@ -188,19 +212,36 @@ CONTAINS
 
   END SUBROUTINE FLL_DUPLICATE_RECURSIVE_NODE
 !
-!  FREE MEMORY FOR NODE
+! 
 !
   SUBROUTINE FLL_COPPY_NODE_ARRAYS(PNODE,PNEW,FPAR)
+!
+! Description: duplicated data of the node
+!
+! External Modules used
+! 
     USE FLL_TYPE_M
     IMPLICIT NONE
 !
-!   SUBROUTINE REMOVES NODE
+! Declarations
+!
+! Arguments description
+! Name         In/Out     Function
+! PNODE        In         pointer data which is to be duplicated
+! PNEW         Out        duplicate of PNODE data 
+! FPAR         In/Out     structure containing function specific data
+!
+! Arguments declaration
 !
    TYPE(DNODE), POINTER  :: PNODE,PNEW
    TYPE(FUNC_DATA_SET) :: FPAR
-
+!
+! Local declarations
+!
    INTEGER(LINT) :: NDIM, NSIZE, NNDIM, NNSIZE
-
+!
+!  check node types
+!
    IF(TRIM(PNODE%LTYPE) /= TRIM(PNEW%LTYPE))THEN
      WRITE(FPAR%MESG,'(A,A,A)')' DUPLICATE - nodes do not have the same array dimensions', TRIM(PNODE%LNAME), TRIM(PNEW%LNAME)
      FPAR%SUCCESS = .FALSE.

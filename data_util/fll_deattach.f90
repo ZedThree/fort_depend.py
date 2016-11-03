@@ -15,45 +15,60 @@
 !     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 !     
 !     contact: libm3l@gmail.com
-! 
 !
-
 !
 !     Subroutine FLL_DEATTACH
 !
-!     Date: 2016-10-10
-! 
-! 
-!
-!
-!     Description: DEATTACHES NODE FROM THE LIST
-!
-!
-!     Input parameters:
-! 
-!
-!     Return value:
-! 
-! 
-!
-!     Modifications:
-!     Date		Version		Patch number		CLA 
-!
-!
-!     Description
-!
 !
 MODULE FLL_DEATTACH_M
-CONTAINS
+!
+! Description: Deattach node from the list
+!
+! 
+! History:
+! Version   Date       Patch number  CLA     Comment
+! -------   --------   --------      ---     -------
+! 1.1       10/10/16                         Initial implementation
+!
+!
+! External Modules used
 
+CONTAINS
    FUNCTION FLL_DEATTACH(PWHAT,FPAR) RESULT(OK)
+!
+! Description: Deattach PWHAT node from the list
+!              upon return, PWHAT parent is set to NULL and 
+!              the nodes is moved outside the list it is currently in
+!
+! 
+! History:
+! Version   Date       Patch number  CLA     Comment
+! -------   --------   --------      ---     -------
+! 1.1       10/10/16                         Initial implementation
+!
+!
+! External Modules used
+
        USE FLL_TYPE_M
        USE FLL_STICH_M
+!
+! Declarations
+!
+! Arguments description
+! Name         In/Out     Function
+! PWHAT        In         node to deattach from the list
+! OK           In         return parameter, of .TRUE. - success, if .FALSE. - fail
+! FPAR         In/Out     structure containing function specific data
+!
+! Arguments declaration
+!
        IMPLICIT NONE
        TYPE(DNODE), POINTER  :: PWHAT
        TYPE(FUNC_DATA_SET) :: FPAR
        LOGICAL::  OK
-
+!
+!  check that PWAT is not null node
+!
        OK = .FALSE.
        IF(.NOT.ASSOCIATED(PWHAT))THEN
          WRITE(FPAR%MESG,'(A,A)')' Deattach - null node '
@@ -64,6 +79,9 @@ CONTAINS
 !   STICH THE LIST WHERE THE SOURCE WILL BE TAKEN FROM 
 !
       CALL FLL_STICH(PWHAT,FPAR)
+!
+!  set PWHAT pointers
+!
       PWHAT%PPAR => NULL()
       PWHAT%PNEXT => NULL()
       PWHAT%PPREV => NULL()

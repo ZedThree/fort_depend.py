@@ -15,13 +15,8 @@
 !     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 !     
 !     contact: libm3l@gmail.com
-! 
-!
-
 !
 !     Subroutine FLL_CP
-!
-!     Date: 2016-10-10
 !
 !
 MODULE FLL_CP_M
