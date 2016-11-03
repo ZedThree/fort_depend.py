@@ -17,43 +17,42 @@
 !     contact: libm3l@gmail.com
 ! 
 !
-
-!
-!     Subroutine FLL_LOCATE
-!
-!     Date: 2016-10-10
-! 
-! 
-!
-!
-!     Description: Finds node in a chain
-! 
-!
-!     Input parameters:
-! 
-!
-!     Return value:
-! 
-! 
-!
-!     Modifications:
-!     Date		Version		Patch number		CLA 
-!
-!
-!     Description
-!
-!
 MODULE FLL_LOCATE_M
+!
+! Description: locate node
+!
+! External Modules used
+!
 CONTAINS
 
    RECURSIVE FUNCTION FLL_LOCATE(PNODE,NAME,NUMBER,LTYPE,DATADIM,RECURSE,FPAR) RESULT(PFIND)
-   
+!
+! Description: function finds node identified by name, type, position in list, dimensions of data it contains
+!                       serach can be done recursively
+!
+! External Modules used
+!   
     USE FLL_TYPE_M
     USE FLL_FUNC_PRT_M
 
     IMPLICIT NONE
 !
-!   FUNCTION FIND NODES WITH SPECIFIED NAME 
+! Declarations
+!
+! Arguments description
+! Name         In/Out     Function
+! PNODE        In         pointer where find node
+! NAME         In         name of node
+! NUMBER       In         position of node in list
+! LTYPE        In         type of node  - can be *
+! DATADIM      In         dimensions of data the node should contain
+!                         can be 0 - scalar), 1 -1D array, 2 -2D array 
+!                         any other number (prefer -1) - do not care about dimensions
+! RECURSE      In         search recursively
+! PFIND        Out        return pointer to located node
+! FPAR         In/Out     structure containing function specific data
+!
+! Arguments declaration
 !
    TYPE(FUNC_DATA_SET) :: FPAR
    TYPE(DNODE), POINTER  :: PNODE,PFIND
@@ -62,21 +61,17 @@ CONTAINS
    INTEGER(LINT) :: NUMBER,DATADIM
    LOGICAL :: RECURSE
 !
-!   LOCAL TYPES
+! Local declarations
 !
    CHARACTER(LEN=TYPE_LENGTH) :: TLTYPE
    TYPE(DNODE), POINTER  :: PCURR, PCHLD
    INTEGER(LINT) :: LOCNUM,I, NDIM, NSIZE
 !   
-!   BODY OF FUNCTION
+!  remove empty spaces
 !
    NULLIFY(PFIND)
-   I = 1
-   DO WHILE(LTYPE(I:I) == ' ')
-     I = I + 1
-   END DO
 
-   TLTYPE = TRIM(LTYPE(I:))
+   TLTYPE = ADJUSTL(TRIM(LTYPE(I:)))
    
    IF(.NOT.ASSOCIATED(PNODE))THEN
       WRITE(FPAR%MESG,'(A,A)')'Locate - Null node: ',TRIM(NAME)

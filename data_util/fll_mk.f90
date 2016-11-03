@@ -17,46 +17,43 @@
 !     contact: libm3l@gmail.com
 ! 
 !
-
-!
-!     Subroutine FLL_MK
-!
-!     Date: 2016-10-19
-! 
-! 
-!
-!
-!     Description: make nodes
-!
-!
-!     Input parameters:
-! 
-!
-!     Return value:
-! 
-! 
-!
-!     Modifications:
-!     Date		Version		Patch number		CLA 
-!
-!
-!     Description
-!
-!
 MODULE FLL_MK_M
+!
+! Description: creates node
+!
+! External Modules used
+!
 CONTAINS
-
    FUNCTION FLL_MK(NAME,LTYPE,NDIM,NSIZE,FPAR) RESULT(PNEW)
-   
+!
+! Description: function creates node specified by name, type and dimensions
+!
+! External Modules used
+! 
        USE FLL_TYPE_M
        
        IMPLICIT NONE
+!
+! Declarations
+!
+! Arguments description
+! Name         In/Out     Function
+! NAME         In         name of node
+! LTYPE        In         type of node  - can be *
+! NDIM, NSIZE  In         node dimensions
+! PNEW         Out        return pointer to newly created node
+! FPAR         In/Out     structure containing function specific data
+!
+! Arguments declaration
+!
        TYPE(FUNC_DATA_SET)   :: FPAR
        TYPE(DNODE), POINTER  :: PNEW
        CHARACTER(*)  :: NAME
        CHARACTER(*)  :: LTYPE
        INTEGER(LINT) :: NDIM, NSIZE
-       
+!
+! Local declarations
+!       
        INTEGER :: ISTAT
        
        PNEW => NULL()
@@ -203,8 +200,5 @@ CONTAINS
 
     RETURN
    END FUNCTION FLL_MK
-   
-   
-   
    
 END MODULE FLL_MK_M

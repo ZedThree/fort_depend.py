@@ -17,39 +17,39 @@
 !     contact: libm3l@gmail.com
 ! 
 !
-
-!
-!     Subroutine FLL_FUNC_PRT_M
-!
-!     Date: 2016-10-10
-! 
-! 
-!
-!
-!     Description: Finds node in a chain
-! 
-!
-!     Input parameters:
-! 
-!
-!     Return value:
-! 
-! 
-!
-!     Modifications:
-!     Date		Version		Patch number		CLA 
-!
-!
-!     Description
-!
-!
 MODULE FLL_FUNC_PRT_M
+!
+! Description: Contains prototypes of some functions
+!
+! 
+! History:
+! Version   Date       Patch number  CLA     Comment
+! -------   --------   --------      ---     -------
+! 1.1       10/10/16                         Initial implementation
+!
+!
+! External Modules used
+!
 CONTAINS
 
    FUNCTION ERR_MSG(NAME,NTYPE) RESULT(MESG)
-    
+!
+! Description: writes to a err message string
+!
+! External Modules used
+!      
       USE FLL_TYPE_M
       IMPLICIT NONE   
+!
+! Declarations
+!
+! Arguments description
+! Name         In/Out     Function
+! NAME         In         name of node
+! NTYPE        In         type of node
+!
+! Arguments declaration
+!
       CHARACTER(LEN=NAME_LENGTH) :: NAME
       CHARACTER(LEN=TYPE_LENGTH) :: NTYPE
       
