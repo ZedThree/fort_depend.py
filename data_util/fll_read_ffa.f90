@@ -230,7 +230,7 @@ CONTAINS
     
     CHARACTER(*)     :: LTYPE,FTYPE
     CHARACTER(*)     :: NAME
-    INTEGER(LINT) :: NDIM, NSIZE,ISTART,IIND,NLINK,TMPINT,NDIMO,NSIZEO
+    INTEGER(LINT) :: NDIM, NSIZE,ISTART,IIND,NLINK,TMPINT,NDIMO,NSIZEO,I
     CHARACTER*255 :: TEXT_LINE,TRIM_LINE
     CHARACTER*32  :: VER
     INTEGER :: IOSTAT
@@ -248,6 +248,10 @@ CONTAINS
       END DO
             
       TRIM_LINE = TRIM(TEXT_LINE)
+      
+      DO I=1,255
+        IF(TRIM_LINE(I:I) == ',') TRIM_LINE(I:I) =' '
+      END DO
 !
 !  GET NAME
 !
@@ -258,12 +262,11 @@ CONTAINS
       END DO 
       ISTART = IIND
       
-      DO WHILE(TRIM_LINE(IIND:IIND) /= ',' )
+      DO WHILE(TRIM_LINE(IIND:IIND) /= ' ' )
          IIND =IIND + 1
          IF(IIND > 254)RETURN
       END DO
-      NAME = TRIM(TRIM_LINE(ISTART:IIND-1))
-      IIND = IIND + 1
+      NAME = TRIM(TRIM_LINE(ISTART:IIND))
 
       DO WHILE(TRIM_LINE(IIND:IIND) == ' ')
         IIND =IIND + 1
@@ -273,15 +276,15 @@ CONTAINS
 !
 !  GET TYPE
 !
-      DO WHILE(TRIM_LINE(IIND:IIND) /= ',' )
+      DO WHILE(TRIM_LINE(IIND:IIND) /= ' ' )
          IIND =IIND + 1
          IF(IIND > 254)RETURN
       END DO
-      LTYPE = TRIM(TRIM_LINE(ISTART:IIND-1))
-      FTYPE = TRIM(TRIM_LINE(ISTART:IIND-1))
-      IIND = IIND + 1
+      LTYPE = TRIM(TRIM_LINE(ISTART:IIND))
+      LTYPE(2:) = ' '
+      FTYPE = LTYPE
 
-      DO WHILE(TRIM_LINE(IIND:IIND) == ' ' .OR. TRIM_LINE(IIND:IIND) == ',')
+      DO WHILE(TRIM_LINE(IIND:IIND) == ' ')
         IIND =IIND + 1
         IF(IIND > 254)RETURN
       END DO       
@@ -289,15 +292,14 @@ CONTAINS
 !
 !  GET NSIZE
 !
-       DO WHILE(TRIM_LINE(IIND:IIND) /= ',' )
+       DO WHILE(TRIM_LINE(IIND:IIND) /= ' ' )
          IIND =IIND + 1
          IF(IIND > 254)RETURN
       END DO
 
       READ(TRIM_LINE(ISTART:IIND-1),'(I30)',IOSTAT=IOSTAT) NSIZE 
-      IIND = IIND + 1         
       
-      DO WHILE(TRIM_LINE(IIND:IIND) == ' ' .OR. TRIM_LINE(IIND:IIND) == ',')
+      DO WHILE(TRIM_LINE(IIND:IIND) == ' ')
         IIND =IIND + 1
         IF(IIND > 254)RETURN
       END DO       
@@ -305,14 +307,14 @@ CONTAINS
 !
 !  GET NDIM
 !
-       DO WHILE(TRIM_LINE(IIND:IIND) /= ',' )
+       DO WHILE(TRIM_LINE(IIND:IIND) /= ' ' )
          IIND =IIND + 1
          IF(IIND > 254)RETURN
       END DO
       READ(TRIM_LINE(ISTART:IIND-1),'(I30)',IOSTAT=IOSTAT) NDIM
       IIND = IIND + 1     
        
-      DO WHILE(TRIM_LINE(IIND:IIND) == ' ' .OR. TRIM_LINE(IIND:IIND) == ',')
+      DO WHILE(TRIM_LINE(IIND:IIND) == ' ')
         IIND =IIND + 1
         IF(IIND > 254)RETURN
       END DO       
