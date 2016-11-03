@@ -16,43 +16,48 @@
 !     
 !     contact: libm3l@gmail.com
 ! 
-!
-
-!
-!     Subroutine FLL_READ_FFA
-!
-!     Date: 2016-10-10
-! 
-! 
-!
-!
-!     Description: reads a ffa file
-!
-!
-!     Input parameters:
-! 
-!
-!     Return value:
-! 
-! 
-!
-!     Modifications:
-!     Date		Version		Patch number		CLA 
-!
-!
-!     Description
-!
-!
 MODULE FLL_READ_FFA_M
+!
+! Description: Contains functions reading FFA native format file, ASCII and BINARY
+!
+! 
+! History:
+! Version   Date       Patch number  CLA     Comment
+! -------   --------   --------      ---     -------
+! 1.1       10/10/16                         Initial implementation
+!
+!
+! External Modules used
+!
 CONTAINS
-
   FUNCTION FLL_READ_FFA(FILE,IOUNIT,FMT,FPAR) RESULT(PNODE)
-   
+!
+! Description: main function opening, reading and closing file
+!
+! 
+! History:
+! Version   Date       Patch number  CLA     Comment
+! -------   --------   --------      ---     -------
+! 1.1       10/10/16                         Initial implementation
+!
+!
+! External Modules used
+!   
     USE FLL_TYPE_M
     
     IMPLICIT NONE
 !
-!   SUBROUTINE MOVES NODE
+! Declarations
+!
+! Arguments description
+! Name         In/Out     Function
+! FILE         In         Name of file
+! PNODE        Out        Node to a first node in list from a file
+! IOUNIT       In         Number of unit
+! FMT          In         Format - a,A ASCII, b,B - Binary, * not specified
+! FPAR         In/Out     structure containing function specific data
+!
+! Arguments declaration
 !
    CHARACTER(*) :: FILE
    TYPE(DNODE), POINTER  :: PNODE
@@ -60,7 +65,7 @@ CONTAINS
    INTEGER :: IOUNIT
    CHARACTER :: FMT
 !
-!   LOCAL TYPES
+! Local declarations
 !
    LOGICAL :: OK
    CHARACTER :: FMT_LOC
@@ -127,26 +132,52 @@ CONTAINS
 !  READS NODE
 !
   RECURSIVE FUNCTION READ_NODE_FFA(IOUNIT,FMT,POS,FPAR) RESULT(PNODE)
-  
+!
+! Description: Function reads a node
+!
+! 
+! History:
+! Version   Date       Patch number  CLA     Comment
+! -------   --------   --------      ---     -------
+! 1.1       10/10/16                         Initial implementation
+!
+!
+! External Modules used
+!  
     USE FLL_TYPE_M
     USE FLL_MK_M
     USE FLL_MV_M
     
     IMPLICIT NONE  
-    
+!
+! Declarations
+!
+! Arguments description
+! Name         In/Out     Function
+! PNODE        Out        Pointer to node
+! IOUNIT       In         Number of unit
+! FMT          In         Format - a,A ASCII, b,B - Binary
+! POS          In/Out     Position in binary file
+! FPAR         In/Out     structure containing function specific data
+!
+! Arguments declaration
+!    
     INTEGER(LINT),    INTENT(OUT)  :: POS
-    TYPE(DNODE), POINTER :: PNODE,PNEW
+    TYPE(DNODE), POINTER :: PNODE
     CHARACTER :: FMT
     TYPE(FUNC_DATA_SET) :: FPAR
     INTEGER :: IOUNIT
-    INTEGER(LINT) :: NSUB
-    CHARACTER(LEN=NAME_LENGTH) :: T
-
+!
+! Local declarations
+!
+    TYPE(DNODE), POINTER :: PNEW
     TYPE(FUNC_DATA_SET) :: FPAR_H
     CHARACTER(LEN=NAME_LENGTH)   :: NAME
     CHARACTER(LEN=TYPE_LENGTH)     :: LTYPE,FTYPE
     INTEGER(LINT) :: NDIM, NSIZE,NNODES,NDIMO,NSIZEO
     LOGICAL :: OK,EXTRALINE
+    INTEGER(LINT) :: NSUB
+    CHARACTER(LEN=NAME_LENGTH) :: T
 !
 !  READ HEADER
 !
@@ -217,24 +248,59 @@ CONTAINS
 !  READ HEADER OR EACH NODE
 !
    SUBROUTINE READ_HEADER_FFA(IOUNIT,FMT,POS,NAME,LTYPE,FTYPE,NDIM,NSIZE,NLINK,NDIMO,NSIZEO,EXTRALINE,FPAR)
-   
+!
+! Description: Reads header of each node
+!
+! 
+! History:
+! Version   Date       Patch number  CLA     Comment
+! -------   --------   --------      ---     -------
+! 1.1       10/10/16                         Initial implementation
+!
+!
+!    
     USE FLL_TYPE_M    
     USE FLL_FUNC_PRT_M
     
     IMPLICIT NONE  
-    
+!
+! Declarations
+!
+! Arguments description
+! Name         In/Out     Function
+! PNODE        Out        Pointer to node
+! IOUNIT       In         Number of unit
+! FMT          In         Format - a,A ASCII, b,B - Binary
+! NAME         In         name of node
+! LTYPE        In         type of node
+! NDIM         In         1st dimension of array in the node
+! NSIZE        In         2nd dimension of array in the node
+! NSIZE        In         2nd dimension of array in the node
+! NLINK        In         = NSUB in FFA format
+! NDIM0        In         original value of NDIM from FFA format
+! NSIZE0       In         original value of NSIZE from FFA format
+! EXTRALINE    In/Out     If node node N but has NSUB > 0 read extra line
+! FPAR         In/Out     structure containing function specific data
+!
+! Arguments declaration
+!     
     INTEGER(LINT) :: POS
     CHARACTER :: FMT
     TYPE(FUNC_DATA_SET) :: FPAR
     INTEGER :: IOUNIT
-    
-    CHARACTER(*)     :: LTYPE,FTYPE
-    CHARACTER(*)     :: NAME
-    INTEGER(LINT) :: NDIM, NSIZE,ISTART,IIND,NLINK,TMPINT,NDIMO,NSIZEO,I
+    LOGICAL :: EXTRALINE
+    INTEGER(LINT) :: NDIM, NSIZE,NLINK,NDIMO,NSIZEO
+    CHARACTER(*)  :: LTYPE
+    CHARACTER(*)  :: NAME
+!
+! Local declarations
+!
+    CHARACTER(*)  :: FTYPE
+    INTEGER(LINT) :: ISTART,IIND,TMPINT,I
     CHARACTER*255 :: TEXT_LINE,TRIM_LINE
     CHARACTER*32  :: VER
     INTEGER :: IOSTAT
-    LOGICAL :: OK,EXTRALINE
+    LOGICAL :: OK
 
     EXTRALINE = .FALSE.
     
@@ -412,19 +478,44 @@ CONTAINS
 !  READ DATA 
 !
     SUBROUTINE READ_DATA_FFA_ASCII(IOUNIT,PNODE,LTYPE,NDIM,NSIZE,FPAR)
-    
+!
+! Description: Reads data contatined in node Pnode - ASCII file
+!
+! 
+! History:
+! Version   Date       Patch number  CLA     Comment
+! -------   --------   --------      ---     -------
+! 1.1       10/10/16                         Initial implementation
+!
+!
+! External Modules used
+!    
     USE FLL_TYPE_M
     USE FLL_FUNC_PRT_M
    
     IMPLICIT NONE
-    
+!
+! Declarations
+!
+! Arguments description
+! Name         In/Out     Function
+! PNODE        In         Pointer to node
+! IOUNIT       In         Number of unit
+! NAME         In         name of node
+! LTYPE        In         type of node
+! NDIM         In         1st dimension of array in the node
+! NSIZE        In         2nd dimension of array in the node
+! FPAR         In/Out     structure containing function specific data
+!
+! Arguments declaration
+!    
     TYPE(DNODE), POINTER :: PNODE
     INTEGER :: IOUNIT
     INTEGER(LINT) :: NDIM,NSIZE
     CHARACTER(LEN=TYPE_LENGTH) :: LTYPE
     TYPE(FUNC_DATA_SET) :: FPAR
 !
-!   LOCAL DECLARATION
+! Local declarations
 !
     INTEGER(LINT) :: I,J
     INTEGER :: IOSTAT
@@ -527,29 +618,49 @@ CONTAINS
    RETURN
 
    END SUBROUTINE READ_DATA_FFA_ASCII
-   
-   
-   
-   
-!
-!  READ DATA 
-!
+
+
+
     SUBROUTINE READ_DATA_FFA_BIN(IOUNIT,PNODE,LTYPE,NDIM,NSIZE,FPAR)
-    
+!
+! Description: Function reads data contained in Pnode, binary file
+!
+! 
+! History:
+! Version   Date       Patch number  CLA     Comment
+! -------   --------   --------      ---     -------
+! 1.1       10/10/16                         Initial implementation
+!
+!
+! External Modules used
+!      
     USE FLL_TYPE_M
     USE FLL_FUNC_PRT_M
    
     IMPLICIT NONE
-    
+!
+! Declarations
+!
+! Arguments description
+! Name         In/Out     Function
+! PNODE        In         Pointer to node
+! IOUNIT       In         Number of unit
+! LTYPE        In         type of node
+! NDIM         In         1st dimension of array in the node
+! NSIZE        In         2nd dimension of array in the node
+! FPAR         In/Out     structure containing function specific data
+!
+! Arguments declaration
+!    
     TYPE(DNODE), POINTER :: PNODE
     INTEGER :: IOUNIT
     INTEGER(LINT) :: NDIM,NSIZE,NINTEG
     CHARACTER(*) :: LTYPE
-    CHARACTER(LEN=NAME_LENGTH) :: T
     TYPE(FUNC_DATA_SET) :: FPAR
 !
-!   LOCAL DECLARATION
+!  Local declarations
 !
+    CHARACTER(LEN=NAME_LENGTH) :: T
     INTEGER(LINT) :: I,J
     INTEGER :: IOSTAT
     LOGICAL :: OK

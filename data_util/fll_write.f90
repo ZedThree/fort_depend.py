@@ -388,7 +388,7 @@ CONTAINS
   
   SUBROUTINE FLL_SAVE_NODE_B(PNODE, IOUNIT, POS, FPAR)
 !
-! Description: Writes node and its data to an ASCII file
+! Description: Writes node and its data to a binary file
 !
 ! 
 ! History:

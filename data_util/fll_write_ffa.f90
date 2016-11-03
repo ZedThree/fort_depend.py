@@ -16,44 +16,47 @@
 !     
 !     contact: libm3l@gmail.com
 ! 
-!
-
-!
-!     Subroutine FLL_WRITE_FFA
-!
-!     Date: 2016-10-10
-! 
-! 
-!
-!
-!     Description: prints node
-! 
-!
-!     Input parameters:
-! 
-!
-!     Return value:
-! 
-! 
-!
-!     Modifications:
-!     Date		Version		Patch number		CLA 
-!
-!
-!     Description
-!
-!
 MODULE FLL_WRITE_FFA_M
+!
+! Description: Contains functions writing FFA native format file, ASCII and BINARY
+!
+! 
+! History:
+! Version   Date       Patch number  CLA     Comment
+! -------   --------   --------      ---     -------
+! 1.1       10/10/16                         Initial implementation
+!
+!
+! External Modules used
+!
 CONTAINS
-
-
   FUNCTION FLL_WRITE_FFA(PNODE,FILE,IOUNIT,FMT,FPAR) RESULT(OK)
-   
+!
+! Description: main function opening, writing and closing file
+!
+! 
+! History:
+! Version   Date       Patch number  CLA     Comment
+! -------   --------   --------      ---     -------
+! 1.1       10/10/16                         Initial implementation
+!
+!
+! External Modules used
+!   
     USE FLL_TYPE_M
-    
     IMPLICIT NONE
 !
-!   SUBROUTINE MOVES NODE
+! Declarations
+!
+! Arguments description
+! Name         In/Out     Function
+! FILE         In         Name of file
+! PNODE        Out        Node to a first node in list from a file
+! IOUNIT       In         Number of unit
+! FMT          In         Format - a,A ASCII, b,B - Binary, * not specified
+! FPAR         In/Out     structure containing function specific data
+!
+! Arguments declaration
 !
    CHARACTER(*) :: FILE
    TYPE(DNODE), POINTER  :: PNODE
@@ -63,7 +66,7 @@ CONTAINS
    LOGICAL OK
    CHARACTER(32) :: FFVERSION='FFA-format-v2'
 !
-!   LOCAL TYPES
+! Local declarations
 !
    CHARACTER :: FMT_LOC
    INTEGER :: ISTAT
@@ -125,20 +128,41 @@ CONTAINS
 
 
    SUBROUTINE FLL_WRITE_FFA_LIST(PNODE,IOUNIT,FMT,FPAR)
-   
+!
+! Description: Function writes a list
+!
+! 
+! History:
+! Version   Date       Patch number  CLA     Comment
+! -------   --------   --------      ---     -------
+! 1.1       10/10/16                         Initial implementation
+!
+!
+! External Modules used
+!   
     USE FLL_TYPE_M
     IMPLICIT NONE
 !
-!   SUBROUTINE WRITES LIST
+! Declarations
 !
-   TYPE(DNODE), POINTER  :: PNODE,PCHILD
+! Arguments description
+! Name         In/Out     Function
+! PNODE        Out        Pointer to node
+! IOUNIT       In         Number of unit
+! FMT          In         Format - a,A ASCII, b,B - Binary
+! FPAR         In/Out     structure containing function specific data
+!
+! Arguments declaration
+!
+   TYPE(DNODE), POINTER  :: PNODE
    TYPE(FUNC_DATA_SET) :: FPAR
    INTEGER :: IOUNIT
    CHARACTER :: FMT   
+!
+!  Local declarations
+!
+   TYPE(DNODE), POINTER  :: PCHILD
    INTEGER(LINT) :: POS
-!
-!   LOCAL TYPES
-!
 !   
 !   BODY OF SUBROUTINE
 !
@@ -170,19 +194,43 @@ CONTAINS
 !  DELETE CHID WITH ALL ITS CHILDREN
 !
   RECURSIVE SUBROUTINE FLL_WRITE_FFA_RECURSIVE_NODE(PNODE,IOUNIT,POS,FMT,FPAR)
-  
+!
+! Description: Function writes a node
+!
+! 
+! History:
+! Version   Date       Patch number  CLA     Comment
+! -------   --------   --------      ---     -------
+! 1.1       10/10/16                         Initial implementation
+!
+!
+! External Modules used
+!   
      USE FLL_TYPE_M
      IMPLICIT NONE
 !
-!   SUBROUTINE REMOVES NODE
+! Declarations
+!
+! Arguments description
+! Name         In/Out     Function
+! PNODE        Out        Pointer to node
+! IOUNIT       In         Number of unit
+! FMT          In         Format - a,A ASCII, b,B - Binary
+! POS          In/Out     position in binary file
+! FPAR         In/Out     structure containing function specific data
+!
+! Arguments declaration
 ! 
     TYPE(DNODE), POINTER  :: PNODE
     TYPE(FUNC_DATA_SET) :: FPAR
     INTEGER(LINT) :: POS 
-   
-    TYPE(DNODE), POINTER  :: PCURR, PNEXT, PCHILD
     INTEGER :: IOUNIT
     CHARACTER :: FMT
+!
+! Local declarations
+!   
+    TYPE(DNODE), POINTER  :: PCURR, PNEXT, PCHILD
+
 !
 !  IF NODE HAS CHILDREN
 !
@@ -215,15 +263,37 @@ CONTAINS
 !  FREE MEMORY FOR NODE
 !
   SUBROUTINE FLL_SAVE_NODE_A(PNODE, IOUNIT, FPAR)
+!
+! Description: Writes node and its data to an ASCII file
+!
+! 
+! History:
+! Version   Date       Patch number  CLA     Comment
+! -------   --------   --------      ---     -------
+! 1.1       10/10/16                         Initial implementation
+!
+!
+! External Modules used
+!
     USE FLL_TYPE_M
     IMPLICIT NONE
 !
-!   SUBROUTINE SAVES NODE
+! Declarations
+!
+! Arguments description
+! Name         In/Out     Function
+! PNODE        Out        Pointer to node
+! IOUNIT       In         Number of unit
+! FPAR         In/Out     structure containing function specific data
+!
+! Arguments declaration
 !
    TYPE(DNODE), POINTER  :: PNODE
    TYPE(FUNC_DATA_SET) :: FPAR
-   
    INTEGER :: IOUNIT
+!
+! Local declarations
+!
    INTEGER(LINT) :: I,J,NDIM,NSIZE
    LOGICAL :: SAVED
    CHARACTER(LEN=TYPE_LENGTH) :: LTYPE
@@ -354,17 +424,40 @@ CONTAINS
   END SUBROUTINE FLL_SAVE_NODE_A
   
   SUBROUTINE FLL_SAVE_NODE_B(PNODE, IOUNIT, POS, FPAR)
-    
+!
+! Description: Writes node and its data to a binary file
+!
+! 
+! History:
+! Version   Date       Patch number  CLA     Comment
+! -------   --------   --------      ---     -------
+! 1.1       10/10/16                         Initial implementation
+!
+!
+! External Modules used
+! 
     USE FLL_TYPE_M
     IMPLICIT NONE
 !
-!   SUBROUTINE SAVES NODE
+! Declarations
 !
+! Arguments description
+! Name         In/Out     Function
+! PNODE        Out        Pointer to node
+! IOUNIT       In         Number of unit
+! POS          In/Out     position in binary file
+! FPAR         In/Out     structure containing function specific data
+!
+! Arguments declaration
+! 
    TYPE(DNODE), POINTER  :: PNODE
    TYPE(FUNC_DATA_SET) :: FPAR
-   
    INTEGER :: IOUNIT
-   INTEGER(LINT) :: I,J,NDIM,NSIZE,POS
+   INTEGER(LINT) :: POS
+!
+! Local declarations
+!
+   INTEGER(LINT) :: I,J,NDIM,NSIZE
    LOGICAL :: SAVED
    
    CHARACTER(LEN=TYPE_LENGTH) :: NTYPE ='N', LTYPE
