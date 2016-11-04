@@ -74,15 +74,15 @@ CONTAINS
    
    PCHILD => PNODE%PCHILD
 !
+!  STICH AND SUBSTRACT FROM PARENT 
+!
+   CALL FLL_STICH(PNODE,FPAR)
+!
 ! IF NODE HAS CHILDREN, REMOVE ALL OF THEM
 !
    IF(ASSOCIATED(PCHILD))CALL FLL_RM_RECURSIVE_NODE(PCHILD,FPAR)
 
    CALL FLL_DEALLOC_DATA(PNODE,FPAR)
-!
-!  STICH AND SUBSTRACT FROM PARENT 
-!
-   CALL FLL_STICH(PNODE,FPAR)
 !
 !  NULLIFY NODE
 !
@@ -251,6 +251,16 @@ CONTAINS
              FPAR%SUCCESS = .TRUE. 
              RETURN
            END IF
+           
+          IF(ASSOCIATED(PNODE%S1))THEN
+             DEALLOCATE(PNODE%S1, STAT=ISTAT)
+             IF(ISTAT /= 0)THEN
+                STOP' ERROR DEALLOCATING MEMORY ==> ll_rm ERR:204 '
+                FPAR%SUCCESS = .FALSE.
+             END IF
+             FPAR%SUCCESS = .TRUE. 
+             RETURN
+           END IF
 !
 !  2D ARRAYS
 !
@@ -286,6 +296,16 @@ CONTAINS
 
            IF(ASSOCIATED(PNODE%L2))THEN
              DEALLOCATE(PNODE%L2, STAT=ISTAT)
+             IF(ISTAT /= 0)THEN
+                STOP' ERROR DEALLOCATING MEMORY ==> ll_rm ERR:246 '
+                FPAR%SUCCESS = .FALSE.
+             END IF
+             FPAR%SUCCESS = .TRUE. 
+             RETURN
+           END IF
+           
+            IF(ASSOCIATED(PNODE%S2))THEN
+             DEALLOCATE(PNODE%S2, STAT=ISTAT)
              IF(ISTAT /= 0)THEN
                 STOP' ERROR DEALLOCATING MEMORY ==> ll_rm ERR:246 '
                 FPAR%SUCCESS = .FALSE.

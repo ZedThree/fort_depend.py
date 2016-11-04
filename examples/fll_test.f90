@@ -105,7 +105,6 @@
 !
    PTMP => FLL_MK('Humidity','D', 10_LINT, 1_LINT, FPAR)
    OK = FLL_MV(PTMP, PNEW1, FPAR)
-   CALL FLL_CAT(PNEW1, 6, .TRUE.,FPAR)
 !
 !  ACCESS DATA OF NODE Humidity
 !
@@ -135,20 +134,33 @@
    DO I=1,10
      HUMID(I) = 3.1415926*I
    END DO
-!
-!  add PNODE to PNEW1
-!  now the node contains Humidity and entire PNODE
-!
+   CALL FLL_CAT(PNEW1, 6, .TRUE.,FPAR)
+
+! !
+! !  add PNODE to PNEW1
+! !  now the node contains Humidity and entire PNODE
+! !
    OK = FLL_MV(PNODE, PNEW1, FPAR)
+   
+     WRITE(*,*)'------------------------------------------------------4-1'
+    CALL FLL_CAT(pnode, 6, .TRUE.,FPAR)	
+     WRITE(*,*)'------------------------------------------------------4-2'
+
+   
    CALL FLL_CAT(PNEW1, 6, .TRUE.,FPAR)	
    WRITE(*,*)'------------------------------------------------------4'
-
+! 
    CALL FLL_TEST_SUBR(PNODE,PNODE1)
 
    WRITE(*,*)'---BACK FROM SUBROUTINE --------------8'
 !
    CALL FLL_RM(PNODE1,FPAR)
    CALL FLL_RM(PNODE,FPAR)
+   
+   CALL FLL_CAT(PNEW1, 6, .TRUE.,FPAR)	
+  
+   
+   CALL FLL_RM(PNEW1,FPAR)
 
   
 END PROGRAM
