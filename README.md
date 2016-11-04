@@ -20,7 +20,18 @@ directory, then do:
 
 mkdir /home/usr/fll_exec
 cd /home/usr/fll_exec
-/home/usr/fll_souce/master/configure.py
+/home/usr/fll_souce/master/configure.py -c compiler
+
+where compiler specifies fortran compile options
+
+avalable are:
+
+        gfortran
+        gfortran_debug
+        x86_64  
+        x86_64_debug
+
+x86_64 are settings for Intel fortran compiler
 
 
 

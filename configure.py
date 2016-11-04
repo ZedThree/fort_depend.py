@@ -15,7 +15,7 @@ import platform
 
 #Definitions
 
-def run(files=None,verbose=True,overwrite=None,output=None,macros={},build=''):
+def run(comp,files=None,verbose=True,overwrite=None,output=None,macros={},build=''):
 #
 #  definition of parameters
 #
@@ -52,14 +52,14 @@ def run(files=None,verbose=True,overwrite=None,output=None,macros={},build=''):
     print("  ")
     print("\033[031mDIAG:\033[039m creating configure file \033[032m \033[039m")  	
     print("  ")
-    ok = mkconfigfile(path=path, cwd=cwd,version='gfortran', bin_dir=cwd)
+    ok = mkconfigfile(path=path, cwd=cwd,version=comp, bin_dir=cwd)
 #
 #   create structure and link necessary files
 #
     print("  ")
     print("\033[031mDIAG:\033[039m Recreating project tree structure and linking files \033[032m \033[039m .....")  	
     print("\033[031mDIAG:\033[039m Project root directory .... \033[032m \033[039m .....")  	
-    ok=prepare_root_dir(root_path=path, cwd=cwd, linkfiles=linkfiles)
+    ok=prepare_compiler(root_path=path, cwd=cwd, linkfiles=linkfiles)
     print("  ")
     print("\033[031mDIAG:\033[039m Subdirectories .... \033[032m \033[039m")  	
     ok=mkdir_structure(root_path=path, cwd=cwd, exclude=exclude, linkfiles=linkfiles)
@@ -95,7 +95,7 @@ def get_all_dirs(path,exclude):
 
     return matchesf
 
-def prepare_root_dir(root_path,cwd, linkfiles):
+def prepare_compiler(root_path,cwd, linkfiles):
 #
 #  list all dirs in project except directories specified in exclude
 #
@@ -254,6 +254,7 @@ if __name__ == "__main__":
     parser.add_argument('-o','--output',nargs=1,help='Output file')
     parser.add_argument('-v','--verbose',action='store_true',help='explain what is done')
     parser.add_argument('-w','--overwrite',action='store_true',help='Overwrite output file without warning')
+    parser.add_argument('-c','--compiler',nargs=1,help='Compiler configuration')
 
     # Parse the command line arguments
     args = parser.parse_args()
@@ -269,4 +270,14 @@ if __name__ == "__main__":
     output = args.output[0] if args.output else None
     build = args.build[0] if args.build else ''
 
-    run(verbose=args.verbose, overwrite=args.overwrite, macros=macros, output=output, build=build)
+    compiler = args.compiler[0] if args.compiler else None
+    
+    if not compiler:
+        print ("\033[031mError: \033[039m missing compiler settings, specify option -c \033[032m")
+        print ("\033[031m       \033[039m available options are: \033[032m gfotran")
+        print ("\033[031m       \033[039m available options are: \033[032m gfotran_debug")
+        print ("\033[031m       \033[039m available options are: \033[032m x86_64")
+        print ("\033[031m       \033[039m available options are: \033[032m x86_64_debug") 
+        sys.exit()
+
+    run(comp=compiler,verbose=args.verbose, overwrite=args.overwrite, macros=macros, output=output, build=build)
