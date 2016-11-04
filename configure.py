@@ -180,6 +180,16 @@ def check_path(path):
 
 def mkconfigfile(path, cwd,version, bin_dir):
     filename = path+'/config/compset.'+version
+
+    if not(os.path.exists(filename)):
+        print ("\033[031mError: \033[039m \033[031m"+version+"\033[039m verion of compiler is not available")
+        print ("\033[031m       \033[039m available options are: \033[032m gfotran\033[039m")
+        print ("\033[031m       \033[039m                        \033[032m gfotran_debug\033[039m")
+        print ("\033[031m       \033[039m                        \033[032m x86_64\033[039m")
+        print ("\033[031m       \033[039m                        \033[032m x86_64_debug\033[039m") 
+        sys.exit()
+        
+
     exec_dir=bin_dir+"/bin/"
     
     confname =  'config.mk'
@@ -273,11 +283,11 @@ if __name__ == "__main__":
     compiler = args.compiler[0] if args.compiler else None
     
     if not compiler:
-        print ("\033[031mError: \033[039m missing compiler settings, specify option -c \033[032m")
-        print ("\033[031m       \033[039m available options are: \033[032m gfotran")
-        print ("\033[031m       \033[039m available options are: \033[032m gfotran_debug")
-        print ("\033[031m       \033[039m available options are: \033[032m x86_64")
-        print ("\033[031m       \033[039m available options are: \033[032m x86_64_debug") 
+        print ("\033[031mError: \033[039m missing compiler settings, specify option \033[031m-c \033[032m")
+        print ("\033[031m       \033[039m available options are: \033[032m gfotran\033[039m")
+        print ("\033[031m       \033[039m                        \033[032m gfotran_debug\033[039m")
+        print ("\033[031m       \033[039m                        \033[032m x86_64\033[039m")
+        print ("\033[031m       \033[039m                        \033[032m x86_64_debug\033[039m") 
         sys.exit()
 
     run(comp=compiler,verbose=args.verbose, overwrite=args.overwrite, macros=macros, output=output, build=build)
