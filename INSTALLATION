@@ -32,8 +32,8 @@ To install FLL you would need to:
 1. CONFIGURATION
 ====================================================
 
-Make a new directory where the compillation procees takes place
-In this directory execute configure file from FLL project source directory.
+Make a new directory.
+In this directory execute configure script from FLL project source directory.
 For example, if the FLL source is in 
 
 /home/usr/fll_souce/fll-master
