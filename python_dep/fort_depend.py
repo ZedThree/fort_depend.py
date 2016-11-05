@@ -248,7 +248,6 @@ if __name__ == "__main__":
     parser.add_argument('-v','--verbose',action='store_true',help='explain what is done')
     parser.add_argument('-w','--overwrite',action='store_true',help='Overwrite output file without warning')
     parser.add_argument('-r','--root_dir',nargs=1,help='Project root directory')
-    parser.add_argument('-c','--compiler',nargs=1,help='Compiler configuration file')
 
     # Parse the command line arguments
     args = parser.parse_args()
@@ -264,7 +263,6 @@ if __name__ == "__main__":
     output = args.output[0] if args.output else None
     build = args.build[0] if args.build else ''
     root_dir = args.root_dir[0] if args.root_dir else None
-    compiler = args.compiler[0] if args.root_dir else None
     
     if not root_dir:
         print ("\033[031mError: \033[039m missing path to project root directory \033[032m")
