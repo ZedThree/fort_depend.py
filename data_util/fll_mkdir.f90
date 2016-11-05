@@ -21,26 +21,25 @@ MODULE FLL_MKDIR_M
 !
 ! Description: creates node
 !
-!
 ! 
 ! History:
 ! Version   Date       Patch number  CLA     Comment
 ! -------   --------   --------      ---     -------
 ! 1.1       10/10/16                         Initial implementation
 !
+!
 ! External Modules used
 !
 CONTAINS
    FUNCTION FLL_MKDIR(NAME,FPAR) RESULT(PNEW)
 !
-! Description: function creates node type of DIR
-! 
+! Description: function creates node specified by name, type and dimensions
 !
 ! External Modules used
 ! 
        USE FLL_TYPE_M
        USE FLL_MK_M
-
+       
        IMPLICIT NONE
 !
 ! Declarations
@@ -54,7 +53,8 @@ CONTAINS
 !
        TYPE(FUNC_DATA_SET)   :: FPAR
        TYPE(DNODE), POINTER  :: PNEW
-       CHARACTER(*)  :: NAME
+       CHARACTER(LEN=*) :: NAME
+!
 ! Local declarations
 !       
        INTEGER :: ISTAT
@@ -62,8 +62,8 @@ CONTAINS
        PNEW => NULL()
 !
 ! Body
-!  
-         PNEW => FLL_MK(NAME,"DIR",0_LINT, 0_LINT,FPAR)
+!
+       PNEW => FLL_MK(NAME,'DIR',0_LINT, 0_LINT, FPAR)
 
     RETURN
    END FUNCTION FLL_MKDIR

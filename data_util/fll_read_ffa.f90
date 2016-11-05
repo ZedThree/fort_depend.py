@@ -424,7 +424,6 @@ CONTAINS
     CASE('B')
        NSIZE = 0
        READ(IOUNIT,IOSTAT=IOSTAT)NAME,LTYPE,NSIZE,NDIM,NLINK
-       WRITE(*,*)' 1st read ',NAME,LTYPE,NSIZE, NLINK
 
        IF(TRIM(NAME) == 'FFA-format-v2')THEN 
 !
@@ -440,9 +439,7 @@ CONTAINS
        FTYPE = LTYPE
        NSIZEO = NSIZE
        NDIMO = NDIM
-
-       WRITE(*,*)NAME,LTYPE,NSIZE, NLINK
-
+       
        IF(TRIM(LTYPE) == 'DIR' .OR. TRIM(LTYPE) == 'N')THEN
          NDIM   = NLINK
        ELSE
