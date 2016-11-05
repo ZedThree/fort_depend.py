@@ -21,6 +21,13 @@ MODULE FLL_MK_M
 !
 ! Description: creates node
 !
+! 
+! History:
+! Version   Date       Patch number  CLA     Comment
+! -------   --------   --------      ---     -------
+! 1.1       10/10/16                         Initial implementation
+!
+!
 ! External Modules used
 !
 CONTAINS
