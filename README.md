@@ -19,7 +19,9 @@ and you want to compile and install everyting in
 directory, then do:
 
 mkdir /home/usr/fll_exec
+
 cd /home/usr/fll_exec
+
 /home/usr/fll_souce/master/configure.py -c compiler
 
 where compiler specifies fortran compile options
