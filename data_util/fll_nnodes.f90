@@ -115,7 +115,7 @@ CONTAINS
       IF(   TRIM(PCURR%LNAME) == TRIM(NAME)  .AND.  &
           (TRIM(TLTYPE) == TRIM(PCURR%LTYPE)   .OR.  TLTYPE(1:1) == '*' ) )THEN
 
-	   NDIM  = PCURR%NDIM
+           NDIM  = PCURR%NDIM
            NSIZE = PCURR%NSIZE
 
           SELECT CASE(DATADIM)

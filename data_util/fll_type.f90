@@ -104,7 +104,7 @@ MODULE FLL_TYPE_M
 ! DEFINITION OF THE DATA SET OF THE NODE IN LINKED LIST
 !
   TYPE DNODE
-    CHARACTER(LEN=NAME_LENGTH)   :: LNAME = ''    ! name the list
+    CHARACTER(LEN=NAME_LENGTH)   :: LNAME = ''   ! name the list
     CHARACTER(LEN=TYPE_LENGTH)     :: LTYPE = ''  ! type of the list
     CHARACTER(LEN=TYPE_LENGTH)     :: FTYPE = ''  ! type of the list
     INTEGER(LINT) :: NDIM  = 0, NSIZE = 0, NLINK = 0
@@ -124,21 +124,20 @@ MODULE FLL_TYPE_M
     CHARACTER(LEN=STRING_LENGHT), POINTER, CONTIGUOUS  :: S1(:)=>NULL()        ! 1D array of strings
     CHARACTER(LEN=STRING_LENGHT), POINTER, CONTIGUOUS  :: S2(:,:)=>NULL()      ! 2D array of strings
     
-    REAL(RSINGLE) :: R0   ! real 
-    REAL(RDOUBLE) :: D0   ! double
-    INTEGER(SINT)  :: I0  ! integer
-    INTEGER(LINT)  :: L0  ! long integer
-    CHARACTER(LEN=STRING_LENGHT) :: S  ! string
-    CHARACTER(LEN=NAME_LENGTH) :: T    ! short string
-    CHARACTER :: C                     ! character
+    REAL(RSINGLE)   :: R0                                     ! real 
+    REAL(RDOUBLE) :: D0                                     ! double
+    INTEGER(SINT)    :: I0                                       ! integer
+    INTEGER(LINT)    :: L0                                      ! long integer
+    CHARACTER(LEN=STRING_LENGHT) :: S   ! string
+    CHARACTER        :: C                                        ! character
     
   END TYPE DNODE
 !
 ! type used for diagnostic data set passed to subroutines and functions
 !
   TYPE FUNC_DATA_SET
-      LOGICAL :: SUCCESS                         ! if .TRUE.=success, .FALSE. = fail
-      CHARACTER(LEN=ERR_MSG_LENGTH)  :: MESG     ! error message
+      LOGICAL :: SUCCESS                                                          ! if .TRUE.=success, .FALSE. = fail
+      CHARACTER(LEN=ERR_MSG_LENGTH)  :: MESG         ! error message
       CHARACTER(LEN=ERR_PATH_LENGTH) :: ERRPATH  ! path 
   END TYPE FUNC_DATA_SET
 

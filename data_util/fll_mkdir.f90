@@ -56,9 +56,7 @@ CONTAINS
        CHARACTER(LEN=*) :: NAME
 !
 ! Local declarations
-!       
-       INTEGER :: ISTAT
-       
+!              
        PNEW => NULL()
 !
 ! Body
