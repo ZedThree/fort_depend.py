@@ -18,7 +18,7 @@
 ! 
 MODULE FLL_SWEEP_M
 !
-! Description: Contains function fll_sweek
+! Description: Contains function fll_sweep and match_pattern
 !
 ! 
 ! History:
@@ -30,7 +30,7 @@ MODULE FLL_SWEEP_M
 ! External Modules used
 !
 CONTAINS
-   FUNCTION FLL_SWEEP(PNODE,NAME,LTYPE,RECURSE,FPAR) RESULT(PFIND)
+   SUBROUTINE  FLL_SWEEP(PNODE,PFIND,NAME,LTYPE,RECURSE,FPAR)
 !
 ! Description: Function sweep through list return each node   -------------  NOT FINISHED YET
 !
@@ -44,20 +44,12 @@ CONTAINS
 ! External Modules used
 !  
     USE FLL_TYPE_M
-    USE FLL_LOCATE_M
     USE FLL_OUT_M
+    USE FLL_MATCH_PATTERN_M
 
     IMPLICIT NONE
 !
-! Description: Module copies PWHAT pointer to PWHERE pointer
-!              If PWHERE pointer == NULL, PWHAT is a duplicate 
-!              of PWHAT with PWHAT%Ppar == NULL
-!
-!              if PWHERE is DIR on N type, PWHAT is added
-!              to it as a new sub-data set
-!
-!              if PWHERE is a data type of nodes
-!              PWHAT overwrites it
+! Description: Sweeps through the list returning nodes matching patern
 !
 ! External Modules used
 ! 
@@ -74,8 +66,7 @@ CONTAINS
    INTEGER(LINT) :: I
 !   
 !   BODY OF FUNCTION
-!
-   NULLIFY(PFIND)
+!      
    I = 1
    DO WHILE(LTYPE(I:I) == ' ')
      I = I + 1
@@ -84,24 +75,25 @@ CONTAINS
    TLTYPE = TRIM(LTYPE(I:))
    
    IF(.NOT.ASSOCIATED(PNODE))THEN
-      WRITE(FPAR%MESG,'(A,A)')'Locate - Null node: ',TRIM(NAME)
+      WRITE(FPAR%MESG,'(A,A)')'Sweep - Null node: ',TRIM(NAME)
       CALL FLL_OUT('ALL',FPAR)
       FPAR%SUCCESS = .FALSE.
       RETURN
    END IF
-!
-!   DO WHILE(PNODE)   
 !
    PCURR => PNODE%PCHILD
    IF(.NOT.ASSOCIATED(PNODE%PCHILD))THEN
      WRITE(*,*)' NODE NOT DIR NODE'
      RETURN 
    END IF
-!   END DO
+!
+!  start loop
+!
+   IF(.NOT.ASSOCIATED(PFIND))PFIND => PNODE%PCHILD
 
 
    RETURN
-   END FUNCTION FLL_SWEEP
+   END SUBROUTINE FLL_SWEEP
 
 
 END MODULE FLL_SWEEP_M
