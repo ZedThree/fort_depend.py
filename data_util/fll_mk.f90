@@ -92,7 +92,7 @@ CONTAINS
       END IF
 
       ALLOCATE(PNEW, STAT = ISTAT)
-      IF(ISTAT /= 0)STOP' ERROR ALLOCATING MEMORY ==> ll_mk ERR:82 '
+      IF(ISTAT /= 0)STOP' ERROR ALLOCATING MEMORY ==> fll_mk ERR:95 '
       PNEW%LNAME  = TRIM(NAME)
       PNEW%LTYPE = LTYPE
       PNEW%NDIM = 0
@@ -126,15 +126,15 @@ CONTAINS
        IF(NDIM == 1)THEN
          IF(NSIZE > 1)THEN
            ALLOCATE(PNEW%R1(NSIZE), STAT=ISTAT)
-           IF(ISTAT /= 0)STOP' ERROR ALLOCATING MEMORY ==> ll_mk ERR:106 '
+           IF(ISTAT /= 0)STOP' ERROR ALLOCATING MEMORY ==> fll_mk ERR:129 '
          END IF
        ELSE
          IF(NSIZE == 1)THEN
             ALLOCATE(PNEW%R1(NDIM), STAT=ISTAT)
-            IF(ISTAT /= 0)STOP' ERROR ALLOCATING MEMORY ==> ll_mk ERR:111 '
+            IF(ISTAT /= 0)STOP' ERROR ALLOCATING MEMORY ==> fll_mk ERR:134 '
          ELSE
             ALLOCATE(PNEW%R2(NDIM,NSIZE), STAT=ISTAT)
-            IF(ISTAT /= 0)STOP' ERROR ALLOCATING MEMORY ==> ll_mk ERR:114 '
+            IF(ISTAT /= 0)STOP' ERROR ALLOCATING MEMORY ==> fll_mk ERR:137 '
          END IF
        END IF
        
@@ -142,15 +142,15 @@ CONTAINS
             IF(NDIM == 1)THEN
          IF(NSIZE > 1)THEN
            ALLOCATE(PNEW%D1(NSIZE), STAT=ISTAT)
-           IF(ISTAT /= 0)STOP' ERROR ALLOCATING MEMORY ==> ll_mk ERR:122 '
+           IF(ISTAT /= 0)STOP' ERROR ALLOCATING MEMORY ==> fll_mk ERR:145 '
          END IF
        ELSE
          IF(NSIZE == 1)THEN
             ALLOCATE(PNEW%D1(NDIM), STAT=ISTAT)
-            IF(ISTAT /= 0)STOP' ERROR ALLOCATING MEMORY ==> ll_mk ERR:127 '
+            IF(ISTAT /= 0)STOP' ERROR ALLOCATING MEMORY ==> fll_mk ERR:150 '
          ELSE
             ALLOCATE(PNEW%D2(NDIM,NSIZE), STAT=ISTAT)
-            IF(ISTAT /= 0)STOP' ERROR ALLOCATING MEMORY ==> ll_mk ERR:130 '
+            IF(ISTAT /= 0)STOP' ERROR ALLOCATING MEMORY ==> fll_mk ERR:153 '
          END IF
        END IF
        
@@ -159,15 +159,15 @@ CONTAINS
        IF(NDIM == 1)THEN
          IF(NSIZE > 1)THEN
            ALLOCATE(PNEW%I1(NSIZE), STAT=ISTAT)
-           IF(ISTAT /= 0)STOP' ERROR ALLOCATING MEMORY ==> ll_mk ERR:139 '
+           IF(ISTAT /= 0)STOP' ERROR ALLOCATING MEMORY ==> fll_mk ERR:162 '
          END IF
        ELSE
          IF(NSIZE == 1)THEN
             ALLOCATE(PNEW%I1(NDIM), STAT=ISTAT)
-            IF(ISTAT /= 0)STOP' ERROR ALLOCATING MEMORY ==> ll_mk ERR:144 '
+            IF(ISTAT /= 0)STOP' ERROR ALLOCATING MEMORY ==> fll_mk ERR:167 '
          ELSE
             ALLOCATE(PNEW%I2(NDIM,NSIZE), STAT=ISTAT)
-            IF(ISTAT /= 0)STOP' ERROR ALLOCATING MEMORY ==> ll_mk ERR:147 '
+            IF(ISTAT /= 0)STOP' ERROR ALLOCATING MEMORY ==> fll_mk ERR:170 '
          END IF
        END IF
        
@@ -176,15 +176,15 @@ CONTAINS
        IF(NDIM == 1)THEN
          IF(NSIZE > 1)THEN
            ALLOCATE(PNEW%L1(NSIZE), STAT=ISTAT)
-           IF(ISTAT /= 0)STOP' ERROR ALLOCATING MEMORY ==> ll_mk ERR:156 '
+           IF(ISTAT /= 0)STOP' ERROR ALLOCATING MEMORY ==> fll_mk ERR:179 '
          END IF
        ELSE
          IF(NSIZE == 1)THEN
             ALLOCATE(PNEW%L1(NDIM), STAT=ISTAT)
-            IF(ISTAT /= 0)STOP' ERROR ALLOCATING MEMORY ==> ll_mk ERR:161 '
+            IF(ISTAT /= 0)STOP' ERROR ALLOCATING MEMORY ==> fll_mk ERR:184 '
          ELSE
             ALLOCATE(PNEW%L2(NDIM,NSIZE), STAT=ISTAT)
-            IF(ISTAT /= 0)STOP' ERROR ALLOCATING MEMORY ==> ll_mk ERR:164 '
+            IF(ISTAT /= 0)STOP' ERROR ALLOCATING MEMORY ==> fll_mk ERR:187 '
          END IF
        END IF     
        
@@ -193,15 +193,15 @@ CONTAINS
        IF(NDIM == 1)THEN
          IF(NSIZE > 1)THEN
            ALLOCATE(PNEW%S1(NSIZE), STAT=ISTAT)
-           IF(ISTAT /= 0)STOP' ERROR ALLOCATING MEMORY ==> ll_mk ERR:156 '
+           IF(ISTAT /= 0)STOP' ERROR ALLOCATING MEMORY ==> fll_mk ERR:196 '
          END IF
        ELSE
          IF(NSIZE == 1)THEN
             ALLOCATE(PNEW%S1(NDIM), STAT=ISTAT)
-            IF(ISTAT /= 0)STOP' ERROR ALLOCATING MEMORY ==> ll_mk ERR:161 '
+            IF(ISTAT /= 0)STOP' ERROR ALLOCATING MEMORY ==> fll_mk ERR:201 '
          ELSE
             ALLOCATE(PNEW%S2(NDIM,NSIZE), STAT=ISTAT)
-            IF(ISTAT /= 0)STOP' ERROR ALLOCATING MEMORY ==> ll_mk ERR:164 '
+            IF(ISTAT /= 0)STOP' ERROR ALLOCATING MEMORY ==> fll_mk ERR:204 '
          END IF
        END IF
      
