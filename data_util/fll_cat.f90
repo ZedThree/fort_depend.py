@@ -41,6 +41,7 @@ CONTAINS
 ! External Modules used
 !     
     USE FLL_TYPE_M
+    USE FLL_OUT_M
     IMPLICIT NONE
 !
 ! Declarations
@@ -71,6 +72,7 @@ CONTAINS
    IF(.NOT.ASSOCIATED(PNODE))THEN
       WRITE(FPAR%MESG,'(A)')' CAT - null node '
       FPAR%SUCCESS = .FALSE.
+      CALL FLL_OUT('ALL',FPAR)
       RETURN
    END IF
    

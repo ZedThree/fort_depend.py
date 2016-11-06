@@ -43,6 +43,7 @@ CONTAINS
 ! External Modules used
 ! 
        USE FLL_TYPE_M
+       USE FLL_OUT_M
        
        IMPLICIT NONE
 !
@@ -74,16 +75,19 @@ CONTAINS
 !
        IF(LEN_TRIM(LTYPE)<1.OR.LEN_TRIM(LTYPE)>TYPE_LENGTH) THEN
          WRITE(FPAR%MESG,'(A,A)')' Wrong type: ',TRIM(LTYPE)
+         CALL FLL_OUT('ALL',FPAR)
          RETURN
       END IF
 
       IF(LEN_TRIM(NAME)>NAME_LENGTH) THEN
         WRITE(FPAR%MESG,'(A,A)')' Wrong name: ',TRIM(NAME)
+        CALL FLL_OUT('ALL',FPAR)
         RETURN
       END IF
 
       IF(.NOT.ANY(LTYPE(1:1)==(/'C','S','I','L','R','D','N'/))) THEN
         WRITE(FPAR%MESG,'(A,A)')' Wrong type: ',TRIM(LTYPE)
+        CALL FLL_OUT('ALL',FPAR)
         RETURN
       END IF
 
@@ -111,9 +115,8 @@ CONTAINS
 
       IF(NDIM < 1 .OR. NSIZE < 1)THEN
         WRITE(FPAR%MESG,'(A,A,I5,I5)')' Wrong dimensions for node ',TRIM(NAME), NDIM, NSIZE
-!        WRITE(*,*)' MK WRONG DIMENSIONS ',TRIM(NAME), NDIM, NSIZE
-!        STOP
-         RETURN
+        CALL FLL_OUT('ALL',FPAR)
+        RETURN
       END IF
 !
 !  ALLOCATE ARRAYS

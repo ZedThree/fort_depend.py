@@ -44,6 +44,7 @@ CONTAINS
 ! External Modules used
 !   
     USE FLL_TYPE_M
+    USE FLL_OUT_M
     
     IMPLICIT NONE
 !
@@ -76,6 +77,7 @@ CONTAINS
    INQUIRE (FILE=TRIM(FILE), EXIST=OK)
    IF(.NOT.OK) THEN
       WRITE(FPAR%MESG,'(A,A)')' Read  - file does not exist ',TRIM(FILE)
+      CALL FLL_OUT('ALL',FPAR)
       FPAR%SUCCESS = .FALSE.
       PNODE => NULL()
       RETURN
@@ -92,6 +94,7 @@ CONTAINS
       FMT_LOC = 'U'
     CASE DEFAULT
       WRITE(FPAR%MESG,'(A,A)')' Read  - unknown format',TRIM(FMT)
+      CALL FLL_OUT('ALL',FPAR)
       FPAR%SUCCESS = .FALSE.
       PNODE => NULL()
       RETURN
@@ -110,6 +113,7 @@ CONTAINS
 
     IF(ISTAT/=0) THEN
       WRITE(FPAR%MESG,'(A,A)')' Read  - error opening file ',TRIM(FILE)
+      CALL FLL_OUT('ALL',FPAR)
       FPAR%SUCCESS = .FALSE.
       PNODE => NULL()
       RETURN
@@ -122,6 +126,7 @@ CONTAINS
     CLOSE(IOUNIT)
     IF(.NOT.ASSOCIATED(PNODE))THEN
        WRITE(FPAR%MESG,'(A,A)')' Read  - error reading file ',TRIM(FILE)
+       CALL FLL_OUT('ALL',FPAR)
        FPAR%SUCCESS = .FALSE.
     END IF
     
@@ -147,7 +152,8 @@ CONTAINS
     USE FLL_TYPE_M
     USE FLL_MK_M
     USE FLL_MV_M
-    
+    USE FLL_OUT_M
+   
     IMPLICIT NONE  
 !
 ! Declarations
@@ -184,6 +190,7 @@ CONTAINS
     
     IF(.NOT.FPAR_H%SUCCESS)THEN
       WRITE(FPAR%MESG,'(A)')' Read  - error reading header '
+      CALL FLL_OUT('ALL',FPAR)
       FPAR%SUCCESS = .FALSE.
       PNODE => NULL()
       RETURN
@@ -197,6 +204,7 @@ CONTAINS
 
     IF(.NOT.ASSOCIATED(PNODE))THEN
       WRITE(FPAR%MESG,'(A)')' Read  - error allocating node '
+      CALL FLL_OUT('ALL',FPAR)
       FPAR%SUCCESS = .FALSE.
       PNODE => NULL()
       STOP
@@ -260,6 +268,7 @@ CONTAINS
 !    
     USE FLL_TYPE_M    
     USE FLL_FUNC_PRT_M
+    USE FLL_OUT_M
     
     IMPLICIT NONE  
 !
@@ -462,10 +471,12 @@ CONTAINS
     END SELECT
     
     WRITE(FPAR%MESG,'(A)')' Read  - reading header error '
+    CALL FLL_OUT('ALL',FPAR)
     FPAR%SUCCESS = .FALSE.
     RETURN
     
     WRITE(FPAR%MESG,'(A)')' Read  - reading header error, reached end of file '
+    CALL FLL_OUT('ALL',FPAR)
     FPAR%SUCCESS = .FALSE.
     RETURN
    

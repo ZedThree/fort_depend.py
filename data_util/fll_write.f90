@@ -45,7 +45,8 @@ CONTAINS
 ! External Modules used
 !    
     USE FLL_TYPE_M
-    
+    USE FLL_OUT_M
+   
     IMPLICIT NONE
 !
 ! Declarations
@@ -83,7 +84,8 @@ CONTAINS
     CASE('U','u','*')! UNKNOWN - UNSPECIFIED FORMAT
       FMT_LOC = 'U'
     CASE DEFAULT
-      WRITE(FPAR%MESG,'(A,A)')' Write  - unknown format',TRIM(FMT)
+      WRITE(FPAR%MESG,'(A,A)')' Write_ffaunknown format',TRIM(FMT)
+      CALL FLL_OUT('ALL',FPAR)
       FPAR%SUCCESS = .FALSE.
       PNODE => NULL()
       OK = .FALSE.
@@ -102,7 +104,8 @@ CONTAINS
     END SELECT
 
     IF(ISTAT/=0) THEN
-      WRITE(FPAR%MESG,'(A,A)')' Write  - error opening file ',TRIM(FILE)
+      WRITE(FPAR%MESG,'(A,A)')' Write_ffaerror opening file ',TRIM(FILE)
+      CALL FLL_OUT('ALL',FPAR)
       FPAR%SUCCESS = .FALSE.
       OK = .FALSE.
       RETURN
@@ -115,6 +118,7 @@ CONTAINS
     CLOSE(IOUNIT)
     IF(.NOT.ASSOCIATED(PNODE))THEN
        WRITE(FPAR%MESG,'(A,A)')' Read  - error reading file ',TRIM(FILE)
+       CALL FLL_OUT('ALL',FPAR)
        FPAR%SUCCESS = .FALSE.
        OK = .FALSE.
        RETURN
@@ -142,6 +146,8 @@ CONTAINS
 !
    
     USE FLL_TYPE_M
+    USE FLL_OUT_M
+    
     IMPLICIT NONE
 !
 ! Declarations
@@ -169,7 +175,8 @@ CONTAINS
    POS = 0
    FPAR%SUCCESS = .FALSE.
    IF(.NOT.ASSOCIATED(PNODE))THEN
-      WRITE(FPAR%MESG,'(A)')' CAT - null node '
+      WRITE(FPAR%MESG,'(A)')' Write_ffa - null node '
+      CALL FLL_OUT('ALL',FPAR)
       FPAR%SUCCESS = .FALSE.
       RETURN
    END IF

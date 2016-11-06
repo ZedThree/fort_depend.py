@@ -52,6 +52,7 @@ CONTAINS
        USE FLL_MV_M
        USE FLL_DUPLICATE_M
        USE FLL_CAT_M
+       USE FLL_OUT_M
 !
 ! Declarations
 !
@@ -76,6 +77,7 @@ CONTAINS
        IF(.NOT.ASSOCIATED(PWHAT))THEN
           WRITE(*,*)' Cp - SOURCE IS NULL NODE'
           WRITE(FPAR%MESG,'(A,A)')' Mv, Cp  - null node '
+          CALL FLL_OUT('ALL',FPAR)
           FPAR%SUCCESS = .FALSE.
           RETURN
        END IF
@@ -110,6 +112,7 @@ CONTAINS
     USE FLL_RM_M
     USE FLL_STICH_M
     USE FLL_DUPLICATE_M
+    USE FLL_OUT_M
 !
 ! Declarations
 !
@@ -144,6 +147,7 @@ CONTAINS
    IF(.NOT.ASSOCIATED(PWHAT))THEN
       WRITE(*,*)' Cp - SOURCE IS NULL NODE'
       WRITE(FPAR%MESG,'(A,A)')' Mv, Cp  - null node '
+      CALL FLL_OUT('ALL',FPAR)
       FPAR%SUCCESS = .FALSE.
       RETURN
    END IF
@@ -152,6 +156,7 @@ CONTAINS
 !
    IF(.NOT.ASSOCIATED(PWHERE))THEN
       WRITE(FPAR%MESG,'(A,A)')' Mv, Cp  - null node '
+      CALL FLL_OUT('ALL',FPAR)
       FPAR%SUCCESS = .FALSE.
       RETURN
    END IF

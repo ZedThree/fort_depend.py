@@ -44,9 +44,13 @@ MODULE FLL_TYPE_M
 !                                          stdout=>output_unit, &
 !                                          stderr=>error_unit
 !#else
-#define stdin  5
-#define stdout 6
-#define stderr 0
+
+! #define STDIN  5
+! #define STDOUT 6
+! #define STDERR 0
+! #define IOSTAT=55
+! #define IOLOG=99
+
 !#endif
 
 !
@@ -76,6 +80,13 @@ MODULE FLL_TYPE_M
 ! Arguments declaration
 !
   IMPLICIT NONE
+  
+  INTEGER, PARAMETER ::  STDIN =5
+  INTEGER, PARAMETER ::  STDOUT=6
+  INTEGER, PARAMETER ::  STDERR=0
+  INTEGER, PARAMETER ::  IOSTATFILE=55
+  INTEGER, PARAMETER ::  IOLOGFILE=99
+  
   INTEGER, PARAMETER  :: RSINGLE = SELECTED_REAL_KIND(P=6,R=37)
   INTEGER, PARAMETER  :: RDOUBLE = KIND(0.D0)
   INTEGER, PARAMETER  :: SINT = SELECTED_INT_KIND(9)

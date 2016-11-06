@@ -36,6 +36,18 @@ CONTAINS
 !
 ! Description: writes to a err message string
 !
+!
+! Description: Writes some standard err message
+!
+! 
+! History:
+! Version   Date       Patch number  CLA     Comment
+! -------   --------   --------      ---     -------
+! 1.1       10/10/16                         Initial implementation
+!
+!
+! External Modules used
+!
 ! External Modules used
 !      
       USE FLL_TYPE_M
@@ -60,8 +72,21 @@ CONTAINS
     END FUNCTION ERR_MSG
     
     FUNCTION TEST_IOSTAT(IOSTAT, FPAR) RESULT(OK)
-!     
+!
+! Description: tests IOSTAT return parameter from R/W functions
+!
+! 
+! History:
+! Version   Date       Patch number  CLA     Comment
+! -------   --------   --------      ---     -------
+! 1.1       10/10/16                         Initial implementation
+!
+!
+! External Modules used
+!
     USE FLL_TYPE_M
+    USE FLL_OUT_M
+    
     IMPLICIT NONE
     INTEGER :: IOSTAT
     TYPE(FUNC_DATA_SET) :: FPAR
@@ -70,9 +95,11 @@ CONTAINS
     OK = .FALSE.
     IF (IOSTAT > 0)  THEN
       WRITE(FPAR%MESG,'(A)')' Read  - error readig node data'
+      CALL FLL_OUT('ALL',FPAR)
       FPAR%SUCCESS = .FALSE.
    ELSE IF (IOSTAT < 0) THEN
       WRITE(FPAR%MESG,'(A)')' Read  - EOF reached'
+      CALL FLL_OUT('ALL',FPAR)
       FPAR%SUCCESS = .FALSE.
    ELSE
       FPAR%SUCCESS = .TRUE.

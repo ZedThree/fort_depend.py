@@ -42,6 +42,7 @@ CONTAINS
 !     
     USE FLL_TYPE_M
     USE FLL_FUNC_PRT_M
+    USE FLL_OUT_M
 
     IMPLICIT NONE
 !
@@ -84,6 +85,7 @@ CONTAINS
    
    IF(.NOT.ASSOCIATED(PNODE))THEN
       WRITE(FPAR%MESG,'(A,A)')'Locate - Null node: ',TRIM(NAME)
+      CALL FLL_OUT('ALL',FPAR)
       FPAR%SUCCESS = .FALSE.
       RETURN
    END IF

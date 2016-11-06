@@ -43,6 +43,7 @@ CONTAINS
 ! External Modules used
 !
        USE FLL_TYPE_M
+       
        IMPLICIT NONE
 !
 ! Declarations
@@ -82,7 +83,8 @@ CONTAINS
     USE FLL_TYPE_M
     USE FLL_RM_M
     USE FLL_STICH_M
-    
+    USE FLL_OUT_M
+   
     IMPLICIT NONE
 !
 !   SUBROUTINE MOVES NODE
@@ -113,12 +115,14 @@ CONTAINS
    FPAR%SUCCESS = .FALSE.
    IF(.NOT.ASSOCIATED(PWHAT))THEN
       WRITE(FPAR%MESG,'(A,A)')' Mv, Cp  - null node '
+      CALL FLL_OUT('ALL',FPAR)
       FPAR%SUCCESS = .FALSE.
       RETURN
    END IF
    
    IF(.NOT.ASSOCIATED(PWHERE))THEN
       WRITE(FPAR%MESG,'(A,A)')' Mv, Cp  - null node '
+      CALL FLL_OUT('ALL',FPAR)
       FPAR%SUCCESS = .FALSE.
       RETURN
    END IF

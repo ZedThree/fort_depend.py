@@ -51,6 +51,7 @@ CONTAINS
 
        USE FLL_TYPE_M
        USE FLL_STICH_M
+       USE FLL_OUT_M
 !
 ! Declarations
 !
@@ -72,6 +73,7 @@ CONTAINS
        OK = .FALSE.
        IF(.NOT.ASSOCIATED(PWHAT))THEN
          WRITE(FPAR%MESG,'(A,A)')' Deattach - null node '
+         CALL FLL_OUT('ALL',FPAR)
          FPAR%SUCCESS = .FALSE.
          RETURN
        END IF

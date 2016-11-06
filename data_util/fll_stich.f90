@@ -39,6 +39,7 @@ CONTAINS
 !
    
     USE FLL_TYPE_M
+    USE FLL_OUT_M
     
     IMPLICIT NONE
 !
@@ -64,6 +65,7 @@ CONTAINS
 !      
    IF(.NOT.ASSOCIATED(PNODE))THEN
      WRITE(FPAR%MESG,'(A)')' Stich  - null node '
+     CALL FLL_OUT('ALL',FPAR)
      FPAR%SUCCESS = .FALSE.
      RETURN
    END IF
@@ -76,6 +78,7 @@ CONTAINS
 
    IF(.NOT.ASSOCIATED(PNODE%PPAR))THEN
      WRITE(FPAR%MESG,'(A,A)')' Stich - null node '
+     CALL FLL_OUT('ALL',FPAR)
      FPAR%SUCCESS = .FALSE.
      RETURN
    END IF

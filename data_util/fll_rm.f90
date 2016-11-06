@@ -45,6 +45,8 @@ CONTAINS
 !
     USE FLL_TYPE_M
     USE FLL_STICH_M
+    USE FLL_OUT_M
+    
     IMPLICIT NONE
 !
 ! Declarations
@@ -68,6 +70,7 @@ CONTAINS
    FPAR%SUCCESS = .FALSE.
    IF(.NOT.ASSOCIATED(PNODE))THEN
       WRITE(FPAR%MESG,'(A)')' RM - null node '
+      CALL FLL_OUT('ALL',FPAR)
       FPAR%SUCCESS = .FALSE.
       RETURN
    END IF
