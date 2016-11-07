@@ -162,8 +162,9 @@ def mkdir_structure(root_path,cwd, exclude, linkfiles):
 
              source = dirtmp+'/'+word
              dest   = newdir+'/'+word
-             print ("\033[031mDIAG: \033[039m linking file \033[032m"+source+"\033[039m ....")
-             linkfile = os.symlink( source, dest)
+             if os.path.exists(source):
+               print ("\033[031mDIAG: \033[039m linking file \033[032m"+source+"\033[039m ....")
+               linkfile = os.symlink( source, dest)
 
           os.chdir(cwd)
           print("  ")
