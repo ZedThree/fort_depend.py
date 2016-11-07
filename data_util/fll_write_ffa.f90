@@ -422,7 +422,7 @@ CONTAINS
            CASE('J')
               WRITE(IOUNIT,*)PNODE%L0
            CASE('S','L')
-               WRITE(IOUNIT,*)"'",PNODE%S,"'"
+               WRITE(IOUNIT,*)"'",PNODE%S0,"'"
 
            CASE DEFAULT 
          
@@ -604,9 +604,9 @@ CONTAINS
            CASE('J')
               WRITE(IOUNIT)1_LINT,PNODE%L0
            CASE('L')
-               WRITE(IOUNIT)1_LINT*STRING_LENGHT,PNODE%S
+               WRITE(IOUNIT)1_LINT*STRING_LENGHT,PNODE%S0
            CASE('S')
-               WRITE(IOUNIT)1_LINT*NAME_LENGTH,PNODE%S(1:NAME_LENGTH)
+               WRITE(IOUNIT)1_LINT*NAME_LENGTH,PNODE%S0(1:NAME_LENGTH)
            END SELECT
         END IF
        END IF

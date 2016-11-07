@@ -382,7 +382,7 @@ CONTAINS
          CASE('L')
           WRITE(IOUNIT, *)PNODE%L0
         CASE('S')
-          WRITE(IOUNIT,*)"'",TRIM(PNODE%S),"'"
+          WRITE(IOUNIT,*)"'",TRIM(PNODE%S0),"'"
 
          CASE DEFAULT 
          
@@ -506,7 +506,7 @@ CONTAINS
          CASE('L')
             WRITE(IOUNIT)PNODE%L0
          CASE('S')
-            WRITE(IOUNIT)"'",PNODE%S,"'"
+            WRITE(IOUNIT)"'",PNODE%S0,"'"
 
          CASE DEFAULT 
          

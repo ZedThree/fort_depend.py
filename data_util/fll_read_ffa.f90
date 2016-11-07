@@ -600,7 +600,7 @@ CONTAINS
          IF(NSIZE > 1)THEN
            READ(IOUNIT,*,IOSTAT=IOSTAT)(PNODE%S1(I),I=1,NSIZE)
          ELSE
-           READ(IOUNIT,*,IOSTAT=IOSTAT)PNODE%S
+           READ(IOUNIT,*,IOSTAT=IOSTAT)PNODE%S0
          END IF
        ELSE
          IF(NSIZE == 1)THEN
@@ -749,7 +749,7 @@ CONTAINS
            END DO
          ELSE
            READ(IOUNIT,IOSTAT=IOSTAT)NINTEG,T
-           PNODE%S = T
+           PNODE%S0 = T
          END IF
        ELSE
          IF(NSIZE == 1)THEN
@@ -776,7 +776,7 @@ CONTAINS
          IF(NSIZE > 1)THEN
            READ(IOUNIT,IOSTAT=IOSTAT)NINTEG,(PNODE%S1(I),I=1,NSIZE)
          ELSE
-           READ(IOUNIT,IOSTAT=IOSTAT)NINTEG,PNODE%S
+           READ(IOUNIT,IOSTAT=IOSTAT)NINTEG,PNODE%S0
          END IF
        ELSE
          IF(NSIZE == 1)THEN

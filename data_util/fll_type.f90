@@ -125,11 +125,11 @@ MODULE FLL_TYPE_M
     CHARACTER(LEN=STRING_LENGHT), POINTER, CONTIGUOUS  :: S2(:,:)=>NULL()      ! 2D array of strings
     
     REAL(RSINGLE)   :: R0                                     ! real 
-    REAL(RDOUBLE) :: D0                                     ! double
-    INTEGER(SINT)    :: I0                                       ! integer
-    INTEGER(LINT)    :: L0                                      ! long integer
-    CHARACTER(LEN=STRING_LENGHT) :: S   ! string
-    CHARACTER        :: C                                        ! character
+    REAL(RDOUBLE)   :: D0                                     ! double
+    INTEGER(SINT)   :: I0                                     ! integer
+    INTEGER(LINT)   :: L0                                     ! long integer
+    CHARACTER(LEN=STRING_LENGHT) :: S0   ! string
+    CHARACTER       :: C                                      ! character
     
   END TYPE DNODE
 !

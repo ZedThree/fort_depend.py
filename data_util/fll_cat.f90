@@ -276,7 +276,7 @@ CONTAINS
             WRITE(TEXT,*)"     ",SPACE,PNODE%L0
             WRITE(IOUNIT, *)TRIM(TEXT1),TRIM(TEXT)  
          CASE('S')
-            WRITE(TEXT,*)"     ",SPACE,TRIM(PNODE%S)
+            WRITE(TEXT,*)"     ",SPACE,TRIM(PNODE%S0)
             WRITE(IOUNIT, *)TRIM(TEXT1),TRIM(TEXT) 
            CASE DEFAULT 
         
