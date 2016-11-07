@@ -75,10 +75,12 @@ CONTAINS
       CALL FLL_OUT('ALL',FPAR)
       RETURN
    END IF
-   
+
+   WRITE(*,*)
    PCHILD => PNODE%PCHILD
    IF(PARENT) THEN
-      IF(ASSOCIATED(PNODE%PPAR))WRITE(*,*)' ===> Node has a parent, its name is ', PNODE%PPAR%LNAME
+      IF(ASSOCIATED(PNODE%PPAR))WRITE(*,*)' ===> Node has a parent, its name is: ', PNODE%PPAR%LNAME
+      WRITE(*,*)
    END IF
    CALL FLL_PRINT(PNODE, IOUNIT, POS, FPAR)
 !

@@ -30,7 +30,7 @@ MODULE FLL_SWEEP_M
 ! External Modules used
 !
 CONTAINS
-   RECURSIVE FUNCTION  FLL_SWEEP(PNODE,PFIND,NAME,LTYPE,DIM,RECURSE,FPAR) RESULT(OK)
+   RECURSIVE FUNCTION  FLL_SWEEP(PNODE,PFIND,NAME,LTYPE,DIM,FPAR) RESULT(OK)
 !
 ! Description: Function sweep through list return each node   -------------  NOT FINISHED YET
 !
@@ -60,7 +60,6 @@ CONTAINS
 ! DIM                 In         dimensions of data the node should contain
 !                                    can be 0 - scalar), 1 -1D array, 2 -2D array 
 !                                    any other number (prefer -1) - do not care about dimensions
-! RECURSE      In        search recursively
 ! PFIND          Out        return pointer to located node
 ! FPAR         In/Out     structure containing function specific data
 !
@@ -70,7 +69,6 @@ CONTAINS
    TYPE(DNODE), POINTER  :: PNODE,PFIND
    CHARACTER(*) :: NAME
    CHARACTER(*) :: LTYPE
-   LOGICAL :: RECURSE
    INTEGER(LINT) :: DIM
    LOGICAL OK
 !
@@ -111,15 +109,6 @@ CONTAINS
    END IF
           
    DO WHILE(ASSOCIATED(PFIND))
-
-!    IF(RECURSE .AND. ASSOCIATED(PFIND%PCHILD))THEN
-!        PFIND => PFIND%PCHILD
-!        IF(FLL_SWEEP(PFIND,PFIND,NAME,LTYPE,DIM,RECURSE,FPAR,.TRUE., PPAR))THEN
-!          OK = .TRUE.
-!          RETURN
-!        END IF
-!         PFIND => PNEXT
-!      END IF
    
      IF(FLL_MATCH_PATTERN(PFIND,NAME,LTYPE,DIM,FPAR))THEN
        OK =.TRUE.
