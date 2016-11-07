@@ -1,0 +1,8 @@
+# This file is generated automatically. DO NOT EDIT!
+
+mpi-IO.o :  \
+	../../data_util/fll_mods.o \
+	create_mpi_struct.o
+
+create_mpi_struct.o :  \
+	../../data_util/fll_mods.o
