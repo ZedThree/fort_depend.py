@@ -39,19 +39,11 @@ MODULE FLL_TYPE_M
 !
 !  define std I/O desriptors
 
-!#ifdef f2008
-!use, intrinsic :: iso_fortran_env, only : stdin=>input_unit, &
-!                                          stdout=>output_unit, &
-!                                          stderr=>error_unit
-!#else
-
-! #define STDIN  5
-! #define STDOUT 6
-! #define STDERR 0
-! #define IOSTAT=55
-! #define IOLOG=99
-
-!#endif
+#ifdef f2008
+use, intrinsic :: iso_fortran_env, only : stdin=>input_unit, &
+                                          stdout=>output_unit, &
+                                          stderr=>error_unit
+#endif
 
 !
 ! Declarations
@@ -80,10 +72,11 @@ MODULE FLL_TYPE_M
 ! Arguments declaration
 !
   IMPLICIT NONE
-  
+#ifndef f2008  
   INTEGER, PARAMETER ::  STDIN =5
   INTEGER, PARAMETER ::  STDOUT=6
   INTEGER, PARAMETER ::  STDERR=0
+#endif
   INTEGER, PARAMETER ::  IOSTATFILE=55
   INTEGER, PARAMETER ::  IOLOGFILE=99
   
@@ -104,10 +97,10 @@ MODULE FLL_TYPE_M
 ! DEFINITION OF THE DATA SET OF THE NODE IN LINKED LIST
 !
   TYPE DNODE
-    CHARACTER(LEN=NAME_LENGTH)   :: LNAME = ''   ! name the list
+    CHARACTER(LEN=NAME_LENGTH)     :: LNAME = ''   ! name the list
     CHARACTER(LEN=TYPE_LENGTH)     :: LTYPE = ''  ! type of the list
     CHARACTER(LEN=TYPE_LENGTH)     :: FTYPE = ''  ! type of the list
-    INTEGER(LINT) :: NDIM  = 0, NSIZE = 0, NLINK = 0
+    INTEGER(LINT) :: NDIM = 0, NSIZE = 0, NLINK = 0
     INTEGER(LINT) :: POS  = 0, LENGTH = 0 
 
     TYPE (DNODE), POINTER :: &
