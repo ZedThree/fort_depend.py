@@ -32,30 +32,36 @@
 EXE    = fll_test
 
 include src_dir_path.mk
-include ../config.mk
+include ../../config.mk
 
 DEP_FILE=project.dep
 
 FMODDIRS= ../../data_util
 
-#SUBDIRS= $(dir $(wildcard $(srcdir)/*))
-SUBDIRS= Simple_data_operation 
+FFILES= $(notdir $(wildcard $(srcdir)/*.f90))
 
 
+OFILES=$(FFILES:%.f90=%.o)
+XOFILES=$(wildcard ../../data_util/*.o)
 
 ###########################################################################
 
-all: $(SUBDIRS:%=%.all)
+all: $(EXE).x 
 
-include ../rules.mk
+include ../../rules.mk
 
-clean: $(SUBDIRS:%=%.clean)
-	rm -f *.x *.o *.mod
+$(EXE).x: $(OFILES) $(XOFILES)
+	$(FC) $(LDFLAGS) -o $@ $^
 
-depend: $(SUBDIRS:%=%.depend)
+clean:
+	rm -f *.x *.o *.mod $(EXE)
 
-install: $(SUBDIRS:%=%.install)
+depend: $(FFILES)
+	@echo "Making dependencies!"
+	cd $(srcdir) && $(MAKEDEPEND) -r $(PROJ_ROOT_PATH) -w -o $(srcdir)/$(DEP_FILE) -f $(FFILES)
 
-test: $(SUBDIRS:%=%.test)
+install: $(EXE).x $(EXE)
+	$(INSTALL) $(EXE) $(bindir)/bin/$(EXE)$(POSTFIX)
+	$(INSTALL) $(EXE).x $(bindir)/bin/$(EXE)$(POSTFIX).x
 
-chk: $(SUBDIRS:%=%.chk)
+-include $(srcdir)/project.dep
