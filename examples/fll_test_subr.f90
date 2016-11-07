@@ -88,13 +88,13 @@ CONTAINS
 !
 !   find the first TEST1_Subdir in PNODE1 and print it on the screen
 !
-   PTMP => FLL_LOCATE(PNODE1,'TEST1_Subdir',1_lint,'*',-1_LINT,.false.,FPAR)
+   PTMP => FLL_LOCATE(PNODE1,'TEST1_Subdir','*',-1_LINT,1_LINT,.false.,FPAR)
    CALL FLL_CAT(PTMP, 6, .TRUE.,FPAR)
    WRITE(*,*)'------------------------------------------------------7'
 !
 !  find the values of pressure subset #1 and print the data on screen
 !
-    PRESS => FLL_GETNDATA_D1(PTMP,'pressure',1_LINT,'D',FPAR)
+    PRESS => FLL_GETNDATA_D1(PTMP,'pressure','D',1_LINT,FPAR)
     write(*,*)' Values of pressure are ',PRESS
 !
 !  PNEW WAS CREATED HERE, IT DOES NOT BELONG TO ANY NODE (WAS NOT MOVED TO ANY NODE)

@@ -77,7 +77,6 @@ CONTAINS
    INTEGER(LINT) :: NLOCD
    
    OK = .FALSE.
-   
    IF(TRIM(PNODE%LNAME) == TRIM(NAME) .OR. TRIM(NAME) == '*')THEN
         OK = .TRUE.
    ELSE

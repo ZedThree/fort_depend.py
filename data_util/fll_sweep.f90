@@ -30,7 +30,7 @@ MODULE FLL_SWEEP_M
 ! External Modules used
 !
 CONTAINS
-   SUBROUTINE  FLL_SWEEP(PNODE,PFIND,NAME,LTYPE,RECURSE,FPAR)
+   RECURSIVE FUNCTION  FLL_SWEEP(PNODE,PFIND,NAME,LTYPE,DIM,RECURSE,FPAR) RESULT(OK)
 !
 ! Description: Function sweep through list return each node   -------------  NOT FINISHED YET
 !
@@ -49,24 +49,41 @@ CONTAINS
 
     IMPLICIT NONE
 !
-! Description: Sweeps through the list returning nodes matching patern
+! Declarations
 !
-! External Modules used
-! 
+! Arguments description
+! Name         In/Out     Function
+! PNODE          In         pointer where find node
+! NAME             In         name of node
+! NUMBER        In         position of node in list
+! LTYPE            In         type of node  - can be *
+! DIM                 In         dimensions of data the node should contain
+!                                    can be 0 - scalar), 1 -1D array, 2 -2D array 
+!                                    any other number (prefer -1) - do not care about dimensions
+! RECURSE      In        search recursively
+! PFIND          Out        return pointer to located node
+! FPAR         In/Out     structure containing function specific data
+!
+! Arguments declaration
+!
    TYPE(FUNC_DATA_SET) :: FPAR
    TYPE(DNODE), POINTER  :: PNODE,PFIND
    CHARACTER(*) :: NAME
    CHARACTER(*) :: LTYPE
    LOGICAL :: RECURSE
+   INTEGER(LINT) :: DIM
+   LOGICAL OK
 !
 !   LOCAL TYPES
 !
    CHARACTER(LEN=TYPE_LENGTH) :: TLTYPE
-   TYPE(DNODE), POINTER  :: PCURR, PCHLD
    INTEGER(LINT) :: I
+   TYPE(DNODE), POINTER :: PNEXT
 !   
 !   BODY OF FUNCTION
 !      
+   OK =.FALSE.
+
    I = 1
    DO WHILE(LTYPE(I:I) == ' ')
      I = I + 1
@@ -81,19 +98,40 @@ CONTAINS
       RETURN
    END IF
 !
-   PCURR => PNODE%PCHILD
-   IF(.NOT.ASSOCIATED(PNODE%PCHILD))THEN
-     WRITE(*,*)' NODE NOT DIR NODE'
-     RETURN 
-   END IF
-!
 !  start loop
 !
-   IF(.NOT.ASSOCIATED(PFIND))PFIND => PNODE%PCHILD
+   IF(.NOT.ASSOCIATED(PFIND))THEN
+     IF(ASSOCIATED(PNODE%PCHILD))THEN
+       PFIND => PNODE%PCHILD
+     ELSE
+       PFIND => PNODE
+     END IF
+   ELSE 
+     PFIND => PFIND%PNEXT
+   END IF
+          
+   DO WHILE(ASSOCIATED(PFIND))
 
+!    IF(RECURSE .AND. ASSOCIATED(PFIND%PCHILD))THEN
+!        PFIND => PFIND%PCHILD
+!        IF(FLL_SWEEP(PFIND,PFIND,NAME,LTYPE,DIM,RECURSE,FPAR,.TRUE., PPAR))THEN
+!          OK = .TRUE.
+!          RETURN
+!        END IF
+!         PFIND => PNEXT
+!      END IF
+   
+     IF(FLL_MATCH_PATTERN(PFIND,NAME,LTYPE,DIM,FPAR))THEN
+       OK =.TRUE.
+       RETURN
+     END IF
+     
+     PFIND => PFIND%PNEXT
+     
+   END DO
 
    RETURN
-   END SUBROUTINE FLL_SWEEP
+   END FUNCTION FLL_SWEEP
 
 
 END MODULE FLL_SWEEP_M
