@@ -8,5 +8,5 @@ CC                 = gcc
 CFLAGS             = -O2   -fopenmp
 C_LDFLAGS          = -O2   -fopenmp
 MPI_FC             = mpif90
-MPI_FFLAGS         = -O2 -fdefault-real-8 -fdefault-double-8 -ffixed-form -fconvert=big-endian -frecord-marker=4  -fopenmp -cpp
-MPI_LDFLAGS        =-O2 -fdefault-real-8 -fdefault-double-8 -ffixed-form -fconvert=big-endian -frecord-marker=4  -fopenmp -cpp
+MPI_FFLAGS         = -O2 -fdefault-real-8 -fdefault-double-8 -fconvert=big-endian -frecord-marker=4  -fopenmp -cpp
+MPI_LDFLAGS        =-O2 -fdefault-real-8 -fdefault-double-8 -fconvert=big-endian -frecord-marker=4  -fopenmp -cpp

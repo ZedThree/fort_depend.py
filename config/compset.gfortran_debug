@@ -2,7 +2,7 @@
 FC                 = gfortran
 FCMODINCFLAG       = -I
 FFLAGS             = -g -ffpe-trap=invalid,zero,overflow -fdefault-real-8 -fdefault-double-8 -fconvert=big-endian -frecord-marker=4 -fbounds-check -Wall -Wextra -fopenmp -x f95-cpp-input
-FFFLAGS            = -g -ffpe-trap=invalid,zero,overflow -fdefault-real-8 -fdefault-double-8 -ffixed-form -fconvert=big-endian -frecord-marker=4 -fbounds-check -Wall -Wextra -fopenmp -x f95-cpp-input
+FFFLAGS            = -g -ffpe-trap=invalid,zero,overflow -fdefault-real-8 -fdefault-double-8 -fconvert=big-endian -frecord-marker=4 -fbounds-check -Wall -Wextra -fopenmp -x f95-cpp-input
 UPPER_MODFILE_NAME =
 LDFLAGS            = -g -ffpe-trap=invalid,zero,overflow -fdefault-real-8 -fdefault-double-8 -fconvert=big-endian -frecord-marker=4 -fbounds-check -Wall -Wextra -fopenmp
 CC                 = gcc -fopenmp
