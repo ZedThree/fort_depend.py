@@ -50,6 +50,7 @@ include rules.mk
 init:
 	echo PROJ_ROOT_PATH=$(PWD) > config.mk
 	echo MAKEDEPEND=$(PWD)/python_dep/fort_depend.py >> config.mk
+	echo MPI_FC=YES >> config.mk
 
 data_util.all: 
 test.all: data_util.all
