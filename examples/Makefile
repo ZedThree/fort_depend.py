@@ -36,10 +36,12 @@ include ../config.mk
 
 DEP_FILE=project.dep
 
-FMODDIRS= ../../data_util
+#FMODDIRS= ../../data_util
 
 #SUBDIRS= $(dir $(wildcard $(srcdir)/*))
-SUBDIRS= Simple_data_operation 
+SUBDIRS= \
+	Simple_data_operation \
+	Example_MPI-IO
 
 
 
