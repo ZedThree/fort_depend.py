@@ -94,7 +94,7 @@ CONTAINS
 !
 !  find the values of pressure subset #1 and print the data on screen
 !
-    PRESS => FLL_GETNDATA_D1(PTMP,'pressure','D',1_LINT,FPAR)
+    PRESS => FLL_GETNDATA_D1(PTMP,'pressure',1_LINT,FPAR)
     write(*,*)' Values of pressure are ',PRESS
 !
 !  PNEW WAS CREATED HERE, IT DOES NOT BELONG TO ANY NODE (WAS NOT MOVED TO ANY NODE)

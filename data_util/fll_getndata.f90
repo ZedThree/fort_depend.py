@@ -31,7 +31,7 @@ MODULE FLL_GETNDATA_M
 ! External Modules used
 !
 CONTAINS
-  FUNCTION FLL_GETNDATA_R0(PNODE,NAME,LTYPE,NUMBER,FPAR) RESULT(R0)
+  FUNCTION FLL_GETNDATA_R0(PNODE,NAME,NUMBER,FPAR) RESULT(R0)
 !
 ! Description: returns single real data of the node
 !
@@ -56,7 +56,6 @@ CONTAINS
 ! PNODE        In         pointer to data set
 ! NAME         In         name of pointer
 ! NUMBER       Out        number of pointer if more pointers of the same type are present
-! LTYPE        Out        type of pointer
 ! FPAR         In/Out     structure containing function specific data
 ! R0           Out        returns value of real scalar
 !
@@ -65,7 +64,6 @@ CONTAINS
    TYPE(FUNC_DATA_SET) :: FPAR
    TYPE(DNODE), POINTER  :: PNODE
    CHARACTER(*) :: NAME
-   CHARACTER(*) :: LTYPE
    INTEGER(LINT) :: NUMBER
    REAL(RSINGLE) :: R0
 !
@@ -81,11 +79,11 @@ CONTAINS
       RETURN      
    END IF
 
-   PFIND => FLL_LOCATE(PNODE,NAME,LTYPE,0_LINT,NUMBER,.FALSE.,FPAR)
+   PFIND => FLL_LOCATE(PNODE,NAME,'R',0_LINT,NUMBER,.FALSE.,FPAR)
 
    IF(.NOT.ASSOCIATED(PFIND))THEN
       FPAR%SUCCESS = .FALSE.
-      WRITE(FPAR%MESG,'(A,A,A)')'FLL_GETNDATA_R0 - Node',TRIM(PNODE%LNAME),' does not contain specified data'
+      WRITE(FPAR%MESG,'(A,A,A)')'FLL_GETNDATA_R0 - Node ',TRIM(PNODE%LNAME),' does not contain specified data'
       CALL FLL_OUT('ALL',FPAR)
       RETURN
    END IF
@@ -97,7 +95,7 @@ CONTAINS
 
 
 
-  FUNCTION FLL_GETNDATA_R1(PNODE,NAME,LTYPE,NUMBER,FPAR) RESULT(R1)
+  FUNCTION FLL_GETNDATA_R1(PNODE,NAME,NUMBER,FPAR) RESULT(R1)
 !
 ! Description: returns single real data of the node
 !
@@ -122,7 +120,6 @@ CONTAINS
 ! PNODE        In         pointer to data set
 ! NAME         In         name of pointer
 ! NUMBER       Out        number of pointer if more pointers of the same type are present
-! LTYPE        Out        type of pointer
 ! FPAR         In/Out     structure containing function specific data
 ! R1           Out        returns pointer to real array
 !
@@ -131,7 +128,6 @@ CONTAINS
    TYPE(FUNC_DATA_SET) :: FPAR
    TYPE(DNODE), POINTER  :: PNODE
    CHARACTER(*) :: NAME
-   CHARACTER(*) :: LTYPE
    INTEGER(LINT) :: NUMBER
    REAL(RSINGLE), POINTER :: R1(:)
 !
@@ -146,11 +142,11 @@ CONTAINS
       RETURN      
    END IF
 
-   PFIND => FLL_LOCATE(PNODE,NAME,LTYPE,1_LINT,NUMBER,.FALSE.,FPAR)
+   PFIND => FLL_LOCATE(PNODE,NAME,'R',1_LINT,NUMBER,.FALSE.,FPAR)
 
    IF(.NOT.ASSOCIATED(PFIND))THEN
       FPAR%SUCCESS = .FALSE.
-      WRITE(FPAR%MESG,'(A,A,A)')'FLL_GETNDATA_R1 - Node',TRIM(PNODE%LNAME),' does not contain specified data'
+      WRITE(FPAR%MESG,'(A,A,A)')'FLL_GETNDATA_R1 - Node ',TRIM(PNODE%LNAME),' does not contain specified data'
       CALL FLL_OUT('ALL',FPAR)
       RETURN
    END IF
@@ -160,7 +156,7 @@ CONTAINS
 
   END FUNCTION FLL_GETNDATA_R1
 
-  FUNCTION FLL_GETNDATA_R2(PNODE,NAME,LTYPE,NUMBER,FPAR) RESULT(R2)
+  FUNCTION FLL_GETNDATA_R2(PNODE,NAME,NUMBER,FPAR) RESULT(R2)
 !
 ! Description: returns single real data of the node
 !
@@ -186,7 +182,6 @@ CONTAINS
 ! PNODE        In         pointer to data set
 ! NAME         In         name of pointer
 ! NUMBER       Out        number of pointer if more pointers of the same type are present
-! LTYPE        Out        type of pointer
 ! FPAR         In/Out     structure containing function specific data
 ! R2           Out        returns pointer to real array
 !
@@ -195,7 +190,6 @@ CONTAINS
    TYPE(FUNC_DATA_SET) :: FPAR
    TYPE(DNODE), POINTER  :: PNODE
    CHARACTER(*) :: NAME
-   CHARACTER(*) :: LTYPE
    INTEGER(LINT) :: NUMBER
    REAL(RSINGLE), POINTER :: R2(:,:)
 !
@@ -210,11 +204,11 @@ CONTAINS
       RETURN      
    END IF
 
-   PFIND => FLL_LOCATE(PNODE,NAME,LTYPE,2_LINT,NUMBER,.FALSE.,FPAR)
+   PFIND => FLL_LOCATE(PNODE,NAME,'R',2_LINT,NUMBER,.FALSE.,FPAR)
 
    IF(.NOT.ASSOCIATED(PFIND))THEN
       FPAR%SUCCESS = .FALSE.
-      WRITE(FPAR%MESG,'(A,A,A)')'FLL_GETNDATA_R2 - Node',TRIM(PNODE%LNAME),' does not contain specified data'
+      WRITE(FPAR%MESG,'(A,A,A)')'FLL_GETNDATA_R2 - Node ',TRIM(PNODE%LNAME),' does not contain specified data'
       CALL FLL_OUT('ALL',FPAR)
       RETURN
    END IF
@@ -226,7 +220,7 @@ CONTAINS
 !
 !  DOUBLE
 !
-  FUNCTION FLL_GETNDATA_D0(PNODE,NAME,LTYPE,NUMBER,FPAR) RESULT(R0)
+  FUNCTION FLL_GETNDATA_D0(PNODE,NAME,NUMBER,FPAR) RESULT(R0)
 !
 ! Description: returns single real data of the node
 !
@@ -252,7 +246,6 @@ CONTAINS
 ! PNODE        In         pointer to data set
 ! NAME         In         name of pointer
 ! NUMBER       Out        number of pointer if more pointers of the same type are present
-! LTYPE        Out        type of pointer
 ! FPAR         In/Out     structure containing function specific data
 ! R1           Out        returns double number
 !
@@ -261,7 +254,6 @@ CONTAINS
    TYPE(FUNC_DATA_SET) :: FPAR
    TYPE(DNODE), POINTER  :: PNODE
    CHARACTER(*) :: NAME
-   CHARACTER(*) :: LTYPE
    INTEGER(LINT) :: NUMBER
    REAL(RDOUBLE) :: R0
 !
@@ -276,11 +268,11 @@ CONTAINS
       RETURN      
    END IF
 
-   PFIND => FLL_LOCATE(PNODE,NAME,LTYPE,0_LINT,NUMBER,.FALSE.,FPAR)
+   PFIND => FLL_LOCATE(PNODE,NAME,'D',0_LINT,NUMBER,.FALSE.,FPAR)
 
    IF(.NOT.ASSOCIATED(PFIND))THEN
       FPAR%SUCCESS = .FALSE.
-      WRITE(FPAR%MESG,'(A,A,A)')'FLL_GETNDATA_D0 - Node',TRIM(PNODE%LNAME),' does not contain specified data'
+      WRITE(FPAR%MESG,'(A,A,A)')'FLL_GETNDATA_D0 - Node ',TRIM(PNODE%LNAME),' does not contain specified data'
       CALL FLL_OUT('ALL',FPAR)
       RETURN
    END IF
@@ -292,7 +284,7 @@ CONTAINS
 
 
 
-  FUNCTION FLL_GETNDATA_D1(PNODE,NAME,LTYPE,NUMBER,FPAR) RESULT(R1)
+  FUNCTION FLL_GETNDATA_D1(PNODE,NAME,NUMBER,FPAR) RESULT(R1)
 !
 ! Description: returns single real data of the node
 !
@@ -318,7 +310,6 @@ CONTAINS
 ! PNODE        In         pointer to data set
 ! NAME         In         name of pointer
 ! NUMBER       Out        number of pointer if more pointers of the same type are present
-! LTYPE        Out        type of pointer
 ! FPAR         In/Out     structure containing function specific data
 ! R1           Out        returns pointer to double array
 !
@@ -327,7 +318,6 @@ CONTAINS
    TYPE(FUNC_DATA_SET) :: FPAR
    TYPE(DNODE), POINTER  :: PNODE
    CHARACTER(*) :: NAME
-   CHARACTER(*) :: LTYPE
    INTEGER(LINT) :: NUMBER
    REAL(RDOUBLE), POINTER :: R1(:)
 !
@@ -342,11 +332,11 @@ CONTAINS
       RETURN      
    END IF
 
-   PFIND => FLL_LOCATE(PNODE,NAME,LTYPE,1_LINT,NUMBER,.FALSE.,FPAR)
+   PFIND => FLL_LOCATE(PNODE,NAME,'D',1_LINT,NUMBER,.FALSE.,FPAR)
 
    IF(.NOT.ASSOCIATED(PFIND))THEN
       FPAR%SUCCESS = .FALSE.
-      WRITE(FPAR%MESG,'(A,A,A)')'FLL_GETNDATA_D1 - Node',TRIM(PNODE%LNAME),' does not contain specified data'
+      WRITE(FPAR%MESG,'(A,A,A)')'FLL_GETNDATA_D1 - Node ',TRIM(PNODE%LNAME),' does not contain specified data'
       CALL FLL_OUT('ALL',FPAR)
       RETURN
    END IF
@@ -357,7 +347,7 @@ CONTAINS
 
   END FUNCTION FLL_GETNDATA_D1
 
-  FUNCTION FLL_GETNDATA_D2(PNODE,NAME,LTYPE,NUMBER,FPAR) RESULT(R2)
+  FUNCTION FLL_GETNDATA_D2(PNODE,NAME,NUMBER,FPAR) RESULT(R2)
 !
 ! Description: returns single real data of the node
 !
@@ -383,7 +373,6 @@ CONTAINS
 ! PNODE        In         pointer to data set
 ! NAME         In         name of pointer
 ! NUMBER       Out        number of pointer if more pointers of the same type are present
-! LTYPE        Out        type of pointer
 ! FPAR         In/Out     structure containing function specific data
 ! R1           Out        returns pointer to double array
 !
@@ -392,7 +381,6 @@ CONTAINS
    TYPE(FUNC_DATA_SET) :: FPAR
    TYPE(DNODE), POINTER  :: PNODE
    CHARACTER(*) :: NAME
-   CHARACTER(*) :: LTYPE
    INTEGER(LINT) :: NUMBER
    REAL(RDOUBLE), POINTER :: R2(:,:)
 !
@@ -407,11 +395,11 @@ CONTAINS
       RETURN      
    END IF
 
-   PFIND => FLL_LOCATE(PNODE,NAME,LTYPE,2_LINT,NUMBER,.FALSE.,FPAR)
+   PFIND => FLL_LOCATE(PNODE,NAME,'D',2_LINT,NUMBER,.FALSE.,FPAR)
 
    IF(.NOT.ASSOCIATED(PFIND))THEN
       FPAR%SUCCESS = .FALSE.
-      WRITE(FPAR%MESG,'(A,A,A)')'FLL_GETNDATA_D2 - Node',TRIM(PNODE%LNAME),' does not contain specified data'
+      WRITE(FPAR%MESG,'(A,A,A)')'FLL_GETNDATA_D2 - Node ',TRIM(PNODE%LNAME),' does not contain specified data'
       CALL FLL_OUT('ALL',FPAR)
       RETURN
    END IF
@@ -423,7 +411,7 @@ CONTAINS
 !
 !  INTEGER
 !
-  FUNCTION FLL_GETNDATA_I0(PNODE,NAME,LTYPE,NUMBER,FPAR) RESULT(I0)
+  FUNCTION FLL_GETNDATA_I0(PNODE,NAME,NUMBER,FPAR) RESULT(I0)
 !
 ! Description: returns single real data of the node
 !
@@ -449,7 +437,6 @@ CONTAINS
 ! PNODE        In         pointer to data set
 ! NAME         In         name of pointer
 ! NUMBER       Out        number of pointer if more pointers of the same type are present
-! LTYPE        Out        type of pointer
 ! FPAR         In/Out     structure containing function specific data
 ! I0           Out        returns integer value
 !
@@ -458,7 +445,6 @@ CONTAINS
    TYPE(FUNC_DATA_SET) :: FPAR
    TYPE(DNODE), POINTER  :: PNODE
    CHARACTER(*) :: NAME
-   CHARACTER(*) :: LTYPE
    INTEGER(LINT) :: NUMBER
    INTEGER(SINT) :: I0
 !
@@ -473,11 +459,11 @@ CONTAINS
       RETURN      
    END IF
 
-   PFIND => FLL_LOCATE(PNODE,NAME,LTYPE,0_LINT,NUMBER,.FALSE.,FPAR)
+   PFIND => FLL_LOCATE(PNODE,NAME,'I',0_LINT,NUMBER,.FALSE.,FPAR)
 
    IF(.NOT.ASSOCIATED(PFIND))THEN
       FPAR%SUCCESS = .FALSE.
-      WRITE(FPAR%MESG,'(A,A,A)')'FLL_GETNDATA_I0 - Node',TRIM(PNODE%LNAME),' does not contain specified data'
+      WRITE(FPAR%MESG,'(A,A,A)')'FLL_GETNDATA_I0 - Node ',TRIM(PNODE%LNAME),' does not contain specified data'
       CALL FLL_OUT('ALL',FPAR)
       RETURN
    END IF
@@ -489,7 +475,7 @@ CONTAINS
 
 
 
-  FUNCTION FLL_GETNDATA_I1(PNODE,NAME,LTYPE,NUMBER,FPAR) RESULT(I1)
+  FUNCTION FLL_GETNDATA_I1(PNODE,NAME,NUMBER,FPAR) RESULT(I1)
 !
 ! Description: returns single real data of the node
 !
@@ -514,7 +500,6 @@ CONTAINS
 ! PNODE        In         pointer to data set
 ! NAME         In         name of pointer
 ! NUMBER       Out        number of pointer if more pointers of the same type are present
-! LTYPE        Out        type of pointer
 ! FPAR         In/Out     structure containing function specific data
 ! I1           Out        returns pointer to integer array
 !
@@ -523,7 +508,6 @@ CONTAINS
    TYPE(FUNC_DATA_SET) :: FPAR
    TYPE(DNODE), POINTER  :: PNODE
    CHARACTER(*) :: NAME
-   CHARACTER(*) :: LTYPE
    INTEGER(LINT) :: NUMBER
    INTEGER(SINT), POINTER :: I1(:)
 !
@@ -538,11 +522,11 @@ CONTAINS
       RETURN      
    END IF
 
-   PFIND => FLL_LOCATE(PNODE,NAME,LTYPE,1_LINT,NUMBER,.FALSE.,FPAR)
+   PFIND => FLL_LOCATE(PNODE,NAME,'I',1_LINT,NUMBER,.FALSE.,FPAR)
 
    IF(.NOT.ASSOCIATED(PFIND))THEN
       FPAR%SUCCESS = .FALSE.
-      WRITE(FPAR%MESG,'(A,A,A)')'FLL_GETNDATA_I1 - Node',TRIM(PNODE%LNAME),' does not contain specified data'
+      WRITE(FPAR%MESG,'(A,A,A)')'FLL_GETNDATA_I1 - Node ',TRIM(PNODE%LNAME),' does not contain specified data'
       CALL FLL_OUT('ALL',FPAR)
       RETURN
    END IF
@@ -552,7 +536,7 @@ CONTAINS
 
   END FUNCTION FLL_GETNDATA_I1
 
-  FUNCTION FLL_GETNDATA_I2(PNODE,NAME,LTYPE,NUMBER,FPAR) RESULT(I2)
+  FUNCTION FLL_GETNDATA_I2(PNODE,NAME,NUMBER,FPAR) RESULT(I2)
 !
 ! Description: returns single real data of the node
 !
@@ -577,7 +561,6 @@ CONTAINS
 ! PNODE        In         pointer to data set
 ! NAME         In         name of pointer
 ! NUMBER       Out        number of pointer if more pointers of the same type are present
-! LTYPE        Out        type of pointer
 ! FPAR         In/Out     structure containing function specific data
 ! I2           Out        returns pointer to integer array
 !
@@ -586,7 +569,6 @@ CONTAINS
    TYPE(FUNC_DATA_SET) :: FPAR
    TYPE(DNODE), POINTER  :: PNODE
    CHARACTER(*) :: NAME
-   CHARACTER(*) :: LTYPE
    INTEGER(LINT) :: NUMBER
    INTEGER(SINT), POINTER :: I2(:,:)
 !
@@ -601,11 +583,11 @@ CONTAINS
       RETURN      
    END IF
 
-   PFIND => FLL_LOCATE(PNODE,NAME,LTYPE,2_LINT,NUMBER,.FALSE.,FPAR)
+   PFIND => FLL_LOCATE(PNODE,NAME,'I',2_LINT,NUMBER,.FALSE.,FPAR)
 
    IF(.NOT.ASSOCIATED(PFIND))THEN
       FPAR%SUCCESS = .FALSE.
-      WRITE(FPAR%MESG,'(A,A,A)')'FLL_GETNDATA_I2 - Node',TRIM(PNODE%LNAME),' does not contain specified data'
+      WRITE(FPAR%MESG,'(A,A,A)')'FLL_GETNDATA_I2 - Node ',TRIM(PNODE%LNAME),' does not contain specified data'
       CALL FLL_OUT('ALL',FPAR)
       RETURN
    END IF
@@ -617,7 +599,7 @@ CONTAINS
 !
 !  LONG INTEGER
 !
-  FUNCTION FLL_GETNDATA_L0(PNODE,NAME,LTYPE,NUMBER,FPAR) RESULT(I0)
+  FUNCTION FLL_GETNDATA_L0(PNODE,NAME,NUMBER,FPAR) RESULT(I0)
 !
 ! Description: returns single real data of the node
 !
@@ -642,7 +624,6 @@ CONTAINS
 ! PNODE        In         pointer to data set
 ! NAME         In         name of pointer
 ! NUMBER       Out        number of pointer if more pointers of the same type are present
-! LTYPE        Out        type of pointer
 ! FPAR         In/Out     structure containing function specific data
 ! I0           Out        returns long integer value
 !
@@ -651,7 +632,6 @@ CONTAINS
    TYPE(FUNC_DATA_SET) :: FPAR
    TYPE(DNODE), POINTER  :: PNODE
    CHARACTER(*) :: NAME
-   CHARACTER(*) :: LTYPE
    INTEGER(LINT) :: NUMBER
    INTEGER(LINT) :: I0
 !
@@ -666,11 +646,11 @@ CONTAINS
       RETURN      
    END IF
 
-   PFIND => FLL_LOCATE(PNODE,NAME,LTYPE,0_LINT,NUMBER,.FALSE.,FPAR)
+   PFIND => FLL_LOCATE(PNODE,NAME,'L',0_LINT,NUMBER,.FALSE.,FPAR)
 
    IF(.NOT.ASSOCIATED(PFIND))THEN
       FPAR%SUCCESS = .FALSE.
-      WRITE(FPAR%MESG,'(A,A,A)')'FLL_GETNDATA_L0 - Node',TRIM(PNODE%LNAME),' does not contain specified data'
+      WRITE(FPAR%MESG,'(A,A,A)')'FLL_GETNDATA_L0 - Node ',TRIM(PNODE%LNAME),' does not contain specified data'
       CALL FLL_OUT('ALL',FPAR)
       RETURN
    END IF
@@ -682,7 +662,7 @@ CONTAINS
 
 
 
-  FUNCTION FLL_GETNDATA_L1(PNODE,NAME,LTYPE,NUMBER,FPAR) RESULT(I1)
+  FUNCTION FLL_GETNDATA_L1(PNODE,NAME,NUMBER,FPAR) RESULT(I1)
    
     USE FLL_TYPE_M
     USE FLL_LOCATE_M
@@ -696,7 +676,6 @@ CONTAINS
 ! PNODE        In         pointer to data set
 ! NAME         In         name of pointer
 ! NUMBER       Out        number of pointer if more pointers of the same type are present
-! LTYPE        Out        type of pointer
 ! FPAR         In/Out     structure containing function specific data
 ! I1           Out        returns pointer to long integer array
 !
@@ -705,7 +684,6 @@ CONTAINS
    TYPE(FUNC_DATA_SET) :: FPAR
    TYPE(DNODE), POINTER  :: PNODE
    CHARACTER(*) :: NAME
-   CHARACTER(*) :: LTYPE
    INTEGER(LINT) :: NUMBER
    INTEGER(LINT), POINTER :: I1(:)
 !
@@ -720,11 +698,11 @@ CONTAINS
       RETURN      
    END IF
 
-   PFIND => FLL_LOCATE(PNODE,NAME,LTYPE,1_LINT,NUMBER,.FALSE.,FPAR)
+   PFIND => FLL_LOCATE(PNODE,NAME,'L',1_LINT,NUMBER,.FALSE.,FPAR)
 
    IF(.NOT.ASSOCIATED(PFIND))THEN
       FPAR%SUCCESS = .FALSE.
-      WRITE(FPAR%MESG,'(A,A,A)')'FLL_GETNDATA_L1 - Node',TRIM(PNODE%LNAME),' does not contain specified data'
+      WRITE(FPAR%MESG,'(A,A,A)')'FLL_GETNDATA_L1 - Node ',TRIM(PNODE%LNAME),' does not contain specified data'
       CALL FLL_OUT('ALL',FPAR)
       RETURN
    END IF
@@ -734,7 +712,7 @@ CONTAINS
 
   END FUNCTION FLL_GETNDATA_L1
 
-  FUNCTION FLL_GETNDATA_L2(PNODE,NAME,LTYPE,NUMBER,FPAR) RESULT(I2)
+  FUNCTION FLL_GETNDATA_L2(PNODE,NAME,NUMBER,FPAR) RESULT(I2)
 !
 ! Description: returns single real data of the node
 !
@@ -759,7 +737,6 @@ CONTAINS
 ! PNODE        In         pointer to data set
 ! NAME         In         name of pointer
 ! NUMBER       Out        number of pointer if more pointers of the same type are present
-! LTYPE        Out        type of pointer
 ! FPAR         In/Out     structure containing function specific data
 ! I2           Out        returns pointer to long integer array
 !
@@ -768,7 +745,6 @@ CONTAINS
    TYPE(FUNC_DATA_SET) :: FPAR
    TYPE(DNODE), POINTER  :: PNODE
    CHARACTER(*) :: NAME
-   CHARACTER(*) :: LTYPE
    INTEGER(LINT) :: NUMBER
    INTEGER(LINT), POINTER :: I2(:,:)
 !
@@ -783,11 +759,11 @@ CONTAINS
       RETURN      
    END IF
 
-   PFIND => FLL_LOCATE(PNODE,NAME,LTYPE,2_LINT,NUMBER,.FALSE.,FPAR)
+   PFIND => FLL_LOCATE(PNODE,NAME,'L',2_LINT,NUMBER,.FALSE.,FPAR)
 
    IF(.NOT.ASSOCIATED(PFIND))THEN
       FPAR%SUCCESS = .FALSE.
-      WRITE(FPAR%MESG,'(A,A,A)')'FLL_GETNDATA_L2 - Node',TRIM(PNODE%LNAME),' does not contain specified data'
+      WRITE(FPAR%MESG,'(A,A,A)')'FLL_GETNDATA_L2 - Node ',TRIM(PNODE%LNAME),' does not contain specified data'
       CALL FLL_OUT('ALL',FPAR)
       RETURN
    END IF
@@ -797,7 +773,7 @@ CONTAINS
 
   END FUNCTION FLL_GETNDATA_L2
   
-  FUNCTION FLL_GETNDATA_S(PNODE,NAME,LTYPE,NUMBER,FPAR) RESULT(STRING)
+  FUNCTION FLL_GETNDATA_S(PNODE,NAME,NUMBER,FPAR) RESULT(STRING)
 !
 ! Description: returns single real data of the node
 !
@@ -822,7 +798,6 @@ CONTAINS
 ! PNODE        In         pointer to data set
 ! NAME         In         name of pointer
 ! NUMBER       Out        number of pointer if more pointers of the same type are present
-! LTYPE        Out        type of pointer
 ! FPAR         In/Out     structure containing function specific data
 ! STRING       Out        returns string
 !
@@ -831,7 +806,6 @@ CONTAINS
    TYPE(FUNC_DATA_SET) :: FPAR
    TYPE(DNODE), POINTER  :: PNODE
    CHARACTER(*) :: NAME
-   CHARACTER(*) :: LTYPE
    INTEGER(LINT) :: NUMBER
    CHARACTER(LEN=STRING_LENGHT) :: STRING
 !
@@ -846,11 +820,11 @@ CONTAINS
       RETURN      
    END IF
 
-   PFIND => FLL_LOCATE(PNODE,NAME,LTYPE,0_LINT,NUMBER,.FALSE.,FPAR)
+   PFIND => FLL_LOCATE(PNODE,NAME,'S',0_LINT,NUMBER,.FALSE.,FPAR)
 
    IF(.NOT.ASSOCIATED(PFIND))THEN
       FPAR%SUCCESS = .FALSE.
-      WRITE(FPAR%MESG,'(A,A,A)')'FLL_GETNDATA_L0 - Node',TRIM(PNODE%LNAME),' does not contain specified data'
+      WRITE(FPAR%MESG,'(A,A,A)')'FLL_GETNDATA_L0 - Node ',TRIM(PNODE%LNAME),' does not contain specified data'
       CALL FLL_OUT('ALL',FPAR)
       RETURN
    END IF
@@ -860,7 +834,7 @@ CONTAINS
 
   END FUNCTION FLL_GETNDATA_S
 
-FUNCTION FLL_GETNDATA_S1(PNODE,NAME,LTYPE,NUMBER,FPAR) RESULT(STRING)
+FUNCTION FLL_GETNDATA_S1(PNODE,NAME,NUMBER,FPAR) RESULT(STRING)
 !
 ! Description: returns single real data of the node
 !
@@ -885,7 +859,6 @@ FUNCTION FLL_GETNDATA_S1(PNODE,NAME,LTYPE,NUMBER,FPAR) RESULT(STRING)
 ! PNODE        In         pointer to data set
 ! NAME         In         name of pointer
 ! NUMBER       Out        number of pointer if more pointers of the same type are present
-! LTYPE        Out        type of pointer
 ! FPAR         In/Out     structure containing function specific data
 ! STRING       Out        returns pointer to string array
 !
@@ -894,7 +867,6 @@ FUNCTION FLL_GETNDATA_S1(PNODE,NAME,LTYPE,NUMBER,FPAR) RESULT(STRING)
    TYPE(FUNC_DATA_SET) :: FPAR
    TYPE(DNODE), POINTER  :: PNODE
    CHARACTER(*) :: NAME
-   CHARACTER(*) :: LTYPE
    INTEGER(LINT) :: NUMBER
    CHARACTER(LEN=STRING_LENGHT), POINTER :: STRING(:)
 !
@@ -909,11 +881,11 @@ FUNCTION FLL_GETNDATA_S1(PNODE,NAME,LTYPE,NUMBER,FPAR) RESULT(STRING)
       RETURN      
    END IF
 
-   PFIND => FLL_LOCATE(PNODE,NAME,LTYPE,1_LINT,NUMBER,.FALSE.,FPAR)
+   PFIND => FLL_LOCATE(PNODE,NAME,'S',1_LINT,NUMBER,.FALSE.,FPAR)
 
    IF(.NOT.ASSOCIATED(PFIND))THEN
       FPAR%SUCCESS = .FALSE.
-      WRITE(FPAR%MESG,'(A,A,A)')'FLL_GETNDATA_L0 - Node',TRIM(PNODE%LNAME),' does not contain specified data'
+      WRITE(FPAR%MESG,'(A,A,A)')'FLL_GETNDATA_L0 - Node ',TRIM(PNODE%LNAME),' does not contain specified data'
       CALL FLL_OUT('ALL',FPAR)
       RETURN
    END IF
@@ -923,7 +895,7 @@ FUNCTION FLL_GETNDATA_S1(PNODE,NAME,LTYPE,NUMBER,FPAR) RESULT(STRING)
 
   END FUNCTION FLL_GETNDATA_S1
 
-  FUNCTION FLL_GETNDATA_S2(PNODE,NAME,LTYPE,NUMBER,FPAR) RESULT(STRING)
+  FUNCTION FLL_GETNDATA_S2(PNODE,NAME,NUMBER,FPAR) RESULT(STRING)
 !
 ! Description: returns single real data of the node
 !
@@ -948,7 +920,6 @@ FUNCTION FLL_GETNDATA_S1(PNODE,NAME,LTYPE,NUMBER,FPAR) RESULT(STRING)
 ! PNODE        In         pointer to data set
 ! NAME         In         name of pointer
 ! NUMBER       Out        number of pointer if more pointers of the same type are present
-! LTYPE        Out        type of pointer
 ! FPAR         In/Out     structure containing function specific data
 ! STRING       Out        returns pointer to string array
 !
@@ -957,7 +928,6 @@ FUNCTION FLL_GETNDATA_S1(PNODE,NAME,LTYPE,NUMBER,FPAR) RESULT(STRING)
    TYPE(FUNC_DATA_SET) :: FPAR
    TYPE(DNODE), POINTER  :: PNODE
    CHARACTER(*) :: NAME
-   CHARACTER(*) :: LTYPE
    INTEGER(LINT) :: NUMBER
    CHARACTER(LEN=STRING_LENGHT), POINTER :: STRING(:,:)
 !
@@ -972,11 +942,11 @@ FUNCTION FLL_GETNDATA_S1(PNODE,NAME,LTYPE,NUMBER,FPAR) RESULT(STRING)
       RETURN      
    END IF
 
-   PFIND => FLL_LOCATE(PNODE,NAME,LTYPE,2_LINT,NUMBER,.FALSE.,FPAR)
+   PFIND => FLL_LOCATE(PNODE,NAME,'S',2_LINT,NUMBER,.FALSE.,FPAR)
 
    IF(.NOT.ASSOCIATED(PFIND))THEN
       FPAR%SUCCESS = .FALSE.
-      WRITE(FPAR%MESG,'(A,A,A)')'FLL_GETNDATA_L0 - Node',TRIM(PNODE%LNAME),' does not contain specified data'
+      WRITE(FPAR%MESG,'(A,A,A)')'FLL_GETNDATA_L0 - Node ',TRIM(PNODE%LNAME),' does not contain specified data'
       CALL FLL_OUT('ALL',FPAR)
       RETURN
    END IF
