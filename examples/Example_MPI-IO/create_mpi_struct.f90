@@ -48,21 +48,24 @@
 MODULE CREATE_MPI_STRUCT_M
 CONTAINS
 
-  SUBROUTINE  CREATE_MPI_STRUCT(PNODE)
+  SUBROUTINE  CREATE_MPI_STRUCT(PNODE,NAME_OF_FILE,NFILES,NPROC)
 
   USE FLL_MODS_M
   IMPLICIT NONE
-!   
+
+  TYPE(DNODE), POINTER  :: PNODE
 !
-  TYPE(DNODE), POINTER  :: PNODE,PTMP
+!   Local declarations
+!
+  TYPE(DNODE), POINTER  :: PTMP
   TYPE(FUNC_DATA_SET) :: FPAR
+
+  INTEGER(LINT) :: NFILES, I,J,NPROC, COUNT
+  CHARACTER(LEN=*) :: NAME_OF_FILE
 !
 !  MAKE STRUCTURE
 !
   PNODE => FLL_MKDIR('MPI-IO',FPAR)
-!
-  WRITE(*,*)' NAME OF OUTPUT FILE WITHOUT SUFFIX'
-  READ(*,*)NAME_OF_FILE
 !
 !  create node for name of the I/O file and add it to the main structure
 !
@@ -72,23 +75,47 @@ CONTAINS
 !
 !  create node with number of files which are to be saved
 !
-  WRITE(*,*)' HOW MANY FILES DO YOU WANT TO SAVE'
-  READ(*,*)NFILES
-  PTMP  => FLL_MK('N-files','L', 1_LINT, 1_LINT, FPAR)
+  PTMP    => FLL_MK('N-files','L', 1_LINT, 1_LINT, FPAR)
   PTMP%L0 = NFILES
   IF(.NOT.FLL_MV(PTMP, PNODE, FPAR))STOP' ERROR MOVING NODE'
+!
+!  create node with number processors the job will run at
+!
+  PTMP    => FLL_MK('N-proc','L', 1_LINT, 1_LINT, FPAR)
+  PTMP%L0 = NPROC
+  IF(.NOT.FLL_MV(PTMP, PNODE, FPAR))STOP' ERROR MOVING NODE'
+!
+!  group processes 
+!  there will be NFILES group
+!  each group would have max NPROC/NFILES partitions and the increment 
+!  between them is NFILES
+!
+!  in this way, each file should be associated to one partition from each node
+!
+  DO J=1,NFILES
+!
+! Make group and add it to the main structure
+!
+     PTMP => FLL_MK('group','L',NPROC/NFILES,1_LINT,FPAR)
+     IF(.NOT.FLL_MV(PTMP, PNODE, FPAR))STOP' ERROR MOVING NODE'
+ 
+     COUNT = 1
+     DO I=J,NPROC,NFILES
+!
+!  fill partition numbers
+!
+       PTMP%L1(COUNT) = I
+       COUNT = COUNT + 1
 
-  
-  DO I=1,NFILES
-
-    
+     END DO
 
   END DO
-   
+!
+!  print node on the screen and save to files
+!
+  CALL FLL_CAT(PNODE,6,.false., FPAR)
+  IF(.NOT.FLL_WRITE(PNODE,"io.str", 9, 'A', FPAR))STOP'Error writing file'
 
-  CALL FLL_CAT(PNODE, FPAR)
-
-	
-
+  RETURN
   END SUBROUTINE  CREATE_MPI_STRUCT  
 END MODULE CREATE_MPI_STRUCT_M

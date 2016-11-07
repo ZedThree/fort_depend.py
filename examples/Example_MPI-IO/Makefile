@@ -29,12 +29,17 @@
 #
 #
 
-EXE    = fll_test
+EXE    = MPI_Test
 
 include src_dir_path.mk
 include ../../config.mk
 
 DEP_FILE=project.dep
+
+# Use MPI compilation in this file
+FC     =$(MPI_FC)
+FFLAGS =$(MPI_FFLAGS) $(FINCFLAGS)
+
 
 FMODDIRS= ../../data_util
 

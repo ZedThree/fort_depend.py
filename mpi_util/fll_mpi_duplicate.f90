@@ -19,7 +19,7 @@
 !
 !
 !
-MODULE FLL_DUPLICATE_M
+MODULE FLL_MPI_DUPLICATE_M
 !
 ! Description: Contains duplicates node
 !
@@ -33,10 +33,10 @@ MODULE FLL_DUPLICATE_M
 ! External Modules used
 !
 CONTAINS
-   FUNCTION FLL_DUPLICATE(PNODE,FPAR) RESULT(PNEW)
+   FUNCTION FLL_MPI_DUPLICATE(PNODE,SENDPART,COMMUNICATOR,FPAR) RESULT(PNEW)
 !
-! Description: Contains duplicates node to PNEW mode
-!              the parent, previous and next pointers of PNEW node are NULL
+! Description: Contains nodes for duplicating DNODE data set from 
+!              one partition to other partitions
 !
 ! 
 ! History:
@@ -47,6 +47,7 @@ CONTAINS
 !
 ! External Modules used
 !
+    USE MPI
     USE FLL_TYPE_M
     USE FLL_MK_M
     USE FLL_MV_M
@@ -59,6 +60,8 @@ CONTAINS
 ! Arguments description
 ! Name         In/Out     Function
 ! PNODE        In         node to duplicate
+! COMMUNICATOR In         MPI communicator
+! SENDPART     In         sending partition
 ! PNEW         Out        duplicate node
 ! FPAR         In/Out     structure containing function specific data
 !
@@ -66,71 +69,141 @@ CONTAINS
 !
    TYPE(DNODE), POINTER  :: PNODE,PNEW
    TYPE(FUNC_DATA_SET) :: FPAR
+   INTEGER :: SENDPART, COMMUNICATOR
 !
 ! Local declarations
 !
    TYPE(DNODE), POINTER :: PCHILD
-!   
-!   BODY OF SUBROUTINE
-!   
+   ITNEGER :: IRANK, IERR
 !
-!  check the node is not null
+! get rank of the process
 !
-   PNEW => NULL()
-   FPAR%SUCCESS = .FALSE.
-   IF(.NOT.ASSOCIATED(PNODE))THEN
-      WRITE(FPAR%MESG,'(A)')' DUPLICATE - null node '
-      CALL FLL_OUT('ALL',FPAR)
-      FPAR%SUCCESS = .FALSE.
-      RETURN
-   END IF
-   
-   PCHILD => PNODE%PCHILD
+   CALL MPI_Comm_rank ( COMMUNICATOR, IRANK, IERR )
 !
-! IF NODE HAS CHILDREN, DUPLICATE ALL OF THEM
+! check the node is not null
 !
-   IF(ASSOCIATED(PCHILD))THEN
-     PNEW => FLL_MK(PNODE%LNAME,'DIR',0_LINT,0_LINT,FPAR)
-     IF(.NOT.ASSOCIATED(PNEW))THEN
-       WRITE(FPAR%MESG,'(A)')' DUPLICATE - error allocating PNEW '
-       FPAR%SUCCESS = .FALSE.
-       PNEW => NULL()
-       RETURN
+
+   IF(IRANK == SENDPART)THEN
+!
+! sending partitions
+!
+     FPAR%SUCCESS = .FALSE.
+     IF(.NOT.ASSOCIATED(PNODE))THEN
+        WRITE(FPAR%MESG,'(A)')' MPI_DUPLICATE - null node '
+        CALL FLL_OUT('ALL',FPAR)
+        FPAR%SUCCESS = .FALSE.
+        RETURN
      END IF
 
-     CALL FLL_DUPLICATE_RECURSIVE_NODE(PCHILD,PNEW,FPAR)
-      IF(.NOT.FPAR%SUCCESS)THEN
-        WRITE(FPAR%MESG,'(A)')' DUPLICATE - error duplicting children nodes '
+     PCHILD => PNODE%PCHILD
+
+     IF(ASSOCIATED(PCHILD))THEN
+
+       CALL FLL_MPI_SEND_NODE_DATA(PNODE,COMMUNICATOR,SENDPART)
+
+       CALL FLL_MPI_DUPLICATE_RECURSIVE_NODE(PCHILD,COMMUNICATOR,SENDPART,FPAR)
+        IF(.NOT.FPAR%SUCCESS)THEN
+          WRITE(FPAR%MESG,'(A)')' DUPLICATE - error duplicting children nodes '
+          CALL FLL_OUT('ALL',FPAR)
+          FPAR%SUCCESS = .FALSE.
+          PNEW => NULL()
+          RETURN
+        END IF
+
+     ELSE
+!
+!  NODE IS A FILE NODE
+!
+      CALL FLL_MPI_SEND_NODE_DATA(PNODE,COMMUNICATOR,SENDPART)
+
+      IF(.NOT.ASSOCIATED(PNEW))THEN
+        WRITE(FPAR%MESG,'(A)')' DUPLICATE - error allocating PNEW '
         CALL FLL_OUT('ALL',FPAR)
         FPAR%SUCCESS = .FALSE.
         PNEW => NULL()
         RETURN
       END IF
+      CALL FLL_COPPY_NODE_ARRAYS(PNODE, PNEW,FPAR)
+
+     END IF
 
    ELSE
 !
+!  RECEVING PARTITIONS
+!
+     PNEW => NULL()
+
+     DO
+
+     PTMP => FLL_MPI_GET_NEW_NODE(PNEW, COMMUNICATOR, SENDPART)
+
+
+     END DO
+
+
+
+
+
+
+     IF(ASSOCIATED(PCHILD))THEN
+       PNEW => FLL_MK(PNODE%LNAME,'DIR',0_LINT,0_LINT,FPAR)
+       IF(.NOT.ASSOCIATED(PNEW))THEN
+         WRITE(FPAR%MESG,'(A)')' DUPLICATE - error allocating PNEW '
+         FPAR%SUCCESS = .FALSE.
+         PNEW => NULL()
+         RETURN
+       END IF
+
+       CALL FLL_MPI_DUPLICATE_RECURSIVE_NODE(PCHILD,PNEW,FPAR)
+        IF(.NOT.FPAR%SUCCESS)THEN
+          WRITE(FPAR%MESG,'(A)')' DUPLICATE - error duplicting children nodes '
+          CALL FLL_OUT('ALL',FPAR)
+          FPAR%SUCCESS = .FALSE.
+          PNEW => NULL()
+          RETURN
+        END IF
+
+     ELSE
+!
 !  NODE IS A FILE NODE
 !
-    PNEW => FLL_MK(PNODE%LNAME,PNODE%LTYPE,PNODE%NDIM,PNODE%NSIZE,FPAR)
-    IF(.NOT.ASSOCIATED(PNEW))THEN
-      WRITE(FPAR%MESG,'(A)')' DUPLICATE - error allocating PNEW '
-      CALL FLL_OUT('ALL',FPAR)
-      FPAR%SUCCESS = .FALSE.
-      PNEW => NULL()
-      RETURN
-    END IF
-    CALL FLL_COPY_NODE_ARRAYS(PNODE, PNEW,FPAR)
+      PNEW => FLL_MK(PNODE%LNAME,PNODE%LTYPE,PNODE%NDIM,PNODE%NSIZE,FPAR)
+      IF(.NOT.ASSOCIATED(PNEW))THEN
+        WRITE(FPAR%MESG,'(A)')' DUPLICATE - error allocating PNEW '
+        CALL FLL_OUT('ALL',FPAR)
+        FPAR%SUCCESS = .FALSE.
+        PNEW => NULL()
+        RETURN
+      END IF
+      CALL FLL_COPPY_NODE_ARRAYS(PNODE, PNEW,FPAR)
+
+     END IF
+
+
+
+
+
+
+
+
+
+
+
+
+
 
    END IF
-
+!
+! IF NODE HAS CHILDREN, DUPLICATE ALL OF THEM
+!
    FPAR%SUCCESS = .TRUE.
    RETURN
 
-   END FUNCTION FLL_DUPLICATE
+   END FUNCTION FLL_MPI_DUPLICATE
 !
 !  DELETE CHID WITH ALL ITS CHILDREN
 !
-  RECURSIVE SUBROUTINE FLL_DUPLICATE_RECURSIVE_NODE(PNODE,PDUPL,FPAR)
+  RECURSIVE SUBROUTINE FLL_MPI_DUPLICATE_RECURSIVE_NODE(PNODE,PDUPL,FPAR)
 !
 ! Description: makes recursive duplicate of PNODE
 !
@@ -174,7 +247,7 @@ CONTAINS
         PNEW => NULL()
         RETURN
       END IF
-      CALL FLL_COPY_NODE_ARRAYS(PNODE, PNEW, FPAR)
+      CALL FLL_COPPY_NODE_ARRAYS(PNODE, PNEW, FPAR)
       OK = FLL_MV(PNEW, PDUPL, FPAR)
       FPAR%SUCCESS = .TRUE.   
     ELSE
@@ -200,7 +273,7 @@ CONTAINS
 !
        DO WHILE(ASSOCIATED(PCHILD))
           
-          CALL FLL_DUPLICATE_RECURSIVE_NODE(PCHILD,PNEW, FPAR)
+          CALL FLL_MPI_DUPLICATE_RECURSIVE_NODE(PCHILD,PNEW, FPAR)
           IF(.NOT.FPAR%SUCCESS) STOP'DUPLICATE - Error duplicating nodes'
           PCHILD => PCHILD%PNEXT
          
@@ -217,11 +290,11 @@ CONTAINS
     FPAR%SUCCESS = .TRUE.
     RETURN
 
-  END SUBROUTINE FLL_DUPLICATE_RECURSIVE_NODE
+  END SUBROUTINE FLL_MPI_DUPLICATE_RECURSIVE_NODE
 !
 ! 
 !
-  SUBROUTINE FLL_COPY_NODE_ARRAYS(PNODE,PNEW,FPAR)
+  SUBROUTINE FLL_COPPY_NODE_ARRAYS(PNODE,PNEW,FPAR)
 !
 ! Description: duplicated data of the node
 !
@@ -514,7 +587,7 @@ CONTAINS
   PNEW%L0 = PNODE%L0
   PNEW%S0 = PNODE%S0
   
-  END SUBROUTINE FLL_COPY_NODE_ARRAYS
+  END SUBROUTINE FLL_COPPY_NODE_ARRAYS
  
 
-END MODULE FLL_DUPLICATE_M
+END MODULE FLL_MPI_DUPLICATE_M
