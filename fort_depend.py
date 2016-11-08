@@ -106,7 +106,9 @@ def check_if_there(use,file):
     with open(file) as f:
         for line in f:
             if "module" in line.lower():
-                if use in line:
+                extrline = line.lower()
+                extrline = extrline.replace("module", "")
+                if use.lower().strip() == extrline.strip():
                     return 1
                 
     f.close()
@@ -185,8 +187,14 @@ def get_depends(fob=[],m2f=[], ffiles=[]):
         tmp=[]
         for j in i.uses:
             try:
+#
+#  module is in the same directory
+#
                 tmp.append(m2f[j.lower()])
             except KeyError:
+#
+#  module is not, loop through all other files
+#
                 for k in ffiles:
                     retval=check_if_there(use=j,file=k)
                     if retval > 0:
