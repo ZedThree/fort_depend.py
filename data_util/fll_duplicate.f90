@@ -225,6 +225,12 @@ CONTAINS
 !
 ! Description: duplicated data of the node
 !
+! History:
+! Version   Date       Patch number  CLA     Comment
+! -------   --------   --------      ---     -------
+! 1.1       10/10/16                         Initial implementation
+!
+!
 ! External Modules used
 ! 
     USE FLL_TYPE_M
