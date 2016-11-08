@@ -168,15 +168,26 @@ CONTAINS
 !
     IF(.NOT.ASSOCIATED(PCHILD))THEN
 
-      PNEW => FLL_MK(PNODE%LNAME,PNODE%LTYPE,PNODE%NDIM,PNODE%NSIZE,FPAR)
-      IF(.NOT.ASSOCIATED(PNEW))THEN
-        FPAR%SUCCESS = .FALSE.
-        PNEW => NULL()
-        RETURN
-      END IF
-      CALL FLL_COPY_NODE_ARRAYS(PNODE, PNEW, FPAR)
-      OK = FLL_MV(PNEW, PDUPL, FPAR)
-      FPAR%SUCCESS = .TRUE.   
+      DO WHILE(ASSOCIATED(PCURR))
+
+        PNEXT => PCURR%PNEXT
+
+        PNEW => FLL_MK(PCURR%LNAME,PCURR%LTYPE,PCURR%NDIM,PCURR%NSIZE,FPAR)
+        IF(.NOT.ASSOCIATED(PNEW))THEN
+          FPAR%SUCCESS = .FALSE.
+          PNEW => NULL()
+          RETURN
+        END IF
+
+        CALL FLL_COPY_NODE_ARRAYS(PCURR, PNEW, FPAR)
+        OK = FLL_MV(PNEW, PDUPL, FPAR)
+
+        PCURR => PNEXT
+
+      END DO 
+
+      FPAR%SUCCESS = .TRUE.  
+
     ELSE
 !
 !  NODE IS DIR
@@ -258,7 +269,7 @@ CONTAINS
 !  check node types
 !
    IF(TRIM(PNODE%LTYPE) /= TRIM(PNEW%LTYPE))THEN
-     WRITE(FPAR%MESG,'(A,A,A)')' DUPLICATE - nodes do not have the same array dimensions', TRIM(PNODE%LNAME), TRIM(PNEW%LNAME)
+     WRITE(FPAR%MESG,'(A,A,A,A)')' DUPLICATE - nodes do not have same dimensions', TRIM(PNODE%LNAME),' ', TRIM(PNEW%LNAME)
      FPAR%SUCCESS = .FALSE.
      CALL FLL_OUT('ALL',FPAR)
      RETURN
@@ -283,7 +294,7 @@ CONTAINS
        NNDIM  = SIZE(PNEW%R1, DIM = 1, KIND = LINT)
 
        IF(NDIM /= NNDIM)THEN
-         WRITE(FPAR%MESG,'(A,A,A)')' DUPLICATE - nodes do not have the same array dimensions', TRIM(PNODE%LNAME), TRIM(PNEW%LNAME)
+         WRITE(FPAR%MESG,'(A,A,A,A)')' DUPLICATE - nodes do not have same dimensions', TRIM(PNODE%LNAME),' ', TRIM(PNEW%LNAME)
          FPAR%SUCCESS = .FALSE.
          CALL FLL_OUT('ALL',FPAR)
          RETURN
@@ -291,7 +302,7 @@ CONTAINS
 
        PNEW%R1 = PNODE%R1
      ELSE
-       WRITE(FPAR%MESG,'(A,A,A)')' DUPLICATE - R1 array not allocated',TRIM(PNEW%LNAME)
+       WRITE(FPAR%MESG,'(A,A,A,A)')' DUPLICATE - R1 array not allocated ',TRIM(PNEW%LNAME)
        FPAR%SUCCESS = .FALSE.
        CALL FLL_OUT('ALL',FPAR)
        RETURN 
@@ -306,7 +317,7 @@ CONTAINS
        NNDIM = SIZE(PNEW%D1, DIM = 1, KIND = LINT)
 
        IF(NDIM /= NNDIM)THEN
-         WRITE(FPAR%MESG,'(A,A,A)')' DUPLICATE - nodes do not have the same array dimensions', TRIM(PNODE%LNAME), TRIM(PNEW%LNAME)
+         WRITE(FPAR%MESG,'(A,A,A,A)')' DUPLICATE - nodes do not have same dimensions', TRIM(PNODE%LNAME),' ', TRIM(PNEW%LNAME)
          FPAR%SUCCESS = .FALSE.
          CALL FLL_OUT('ALL',FPAR)
          RETURN
@@ -314,7 +325,7 @@ CONTAINS
 
        PNEW%D1 = PNODE%D1
      ELSE
-       WRITE(FPAR%MESG,'(A,A,A)')' DUPLICATE - D1 array not allocated',TRIM(PNEW%LNAME)
+       WRITE(FPAR%MESG,'(A,A,A,A)')' DUPLICATE - D1 array not allocated ',TRIM(PNEW%LNAME)
        FPAR%SUCCESS = .FALSE.
        CALL FLL_OUT('ALL',FPAR)
        RETURN 
@@ -330,14 +341,14 @@ CONTAINS
        NNDIM = SIZE(PNEW%I1, DIM = 1, KIND = LINT)
 
        IF(NDIM /= NNDIM)THEN
-         WRITE(FPAR%MESG,'(A,A,A)')' DUPLICATE - nodes do not have the same array dimensions', TRIM(PNODE%LNAME), TRIM(PNEW%LNAME)
+         WRITE(FPAR%MESG,'(A,A,A,A)')' DUPLICATE - nodes do not have same dimensions', TRIM(PNODE%LNAME),' ', TRIM(PNEW%LNAME)
          FPAR%SUCCESS = .FALSE.
          CALL FLL_OUT('ALL',FPAR)
          RETURN
        END IF
        PNEW%I1(1:NDIM) = PNODE%I1(1:NDIM)
      ELSE
-       WRITE(FPAR%MESG,'(A,A,A)')' DUPLICATE - I1 array not allocated',TRIM(PNEW%LNAME)
+       WRITE(FPAR%MESG,'(A,A,A,A)')' DUPLICATE - I1 array not allocated ',TRIM(PNEW%LNAME)
        FPAR%SUCCESS = .FALSE.
        CALL FLL_OUT('ALL',FPAR)
        RETURN 
@@ -352,7 +363,7 @@ CONTAINS
        NNDIM  = SIZE(PNEW%L1, DIM = 1, KIND = LINT)
 
        IF(NDIM /= NNDIM)THEN
-         WRITE(FPAR%MESG,'(A,A,A)')' DUPLICATE - nodes do not have the same array dimensions', TRIM(PNODE%LNAME), TRIM(PNEW%LNAME)
+         WRITE(FPAR%MESG,'(A,A,A,A)')' DUPLICATE - nodes do not have same dimensions', TRIM(PNODE%LNAME),' ', TRIM(PNEW%LNAME)
          FPAR%SUCCESS = .FALSE.
          CALL FLL_OUT('ALL',FPAR)
          RETURN
@@ -360,7 +371,7 @@ CONTAINS
 
        PNEW%L1 = PNODE%L1
      ELSE
-       WRITE(FPAR%MESG,'(A,A,A)')' DUPLICATE - L1 array not allocated',TRIM(PNEW%LNAME)
+       WRITE(FPAR%MESG,'(A,A,A,A)')' DUPLICATE - L1 array not allocated ',TRIM(PNEW%LNAME)
        FPAR%SUCCESS = .FALSE.
        CALL FLL_OUT('ALL',FPAR)
        RETURN 
@@ -375,7 +386,7 @@ CONTAINS
        NNDIM = SIZE(PNEW%S1, DIM = 1, KIND = LINT)
 
        IF(NDIM /= NNDIM)THEN
-         WRITE(FPAR%MESG,'(A,A,A)')' DUPLICATE - nodes do not have the same array dimensions', TRIM(PNODE%LNAME), TRIM(PNEW%LNAME)
+         WRITE(FPAR%MESG,'(A,A,A,A)')' DUPLICATE - nodes do not have same dimensions', TRIM(PNODE%LNAME),' ', TRIM(PNEW%LNAME)
          FPAR%SUCCESS = .FALSE.
          CALL FLL_OUT('ALL',FPAR)
          RETURN
@@ -383,7 +394,7 @@ CONTAINS
 
        PNEW%S1 = PNODE%S1
      ELSE
-       WRITE(FPAR%MESG,'(A,A,A)')' DUPLICATE - S1 array not allocated',TRIM(PNEW%LNAME)
+       WRITE(FPAR%MESG,'(A,A,A,A)')' DUPLICATE - S1 array not allocated ',TRIM(PNEW%LNAME)
        FPAR%SUCCESS = .FALSE.
        CALL FLL_OUT('ALL',FPAR)
        RETURN 
@@ -401,7 +412,7 @@ CONTAINS
         NNSIZE   = SIZE(PNODE%R2, DIM = 2, KIND = LINT)
         
        IF(NDIM /= NNDIM .OR. NSIZE /= NNSIZE)THEN
-         WRITE(FPAR%MESG,'(A,A,A)')' DUPLICATE - nodes do not have the same array dimensions', TRIM(PNODE%LNAME), TRIM(PNEW%LNAME)
+         WRITE(FPAR%MESG,'(A,A,A,A)')' DUPLICATE - nodes do not have same dimensions', TRIM(PNODE%LNAME),' ', TRIM(PNEW%LNAME)
          FPAR%SUCCESS = .FALSE.
          CALL FLL_OUT('ALL',FPAR)
          RETURN
@@ -409,7 +420,7 @@ CONTAINS
 
        PNEW%R2 = PNODE%R2
      ELSE
-       WRITE(FPAR%MESG,'(A,A,A)')' DUPLICATE - R2 array not allocated',TRIM(PNEW%LNAME)
+       WRITE(FPAR%MESG,'(A,A,A,A)')' DUPLICATE - R2 array not allocated ',TRIM(PNEW%LNAME)
        FPAR%SUCCESS = .FALSE.
        CALL FLL_OUT('ALL',FPAR)
        RETURN 
@@ -425,7 +436,7 @@ CONTAINS
         NNSIZE   = SIZE(PNODE%D2, DIM = 2, KIND = LINT)
         
        IF(NDIM /= NNDIM .OR. NSIZE /= NNSIZE)THEN
-         WRITE(FPAR%MESG,'(A,A,A)')' DUPLICATE - nodes do not have the same array dimensions', TRIM(PNODE%LNAME), TRIM(PNEW%LNAME)
+         WRITE(FPAR%MESG,'(A,A,A,A)')' DUPLICATE - nodes do not have same dimensions', TRIM(PNODE%LNAME),' ', TRIM(PNEW%LNAME)
          FPAR%SUCCESS = .FALSE.
          CALL FLL_OUT('ALL',FPAR)
          RETURN
@@ -433,7 +444,7 @@ CONTAINS
 
        PNEW%D2 = PNODE%D2
      ELSE
-       WRITE(FPAR%MESG,'(A,A,A)')' DUPLICATE - D2 array not allocated',TRIM(PNEW%LNAME)
+       WRITE(FPAR%MESG,'(A,A,A,A)')' DUPLICATE - D2 array not allocated ',TRIM(PNEW%LNAME)
        FPAR%SUCCESS = .FALSE.
        CALL FLL_OUT('ALL',FPAR)
        RETURN 
@@ -449,7 +460,7 @@ CONTAINS
         NNSIZE   = SIZE(PNODE%I2, DIM = 2, KIND = LINT)
         
        IF(NDIM /= NNDIM .OR. NSIZE /= NNSIZE)THEN
-         WRITE(FPAR%MESG,'(A,A,A)')' DUPLICATE - nodes do not have the same array dimensions', TRIM(PNODE%LNAME), TRIM(PNEW%LNAME)
+         WRITE(FPAR%MESG,'(A,A,A,A)')' DUPLICATE - nodes do not have same dimensions', TRIM(PNODE%LNAME),' ', TRIM(PNEW%LNAME)
          FPAR%SUCCESS = .FALSE.
          CALL FLL_OUT('ALL',FPAR)
          RETURN
@@ -457,7 +468,7 @@ CONTAINS
 
        PNEW%I2 = PNODE%I2
      ELSE
-       WRITE(FPAR%MESG,'(A,A,A)')' DUPLICATE - I2 array not allocated',TRIM(PNEW%LNAME)
+       WRITE(FPAR%MESG,'(A,A,A,A)')' DUPLICATE - I2 array not allocated ',TRIM(PNEW%LNAME)
        FPAR%SUCCESS = .FALSE.
        CALL FLL_OUT('ALL',FPAR)
        RETURN 
@@ -473,7 +484,7 @@ CONTAINS
         NNSIZE   = SIZE(PNODE%L2, DIM = 2, KIND = LINT)
         
        IF(NDIM /= NNDIM .OR. NSIZE /= NNSIZE)THEN
-         WRITE(FPAR%MESG,'(A,A,A)')' DUPLICATE - nodes do not have the same array dimensions', TRIM(PNODE%LNAME), TRIM(PNEW%LNAME)
+         WRITE(FPAR%MESG,'(A,A,A,A)')' DUPLICATE - nodes do not have same dimensions', TRIM(PNODE%LNAME),' ', TRIM(PNEW%LNAME)
          FPAR%SUCCESS = .FALSE.
          CALL FLL_OUT('ALL',FPAR)
          RETURN
@@ -481,7 +492,7 @@ CONTAINS
 
        PNEW%L2 = PNODE%L2
      ELSE
-       WRITE(FPAR%MESG,'(A,A,A)')' DUPLICATE - L2 array not allocated',TRIM(PNEW%LNAME)
+       WRITE(FPAR%MESG,'(A,A,A,A)')' DUPLICATE - L2 array not allocated ',TRIM(PNEW%LNAME)
        FPAR%SUCCESS = .FALSE.
        CALL FLL_OUT('ALL',FPAR)
        RETURN 
@@ -497,7 +508,7 @@ CONTAINS
         NNSIZE   = SIZE(PNODE%S2, DIM = 2, KIND = LINT)
         
        IF(NDIM /= NNDIM .OR. NSIZE /= NNSIZE)THEN
-         WRITE(FPAR%MESG,'(A,A,A)')' DUPLICATE - nodes do not have the same array dimensions', TRIM(PNODE%LNAME), TRIM(PNEW%LNAME)
+         WRITE(FPAR%MESG,'(A,A,A,A)')' DUPLICATE - nodes do not have same dimensions', TRIM(PNODE%LNAME),' ', TRIM(PNEW%LNAME)
          FPAR%SUCCESS = .FALSE.
          CALL FLL_OUT('ALL',FPAR)
          RETURN
@@ -505,7 +516,7 @@ CONTAINS
 
        PNEW%S2 = PNODE%S2
      ELSE
-       WRITE(FPAR%MESG,'(A,A,A)')' DUPLICATE - S2 array not allocated',TRIM(PNEW%LNAME)
+       WRITE(FPAR%MESG,'(A,A,A,A)')' DUPLICATE - S2 array not allocated ',TRIM(PNEW%LNAME)
        FPAR%SUCCESS = .FALSE.
        CALL FLL_OUT('ALL',FPAR)
        RETURN 
