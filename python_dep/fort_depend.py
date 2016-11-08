@@ -63,11 +63,13 @@ def write_depend(path,cwd,outfile="makefile.dep",dep=[],overwrite=False,build=''
             return
 
     #Open file
+    print("  ")
     f=open(outfile,'w')
     f.write('# This file is generated automatically. DO NOT EDIT!\n')
     for i in dep.keys():
         tmp,fil=os.path.split(i)
         stri="\n"+os.path.join(build, fil.split(".")[0]+".o"+" : ")
+        print("\033[031m Writing dependency info for \033[032m"+i+"\033[039m module")
         for j in dep[i]:
             npathseg = j.count('/')
             if npathseg == 0:
@@ -83,6 +85,7 @@ def write_depend(path,cwd,outfile="makefile.dep",dep=[],overwrite=False,build=''
         stri=stri+"\n"
         f.write(stri)
     f.close()
+    print("  ")
     return
 
 def get_source(ext=[".f90",".F90"]):
