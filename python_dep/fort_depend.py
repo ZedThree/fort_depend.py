@@ -217,7 +217,7 @@ def get_depends(fob=[],m2f=[], ffiles=[]):
                 if istat== 0 and not(j == ""):
                     print("")
                     print ("\033[031mNote!!!!: \033[039m module \033[032m"+j+"\033[039m not defined in any file")
-                    print ("\033[031m..... \033[039m assuming internal module, not adding to dependency tree ... \033[032m\033[039m")
+                    print ("\033[031m..... \033[039m assuming intrinsic module, not adding to dependency tree ... \033[032m\033[039m")
                     print("")
 
         deps[i.file_name]=tmp
