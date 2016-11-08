@@ -2,9 +2,10 @@
 
 Example_mpi-IO.o :  \
 	../../data_util/fll_mods.o \
-	read_input.o \
 	create_data_set.o \
-	create_mpi_struct.o
+	read_input.o \
+	create_mpi_struct.o \
+	../../mpi_util/fll_mpi_mods.o
 
 read_input.o :  \
 	../../data_util/fll_mods.o

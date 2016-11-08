@@ -41,13 +41,13 @@ FC     =$(MPI_FC)
 FFLAGS =$(MPI_FFLAGS) $(FINCFLAGS)
 
 
-FMODDIRS= ../../data_util
+FMODDIRS= ../../data_util ../../mpi_util
 
 FFILES= $(notdir $(wildcard $(srcdir)/*.f90))
 
 
 OFILES=$(FFILES:%.f90=%.o)
-XOFILES=$(wildcard ../../data_util/*.o)
+XOFILES=$(wildcard ../../data_util/*.o ../../mpi_util/*.o)
 
 ###########################################################################
 

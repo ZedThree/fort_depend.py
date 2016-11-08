@@ -21,7 +21,7 @@
 !
 MODULE FLL_MPI_DUPLICATE_M
 !
-! Description: Contains duplicates node
+! Description: Distributes FLL list from one node to all others in communicator
 !
 ! 
 ! History:
@@ -33,10 +33,10 @@ MODULE FLL_MPI_DUPLICATE_M
 ! External Modules used
 !
 CONTAINS
-   FUNCTION FLL_MPI_DUPLICATE(PNODE,SENDPART,COMMUNICATOR,FPAR) RESULT(PNEW)
+   FUNCTION FLL_MPI_DUPLICATE(PNODE,COMMUNICATOR,SENDPART,FPAR) RESULT(PNEW)
 !
-! Description: Contains nodes for duplicating DNODE data set from 
-!              one partition to other partitions
+! Description: Contains duplicates node to PNEW mode
+!              the parent, previous and next pointers of PNEW node are NULL
 !
 ! 
 ! History:
@@ -47,7 +47,6 @@ CONTAINS
 !
 ! External Modules used
 !
-    USE MPI
     USE FLL_TYPE_M
     USE FLL_MK_M
     USE FLL_MV_M
@@ -60,150 +59,90 @@ CONTAINS
 ! Arguments description
 ! Name         In/Out     Function
 ! PNODE        In         node to duplicate
-! COMMUNICATOR In         MPI communicator
-! SENDPART     In         sending partition
 ! PNEW         Out        duplicate node
+! COMMUNICATOR In         MPI communicatior
+! SENDPART     In         Sending partition
 ! FPAR         In/Out     structure containing function specific data
 !
 ! Arguments declaration
 !
    TYPE(DNODE), POINTER  :: PNODE,PNEW
    TYPE(FUNC_DATA_SET) :: FPAR
-   INTEGER :: SENDPART, COMMUNICATOR
+   INTEGER :: COMMUNICATOR,SENDPART
 !
-! Local declarations
+!  Local declarations
 !
    TYPE(DNODE), POINTER :: PCHILD
-   ITNEGER :: IRANK, IERR
+   INTEGER :: RANK, IERR
 !
-! get rank of the process
+!  check the node is not null
 !
-   CALL MPI_Comm_rank ( COMMUNICATOR, IRANK, IERR )
+   FPAR%SUCCESS = .FALSE.
 !
-! check the node is not null
+!  If not sending partition, nullify pointer
+!  owherwise check that sending partition does not send NULL pointer and 
+!  associate returning pointer with sending
 !
+   CALL MPI_Comm_rank ( COMMUNICATOR, RANK, IERR )
 
-   IF(IRANK == SENDPART)THEN
+   DIFFPART: IF(SENDPART /= RANK)THEN
+     PNEW => NULL()
+
+     PNEW => BROADCAST_NODE_RECEIVE(COMMUNICATOR, SENDPART, FPAR)
 !
-! sending partitions
+!  If dir has childrenm loop over them
+!  the number of children in this routine is stored in 
+!  NLINK, not ndim, ndim is set to 0 and then incremented automatically
+!  when adding children
 !
-     FPAR%SUCCESS = .FALSE.
-     IF(.NOT.ASSOCIATED(PNODE))THEN
-        WRITE(FPAR%MESG,'(A)')' MPI_DUPLICATE - null node '
-        CALL FLL_OUT('ALL',FPAR)
-        FPAR%SUCCESS = .FALSE.
-        RETURN
-     END IF
-
-     PCHILD => PNODE%PCHILD
-
-     IF(ASSOCIATED(PCHILD))THEN
-
-       CALL FLL_MPI_SEND_NODE_DATA(PNODE,COMMUNICATOR,SENDPART)
-
-       CALL FLL_MPI_DUPLICATE_RECURSIVE_NODE(PCHILD,COMMUNICATOR,SENDPART,FPAR)
-        IF(.NOT.FPAR%SUCCESS)THEN
-          WRITE(FPAR%MESG,'(A)')' DUPLICATE - error duplicting children nodes '
-          CALL FLL_OUT('ALL',FPAR)
-          FPAR%SUCCESS = .FALSE.
-          PNEW => NULL()
-          RETURN
-        END IF
-
-     ELSE
+     IF(PNEW%NLINK > 0)THEN
 !
-!  NODE IS A FILE NODE
+!  Node has children
 !
-      CALL FLL_MPI_SEND_NODE_DATA(PNODE,COMMUNICATOR,SENDPART)
-
-      IF(.NOT.ASSOCIATED(PNEW))THEN
-        WRITE(FPAR%MESG,'(A)')' DUPLICATE - error allocating PNEW '
-        CALL FLL_OUT('ALL',FPAR)
-        FPAR%SUCCESS = .FALSE.
-        PNEW => NULL()
-        RETURN
-      END IF
-      CALL FLL_COPPY_NODE_ARRAYS(PNODE, PNEW,FPAR)
+       CALL FLL_RECEIVE_RECURSIVE(PCHILD,COMMUNICATOR,SENDPART,FPAR)
 
      END IF
+
+     RETURN 
 
    ELSE
 !
-!  RECEVING PARTITIONS
+!  Sending partition
 !
-     PNEW => NULL()
+     IF(.NOT.ASSOCIATED(PNODE))THEN
+       WRITE(FPAR%MESG,'(A)')' DUPLICATE - null node '
+       CALL FLL_OUT('ALL',FPAR)
+       FPAR%SUCCESS = .FALSE.
+       RETURN
+     END IF
 
-     DO
+     PNEW => PNODE
 
-     PTMP => FLL_MPI_GET_NEW_NODE(PNEW, COMMUNICATOR, SENDPART)
-
-
-     END DO
-
-
-
-
-
-
+     CALL BROADCAST_NODE_SEND(PNODE, COMMUNICATOR, SENDPART, FPAR)
+  
+     PCHILD => PNODE%PCHILD
+!
+! If node has children, duplicate them too
+!
      IF(ASSOCIATED(PCHILD))THEN
-       PNEW => FLL_MK(PNODE%LNAME,'DIR',0_LINT,0_LINT,FPAR)
-       IF(.NOT.ASSOCIATED(PNEW))THEN
-         WRITE(FPAR%MESG,'(A)')' DUPLICATE - error allocating PNEW '
-         FPAR%SUCCESS = .FALSE.
-         PNEW => NULL()
-         RETURN
-       END IF
 
-       CALL FLL_MPI_DUPLICATE_RECURSIVE_NODE(PCHILD,PNEW,FPAR)
-        IF(.NOT.FPAR%SUCCESS)THEN
-          WRITE(FPAR%MESG,'(A)')' DUPLICATE - error duplicting children nodes '
-          CALL FLL_OUT('ALL',FPAR)
-          FPAR%SUCCESS = .FALSE.
-          PNEW => NULL()
-          RETURN
-        END IF
-
-     ELSE
-!
-!  NODE IS A FILE NODE
-!
-      PNEW => FLL_MK(PNODE%LNAME,PNODE%LTYPE,PNODE%NDIM,PNODE%NSIZE,FPAR)
-      IF(.NOT.ASSOCIATED(PNEW))THEN
-        WRITE(FPAR%MESG,'(A)')' DUPLICATE - error allocating PNEW '
-        CALL FLL_OUT('ALL',FPAR)
-        FPAR%SUCCESS = .FALSE.
-        PNEW => NULL()
-        RETURN
-      END IF
-      CALL FLL_COPPY_NODE_ARRAYS(PNODE, PNEW,FPAR)
+       CALL FLL_SEND_RECURSIVE(PCHILD,COMMUNICATOR,SENDPART,FPAR)
 
      END IF
 
+   END IF DIFFPART
 
-
-
-
-
-
-
-
-
-
-
-
-
-   END IF
-!
-! IF NODE HAS CHILDREN, DUPLICATE ALL OF THEM
-!
    FPAR%SUCCESS = .TRUE.
+
+
+   write(*,*)'----------  partition returning from main subr ', RANK
    RETURN
 
    END FUNCTION FLL_MPI_DUPLICATE
 !
 !  DELETE CHID WITH ALL ITS CHILDREN
 !
-  RECURSIVE SUBROUTINE FLL_MPI_DUPLICATE_RECURSIVE_NODE(PNODE,PDUPL,FPAR)
+  RECURSIVE SUBROUTINE FLL_SEND_RECURSIVE(PNODE,COMMUNICATOR,SENDPART,FPAR)
 !
 ! Description: makes recursive duplicate of PNODE
 !
@@ -221,13 +160,15 @@ CONTAINS
 ! Arguments description
 ! Name         In/Out     Function
 ! PNODE        In         pointer which is to be duplicated
-! PDUPL        Out        duplicate of PNODE
+! SENDPART     In         sending partition rank
+! COMMUNICATOR In         Commuticator
 ! FPAR         In/Out     structure containing function specific data
 !
 ! Arguments declaration
 ! 
-    TYPE(DNODE), POINTER  :: PNODE,PDUPL
-    TYPE(FUNC_DATA_SET) :: FPAR
+    TYPE(DNODE), POINTER :: PNODE,PDUPL
+    TYPE(FUNC_DATA_SET)  :: FPAR
+    INTEGER              :: SENDPART,COMMUNICATOR
 !
 ! Local declarations
 !
@@ -236,70 +177,105 @@ CONTAINS
 !
     PCURR => PNODE
     PCHILD => PNODE%PCHILD
-!
-!  NODE IS A FILE NODE
-!
-    IF(.NOT.ASSOCIATED(PCHILD))THEN
-
-      PNEW => FLL_MK(PNODE%LNAME,PNODE%LTYPE,PNODE%NDIM,PNODE%NSIZE,FPAR)
-      IF(.NOT.ASSOCIATED(PNEW))THEN
-        FPAR%SUCCESS = .FALSE.
-        PNEW => NULL()
-        RETURN
-      END IF
-      CALL FLL_COPPY_NODE_ARRAYS(PNODE, PNEW, FPAR)
-      OK = FLL_MV(PNEW, PDUPL, FPAR)
-      FPAR%SUCCESS = .TRUE.   
-    ELSE
-!
 !  NODE IS DIR
 !  LOOP OVER CHILDREN
 !
-      DO WHILE(ASSOCIATED(PCURR))
+!     WRITE(*,*)' ....................  sub - sendind child ', PCURR%lname
+    DO WHILE(ASSOCIATED(PCURR))
 
        PNEXT => PCURR%PNEXT
        PCHILD=> PCURR%PCHILD
 
-       PNEW => FLL_MK(PCURR%LNAME,'DIR',0_LINT,0_LINT,FPAR)
-       IF(.NOT.ASSOCIATED(PNEW))THEN
-        WRITE(FPAR%MESG,'(A)')' DUPLICATE - error allocating PNEW '
-        CALL FLL_OUT('ALL',FPAR)
-        FPAR%SUCCESS = .FALSE.
-        PNEW => NULL()
-        RETURN
-       END IF
+       CALL BROADCAST_NODE_SEND(PCURR, COMMUNICATOR, SENDPART, FPAR)
 !
 !  NODE HAS CHILDREN
 !
        DO WHILE(ASSOCIATED(PCHILD))
           
-          CALL FLL_MPI_DUPLICATE_RECURSIVE_NODE(PCHILD,PNEW, FPAR)
-          IF(.NOT.FPAR%SUCCESS) STOP'DUPLICATE - Error duplicating nodes'
+          CALL FLL_SEND_RECURSIVE(PCHILD,COMMUNICATOR,SENDPART,FPAR)
           PCHILD => PCHILD%PNEXT
          
        END DO
 !
 !  ADD TO PDUPL LIST
 !
-       OK = FLL_MV(PNEW,PDUPL,FPAR)
        PCURR => PNEXT
+!     WRITE(*,*)' ....................  sub - next sendind child ', PCURR%lname
 
-      END DO
-    END IF
+    END DO
     
     FPAR%SUCCESS = .TRUE.
     RETURN
 
-  END SUBROUTINE FLL_MPI_DUPLICATE_RECURSIVE_NODE
+  END SUBROUTINE FLL_SEND_RECURSIVE
+
+
+  SUBROUTINE FLL_RECEIVE_RECURSIVE(PNODE,COMMUNICATOR,SENDPART,FPAR)
 !
+! Description: makes recursive duplicate of PNODE
+!
+! External Modules used
+!
+     USE FLL_TYPE_M
+     USE FLL_MK_M
+     USE FLL_MV_M
+     USE FLL_OUT_M
+
+     IMPLICIT NONE
+!
+! Declarations
+!
+! Arguments description
+! Name         In/Out     Function
+! PNODE        In         pointer which is to be duplicated
+! PNEW         In         recevied pointer
+! SENDPART     In         sending partition rank
+! COMMUNICATOR In         Commuticator
+! FPAR         In/Out     structure containing function specific data
+!
+! Arguments declaration
 ! 
+    TYPE(DNODE), POINTER :: PNODE,PNEW
+    TYPE(FUNC_DATA_SET)  :: FPAR
+    INTEGER              :: SENDPART,COMMUNICATOR
 !
-  SUBROUTINE FLL_COPPY_NODE_ARRAYS(PNODE,PNEW,FPAR)
+! Local declarations
 !
-! Description: duplicated data of the node
+    TYPE(DNODE), POINTER  :: PCURR,PNEXT,PCHILD
+    LOGICAL :: OK
+    
+    integer :: incrm
+
+    incrm = 0
+
+    DO 
+
+     incrm = incrm + 1
+     write(*,*)' <<<<<<<<<<<<<<  receving child # ', incrm
+
+     PNEW => BROADCAST_NODE_RECEIVE(COMMUNICATOR,SENDPART,FPAR)
+     WRITE(*,*)'<<<<<<<<<<<<<<  RECEIVED NODE NAME ', PNEW%LNAME
+     if(incrm == 19)return
+
+   END DO
+!
+
+  END SUBROUTINE FLL_RECEIVE_RECURSIVE
+!
+!
+  SUBROUTINE BROADCAST_NODE_SEND(PNODE,COMMUNICATOR,SENDPART,FPAR)
+!
+! Description: Boradcast - send the node
+!
+! History:
+! Version   Date       Patch number  CLA     Comment
+! -------   --------   --------      ---     -------
+! 1.1       10/10/16                         Initial implementation
+!
 !
 ! External Modules used
 ! 
+    USE MPI
     USE FLL_TYPE_M
     USE FLL_OUT_M
 
@@ -310,284 +286,381 @@ CONTAINS
 ! Arguments description
 ! Name         In/Out     Function
 ! PNODE        In         pointer data which is to be duplicated
-! PNEW         Out        duplicate of PNODE data 
+! COMMUNICATOR In         communicator
+! SENDPART     In         sending partition
 ! FPAR         In/Out     structure containing function specific data
 !
 ! Arguments declaration
 !
-   TYPE(DNODE), POINTER  :: PNODE,PNEW
-   TYPE(FUNC_DATA_SET) :: FPAR
+   TYPE(DNODE), POINTER :: PNODE,PNEW
+   TYPE(FUNC_DATA_SET)  :: FPAR
+   INTEGER :: SENDPART, COMMUNICATOR
 !
 ! Local declarations
 !
-   INTEGER(LINT) :: NDIM, NSIZE, NNDIM, NNSIZE
+   INTEGER(LINT) :: NDIM, NSIZE, CODE, IARR(3)
+   INTEGER :: IERR
 !
-!  check node types
+! Prepare header of the node
 !
-   IF(TRIM(PNODE%LTYPE) /= TRIM(PNEW%LTYPE))THEN
-     WRITE(FPAR%MESG,'(A,A,A)')' DUPLICATE - nodes do not have the same array dimensions', TRIM(PNODE%LNAME), TRIM(PNEW%LNAME)
-     FPAR%SUCCESS = .FALSE.
-     CALL FLL_OUT('ALL',FPAR)
-     RETURN
-   END IF
+   CODE  = GET_NCODE(PNODE)
+   NDIM  = PNODE%NDIM
+   NSIZE = PNODE%NSIZE
+
+   IARR(1) = CODE
+   IARR(2) = NDIM
+   IARR(3) = NSIZE
 !
-!  COPY JUST NAME AND TYPE
-!  THE REST IS GOING TO BE AUTOMATIC
+!  Send node header
 !
-   PNEW%LNAME = PNODE%LNAME
-   PNEW%LTYPE = PNODE%LTYPE
-!
-!  IF DIR NODE, RETURN
-!
-   IF(TRIM(PNODE%LTYPE) == 'DIR' .OR. TRIM(PNODE%LTYPE) == 'N') RETURN
+   CALL MPI_BCAST(IARR, 3, MPI_INTEGER8, SENDPART,COMMUNICATOR, IERR)
+   CALL MPI_BCAST(PNODE%LNAME, NAME_LENGTH, MPI_CHARACTER, SENDPART,COMMUNICATOR, IERR)
+!   IF(IERR /= 0)THEN
+!       WRITE(FPAR%MESG,'(A)')' GET_NCODE- null node '
+!       CALL FLL_OUT('ALL',FPAR)
+!       FPAR%SUCCESS = .FALSE.
+!       CODE = -1
+!       RETURN
+!   END IF
+
+   IF(CODE == 0) RETURN
+   IF(NDIM*NSIZE > 1) THEN
 !
 !   1D ARRAYS
 !
-   IF(ASSOCIATED(PNODE%R1))THEN
-     NDIM   = SIZE(PNODE%R1, DIM = 1, KIND = LINT)
-
-     IF(ASSOCIATED(PNEW%R1))THEN
-       NNDIM  = SIZE(PNEW%R1, DIM = 1, KIND = LINT)
-
-       IF(NDIM /= NNDIM)THEN
-         WRITE(FPAR%MESG,'(A,A,A)')' DUPLICATE - nodes do not have the same array dimensions', TRIM(PNODE%LNAME), TRIM(PNEW%LNAME)
-         FPAR%SUCCESS = .FALSE.
-         CALL FLL_OUT('ALL',FPAR)
-         RETURN
-       END IF
-
-       PNEW%R1 = PNODE%R1
-     ELSE
-       WRITE(FPAR%MESG,'(A,A,A)')' DUPLICATE - R1 array not allocated',TRIM(PNEW%LNAME)
-       FPAR%SUCCESS = .FALSE.
-       CALL FLL_OUT('ALL',FPAR)
-       RETURN 
-     END IF     
-
-   END IF
+     IF(ASSOCIATED(PNODE%R1))THEN
+       CALL MPI_BCAST(PNODE%R1, NDIM*NSIZE, MPI_REAL, SENDPART,COMMUNICATOR, IERR)
+       RETURN     
+     END IF
+     IF(ASSOCIATED(PNODE%D1))THEN
+       CALL MPI_BCAST(PNODE%D1, NDIM*NSIZE, MPI_DOUBLE, SENDPART,COMMUNICATOR, IERR)
+       RETURN     
+     END IF
+     IF(ASSOCIATED(PNODE%I1))THEN
+       CALL MPI_BCAST(PNODE%I1, NDIM*NSIZE, MPI_INTEGER, SENDPART,COMMUNICATOR, IERR)
+       RETURN     
+     END IF
+     IF(ASSOCIATED(PNODE%L1))THEN
+       CALL MPI_BCAST(PNODE%L1, NDIM*NSIZE, MPI_INTEGER8, SENDPART,COMMUNICATOR, IERR)
+       RETURN     
+     END IF
+     IF(ASSOCIATED(PNODE%S1))THEN
+       CALL MPI_BCAST(PNODE%S1, NDIM*NSIZE*NAME_LENGTH, MPI_CHARACTER, SENDPART,COMMUNICATOR, IERR)
+       RETURN     
+     END IF
 !
-   IF(ASSOCIATED(PNODE%D1))THEN
-     NDIM = SIZE(PNODE%D1, DIM = 1, KIND = LINT)
-
-     IF(ASSOCIATED(PNEW%D1))THEN
-       NNDIM = SIZE(PNEW%D1, DIM = 1, KIND = LINT)
-
-       IF(NDIM /= NNDIM)THEN
-         WRITE(FPAR%MESG,'(A,A,A)')' DUPLICATE - nodes do not have the same array dimensions', TRIM(PNODE%LNAME), TRIM(PNEW%LNAME)
-         FPAR%SUCCESS = .FALSE.
-         CALL FLL_OUT('ALL',FPAR)
-         RETURN
-       END IF
-
-       PNEW%D1 = PNODE%D1
-     ELSE
-       WRITE(FPAR%MESG,'(A,A,A)')' DUPLICATE - D1 array not allocated',TRIM(PNEW%LNAME)
-       FPAR%SUCCESS = .FALSE.
-       CALL FLL_OUT('ALL',FPAR)
-       RETURN 
-     END IF   
-
-   END IF
-!
-   IF(ASSOCIATED(PNODE%I1))THEN
-
-     NDIM = SIZE(PNODE%I1, DIM = 1, KIND = LINT)
-
-     IF(ASSOCIATED(PNEW%I1))THEN
-       NNDIM = SIZE(PNEW%I1, DIM = 1, KIND = LINT)
-
-       IF(NDIM /= NNDIM)THEN
-         WRITE(FPAR%MESG,'(A,A,A)')' DUPLICATE - nodes do not have the same array dimensions', TRIM(PNODE%LNAME), TRIM(PNEW%LNAME)
-         FPAR%SUCCESS = .FALSE.
-         CALL FLL_OUT('ALL',FPAR)
-         RETURN
-       END IF
-       PNEW%I1(1:NDIM) = PNODE%I1(1:NDIM)
-     ELSE
-       WRITE(FPAR%MESG,'(A,A,A)')' DUPLICATE - I1 array not allocated',TRIM(PNEW%LNAME)
-       FPAR%SUCCESS = .FALSE.
-       CALL FLL_OUT('ALL',FPAR)
-       RETURN 
-     END IF  
-
-   END IF
-!
-   IF(ASSOCIATED(PNODE%L1))THEN
-     NDIM   = SIZE(PNODE%L1, DIM = 1, KIND = LINT)
-
-     IF(ASSOCIATED(PNEW%L1))THEN
-       NNDIM  = SIZE(PNEW%L1, DIM = 1, KIND = LINT)
-
-       IF(NDIM /= NNDIM)THEN
-         WRITE(FPAR%MESG,'(A,A,A)')' DUPLICATE - nodes do not have the same array dimensions', TRIM(PNODE%LNAME), TRIM(PNEW%LNAME)
-         FPAR%SUCCESS = .FALSE.
-         CALL FLL_OUT('ALL',FPAR)
-         RETURN
-       END IF
-
-       PNEW%L1 = PNODE%L1
-     ELSE
-       WRITE(FPAR%MESG,'(A,A,A)')' DUPLICATE - L1 array not allocated',TRIM(PNEW%LNAME)
-       FPAR%SUCCESS = .FALSE.
-       CALL FLL_OUT('ALL',FPAR)
-       RETURN 
-     END IF   
-
-   END IF 
-
-   IF(ASSOCIATED(PNODE%S1))THEN
-     NDIM = SIZE(PNODE%S1, DIM = 1, KIND = LINT)
-
-     IF(ASSOCIATED(PNEW%S1))THEN
-       NNDIM = SIZE(PNEW%S1, DIM = 1, KIND = LINT)
-
-       IF(NDIM /= NNDIM)THEN
-         WRITE(FPAR%MESG,'(A,A,A)')' DUPLICATE - nodes do not have the same array dimensions', TRIM(PNODE%LNAME), TRIM(PNEW%LNAME)
-         FPAR%SUCCESS = .FALSE.
-         CALL FLL_OUT('ALL',FPAR)
-         RETURN
-       END IF
-
-       PNEW%S1 = PNODE%S1
-     ELSE
-       WRITE(FPAR%MESG,'(A,A,A)')' DUPLICATE - S1 array not allocated',TRIM(PNEW%LNAME)
-       FPAR%SUCCESS = .FALSE.
-       CALL FLL_OUT('ALL',FPAR)
-       RETURN 
-     END IF 
-   END IF      
-!
-!  2D ARRAYS
+! 2D ARRAYS
 !
      IF(ASSOCIATED(PNODE%R2))THEN
-     NDIM    = SIZE(PNODE%R2, DIM = 1, KIND = LINT)
-     NSIZE   = SIZE(PNODE%R2, DIM = 2, KIND = LINT)
-
-     IF(ASSOCIATED(PNEW%R2))THEN
-        NNDIM    = SIZE(PNODE%R2, DIM = 1, KIND = LINT)
-        NNSIZE   = SIZE(PNODE%R2, DIM = 2, KIND = LINT)
-        
-       IF(NDIM /= NNDIM .OR. NSIZE /= NNSIZE)THEN
-         WRITE(FPAR%MESG,'(A,A,A)')' DUPLICATE - nodes do not have the same array dimensions', TRIM(PNODE%LNAME), TRIM(PNEW%LNAME)
-         FPAR%SUCCESS = .FALSE.
-         CALL FLL_OUT('ALL',FPAR)
-         RETURN
-       END IF
-
-       PNEW%R2 = PNODE%R2
-     ELSE
-       WRITE(FPAR%MESG,'(A,A,A)')' DUPLICATE - R2 array not allocated',TRIM(PNEW%LNAME)
-       FPAR%SUCCESS = .FALSE.
-       CALL FLL_OUT('ALL',FPAR)
-       RETURN 
-     END IF     
-   END IF
-   
-   IF(ASSOCIATED(PNODE%D2))THEN
-     NDIM    = SIZE(PNODE%D2, DIM = 1, KIND = LINT)
-     NSIZE   = SIZE(PNODE%D2, DIM = 2, KIND = LINT)
-
-     IF(ASSOCIATED(PNEW%D2))THEN
-        NNDIM    = SIZE(PNODE%D2, DIM = 1, KIND = LINT)
-        NNSIZE   = SIZE(PNODE%D2, DIM = 2, KIND = LINT)
-        
-       IF(NDIM /= NNDIM .OR. NSIZE /= NNSIZE)THEN
-         WRITE(FPAR%MESG,'(A,A,A)')' DUPLICATE - nodes do not have the same array dimensions', TRIM(PNODE%LNAME), TRIM(PNEW%LNAME)
-         FPAR%SUCCESS = .FALSE.
-         CALL FLL_OUT('ALL',FPAR)
-         RETURN
-       END IF
-
-       PNEW%D2 = PNODE%D2
-     ELSE
-       WRITE(FPAR%MESG,'(A,A,A)')' DUPLICATE - D2 array not allocated',TRIM(PNEW%LNAME)
-       FPAR%SUCCESS = .FALSE.
-       CALL FLL_OUT('ALL',FPAR)
-       RETURN 
-     END IF     
-   END IF
-   
-   IF(ASSOCIATED(PNODE%I2))THEN
-     NDIM    = SIZE(PNODE%I2, DIM = 1, KIND = LINT)
-     NSIZE   = SIZE(PNODE%I2, DIM = 2, KIND = LINT)
-
-     IF(ASSOCIATED(PNEW%I2))THEN
-        NNDIM    = SIZE(PNODE%I2, DIM = 1, KIND = LINT)
-        NNSIZE   = SIZE(PNODE%I2, DIM = 2, KIND = LINT)
-        
-       IF(NDIM /= NNDIM .OR. NSIZE /= NNSIZE)THEN
-         WRITE(FPAR%MESG,'(A,A,A)')' DUPLICATE - nodes do not have the same array dimensions', TRIM(PNODE%LNAME), TRIM(PNEW%LNAME)
-         FPAR%SUCCESS = .FALSE.
-         CALL FLL_OUT('ALL',FPAR)
-         RETURN
-       END IF
-
-       PNEW%I2 = PNODE%I2
-     ELSE
-       WRITE(FPAR%MESG,'(A,A,A)')' DUPLICATE - I2 array not allocated',TRIM(PNEW%LNAME)
-       FPAR%SUCCESS = .FALSE.
-       CALL FLL_OUT('ALL',FPAR)
-       RETURN 
-     END IF     
-   END IF
-   
-   IF(ASSOCIATED(PNODE%L2))THEN
-     NDIM    = SIZE(PNODE%L2, DIM = 1, KIND = LINT)
-     NSIZE   = SIZE(PNODE%L2, DIM = 2, KIND = LINT)
-
-     IF(ASSOCIATED(PNEW%L2))THEN
-        NNDIM    = SIZE(PNODE%L2, DIM = 1, KIND = LINT)
-        NNSIZE   = SIZE(PNODE%L2, DIM = 2, KIND = LINT)
-        
-       IF(NDIM /= NNDIM .OR. NSIZE /= NNSIZE)THEN
-         WRITE(FPAR%MESG,'(A,A,A)')' DUPLICATE - nodes do not have the same array dimensions', TRIM(PNODE%LNAME), TRIM(PNEW%LNAME)
-         FPAR%SUCCESS = .FALSE.
-         CALL FLL_OUT('ALL',FPAR)
-         RETURN
-       END IF
-
-       PNEW%L2 = PNODE%L2
-     ELSE
-       WRITE(FPAR%MESG,'(A,A,A)')' DUPLICATE - L2 array not allocated',TRIM(PNEW%LNAME)
-       FPAR%SUCCESS = .FALSE.
-       CALL FLL_OUT('ALL',FPAR)
-       RETURN 
-     END IF     
-   END IF
-
-   IF(ASSOCIATED(PNODE%S2))THEN
-     NDIM    = SIZE(PNODE%S2, DIM = 1, KIND = LINT)
-     NSIZE   = SIZE(PNODE%S2, DIM = 2, KIND = LINT)
-
-     IF(ASSOCIATED(PNEW%L2))THEN
-        NNDIM    = SIZE(PNODE%S2, DIM = 1, KIND = LINT)
-        NNSIZE   = SIZE(PNODE%S2, DIM = 2, KIND = LINT)
-        
-       IF(NDIM /= NNDIM .OR. NSIZE /= NNSIZE)THEN
-         WRITE(FPAR%MESG,'(A,A,A)')' DUPLICATE - nodes do not have the same array dimensions', TRIM(PNODE%LNAME), TRIM(PNEW%LNAME)
-         FPAR%SUCCESS = .FALSE.
-         CALL FLL_OUT('ALL',FPAR)
-         RETURN
-       END IF
-
-       PNEW%S2 = PNODE%S2
-     ELSE
-       WRITE(FPAR%MESG,'(A,A,A)')' DUPLICATE - S2 array not allocated',TRIM(PNEW%LNAME)
-       FPAR%SUCCESS = .FALSE.
-       CALL FLL_OUT('ALL',FPAR)
-       RETURN 
-     END IF     
-   END IF
+       CALL MPI_BCAST(PNODE%R2, NDIM*NSIZE, MPI_REAL, SENDPART,COMMUNICATOR, IERR)
+      RETURN     
+     END IF
+     IF(ASSOCIATED(PNODE%D2))THEN
+      CALL MPI_BCAST(PNODE%D2, NDIM*NSIZE, MPI_DOUBLE, SENDPART,COMMUNICATOR, IERR)
+       RETURN     
+     END IF
+     IF(ASSOCIATED(PNODE%I2))THEN
+       CALL MPI_BCAST(PNODE%I2, NDIM*NSIZE, MPI_INTEGER, SENDPART,COMMUNICATOR, IERR)
+       RETURN     
+     END IF
+     IF(ASSOCIATED(PNODE%L2))THEN
+       CALL MPI_BCAST(PNODE%L2, NDIM*NSIZE, MPI_INTEGER8,SENDPART, COMMUNICATOR, IERR)
+       RETURN     
+     END IF
+     IF(ASSOCIATED(PNODE%S2))THEN
+       CALL MPI_BCAST(PNODE%S2, NDIM*NSIZE*NAME_LENGTH, MPI_CHARACTER,SENDPART, COMMUNICATOR, IERR)
+       RETURN     
+     END IF
 !
 !  SCALARS AND STATICALLY DEFINED ARRAYS
 !
-  PNEW%R0 = PNODE%R0
-  PNEW%D0 = PNODE%D0
-  PNEW%I0 = PNODE%I0
-  PNEW%L0 = PNODE%L0
-  PNEW%S0 = PNODE%S0
+   ELSE
+     SELECT CASE(CODE)
+      CASE(1)
+       CALL MPI_BCAST(PNODE%R0, 1, MPI_REAL, SENDPART,COMMUNICATOR, IERR)
+      CASE(2)
+       CALL MPI_BCAST(PNODE%D0, 1, MPI_DOUBLE, SENDPART,COMMUNICATOR, IERR)
+      CASE(3)
+       CALL MPI_BCAST(PNODE%I0, 1, MPI_INTEGER, SENDPART,COMMUNICATOR, IERR)
+      CASE(4)
+       CALL MPI_BCAST(PNODE%L0, 1, MPI_INTEGER8, SENDPART,COMMUNICATOR, IERR)
+      CASE(5)
+       CALL MPI_BCAST(PNODE%S0, NAME_LENGTH, MPI_CHARACTER, SENDPART,COMMUNICATOR, IERR)
+     END SELECT
+   END IF  
+
+  END SUBROUTINE BROADCAST_NODE_SEND
+
+
+  FUNCTION BROADCAST_NODE_RECEIVE(COMMUNICATOR,SENDPART,FPAR) RESULT(PNODE)
+!
+! Description: Boradcast - receive the node
+!
+! History:
+! Version   Date       Patch number  CLA     Comment
+! -------   --------   --------      ---     -------
+! 1.1       10/10/16                         Initial implementation
+!
+!
+! External Modules used
+! 
+    USE MPI
+    USE FLL_TYPE_M
+    USE FLL_OUT_M
+    USE FLL_MK_M
+
+    IMPLICIT NONE
+!
+! Declarations
+!
+! Arguments description
+! Name         In/Out     Function
+! PNODE        In         pointer data which is to be duplicated
+! COMMUNICATOR In         communicator
+! SENDPART     In         sending partition
+! FPAR         In/Out     structure containing function specific data
+!
+! Arguments declaration
+!
+   TYPE(DNODE), POINTER :: PNODE
+   TYPE(FUNC_DATA_SET)  :: FPAR
+   INTEGER :: COMMUNICATOR, SENDPART
+!
+! Local declarations
+!
+   INTEGER(LINT) :: IARR(3), NDIM, NSIZE
+   INTEGER :: IERR
+   CHARACTER(LEN=TYPE_LENGTH) :: TYPE
+   CHARACTER(LEN=NAME_LENGTH) :: NAME
+!
+! Prepare header of the node
+!
+   CALL MPI_BCAST(IARR, 3, MPI_INTEGER8, SENDPART, COMMUNICATOR, IERR)
+   CALL MPI_BCAST(NAME, NAME_LENGTH, MPI_CHARACTER, SENDPART,COMMUNICATOR, IERR)
+
+   TYPE = GET_NTYPE(INT(IARR(1), KIND=SINT))
+
+   IF(IARR(1) == 0)THEN
+!
+!  IF DIR, STORE THE NDIM DIMENSION IN NLINK AND 
+!  KEEP NIDM = 0
+!  UPON ADDING MODES TO DIR, NDIM IS INCREMENTED AUTOMATICALLY
+!
+     PNODE => FLL_MK(NAME,TYPE,0_LINT,0_LINT ,FPAR)
+     PNODE%LNAME = NAME
+     PNODE%NLINK = IARR(2)
+     IF(.NOT.ASSOCIATED(PNODE))THEN
+       WRITE(FPAR%MESG,'(A)')' BROADCAST_NODE_RECEIVE - error allocating PNEW '
+       FPAR%SUCCESS = .FALSE.
+       PNODE => NULL()
+       RETURN
+     END IF
+     RETURN
+
+   ELSE
+   
+     PNODE => FLL_MK(NAME,TYPE,IARR(2),IARR(3) ,FPAR)
+     IF(.NOT.ASSOCIATED(PNODE))THEN
+       WRITE(FPAR%MESG,'(A)')' BROADCAST_NODE_RECEIVE - error allocating PNEW '
+       FPAR%SUCCESS = .FALSE.
+       PNODE => NULL()
+       RETURN
+     END IF
+   END IF
+
+   NDIM = IARR(2)
+   NSIZE = IARR(3)
+   IF(NDIM*NSIZE > 1 )THEN
+!
+!   1D ARRAYS
+!
+     IF(ASSOCIATED(PNODE%R1))THEN
+       CALL MPI_BCAST(PNODE%R1, NDIM*NSIZE, MPI_REAL,SENDPART, COMMUNICATOR, IERR)
+       RETURN     
+     END IF
+     IF(ASSOCIATED(PNODE%D1))THEN
+       CALL MPI_BCAST(PNODE%D1, NDIM*NSIZE, MPI_DOUBLE,SENDPART, COMMUNICATOR, IERR)
+       RETURN     
+     END IF
+     IF(ASSOCIATED(PNODE%I1))THEN
+       CALL MPI_BCAST(PNODE%I1, NDIM*NSIZE, MPI_INTEGER,SENDPART, COMMUNICATOR, IERR)
+       RETURN     
+     END IF
+     IF(ASSOCIATED(PNODE%L1))THEN
+       CALL MPI_BCAST(PNODE%L1, NDIM*NSIZE, MPI_INTEGER8,SENDPART, COMMUNICATOR, IERR)
+       RETURN     
+     END IF
+     IF(ASSOCIATED(PNODE%S1))THEN
+       CALL MPI_BCAST(PNODE%S1, NDIM*NSIZE*NAME_LENGTH, MPI_CHARACTER,SENDPART, COMMUNICATOR, IERR)
+       RETURN     
+     END IF
+!
+! 2D ARRAYS
+!
+     IF(ASSOCIATED(PNODE%R2))THEN
+       CALL MPI_BCAST(PNODE%R2, NDIM*NSIZE, MPI_REAL,SENDPART, COMMUNICATOR, IERR)
+       RETURN     
+     END IF
+     IF(ASSOCIATED(PNODE%D2))THEN
+       CALL MPI_BCAST(PNODE%D2, NDIM*NSIZE, MPI_DOUBLE,SENDPART, COMMUNICATOR, IERR)
+       RETURN     
+     END IF
+     IF(ASSOCIATED(PNODE%I2))THEN
+       CALL MPI_BCAST(PNODE%I2, NDIM*NSIZE, MPI_INTEGER,SENDPART, COMMUNICATOR, IERR)
+       RETURN     
+     END IF
+     IF(ASSOCIATED(PNODE%L2))THEN
+       CALL MPI_BCAST(PNODE%L2, NDIM*NSIZE, MPI_INTEGER8,SENDPART, COMMUNICATOR, IERR)
+       RETURN     
+     END IF
+     IF(ASSOCIATED(PNODE%S2))THEN
+       CALL MPI_BCAST(PNODE%S2, NDIM*NSIZE*NAME_LENGTH, MPI_CHARACTER, SENDPART,COMMUNICATOR, IERR)
+       RETURN     
+     END IF
+!
+!  SCALARS AND STATICALLY DEFINED ARRAYS
+!
+   ELSE
+     SELECT CASE(INT(IARR(1), KIND=SINT))
+      CASE(1)
+       CALL MPI_BCAST(PNODE%R0, 1, MPI_REAL, SENDPART,COMMUNICATOR, IERR)
+      CASE(2)
+       CALL MPI_BCAST(PNODE%D0, 1, MPI_DOUBLE, SENDPART,COMMUNICATOR, IERR)
+      CASE(3)
+       CALL MPI_BCAST(PNODE%I0, 1, MPI_INTEGER, SENDPART,COMMUNICATOR, IERR)
+      CASE(4)
+       CALL MPI_BCAST(PNODE%L0, 1, MPI_INTEGER8, SENDPART,COMMUNICATOR, IERR)
+      CASE(5)
+       PNODE%S0 = ''
+       CALL MPI_BCAST(PNODE%S0, NAME_LENGTH, MPI_CHARACTER, SENDPART,COMMUNICATOR, IERR)
+     END SELECT
+   END IF
+
+   RETURN
   
-  END SUBROUTINE FLL_COPPY_NODE_ARRAYS
+  END FUNCTION BROADCAST_NODE_RECEIVE
+
+
+
+
+
+  FUNCTION GET_NCODE(PNODE) RESULT(CODE)
+!
+! Description: gives back code for node
+!
+! History:
+! Version   Date       Patch number  CLA     Comment
+! -------   --------   --------      ---     -------
+! 1.1       10/10/16                         Initial implementation
+!
+!
+! External Modules used
+!  
+   USE FLL_TYPE_M
+   USE FLL_OUT_M
+
+   IMPLICIT NONE
+!
+! Declarations
+!
+! Arguments description
+! Name         In/Out     Function
+! PNODE        In         pointer data which is to be duplicated
+! CODE         Out        return code
+!
+! Arguments declaration
+!
+   TYPE(DNODE), POINTER :: PNODE
+   INTEGER :: CODE
+!
+! Local declaration
+! 
+   IF(.NOT.ASSOCIATED(PNODE))THEN
+    CODE = -1
+    RETURN
+   END IF
+
+   SELECT CASE(TRIM(PNODE%LTYPE))
+
+   CASE('DIR','N')
+     CODE = 0
+   CASE('R')
+     CODE = 1
+   CASE('D')
+     CODE = 2
+   CASE('I')
+     CODE = 3
+   CASE('L')
+     CODE = 4
+   CASE('S')
+     CODE = 5
+   CASE('C')
+     CODE = 6
+   CASE DEFAULT
+     CODE = -1
+   END SELECT
+
+
+  END FUNCTION GET_NCODE
+
+
+
+  FUNCTION GET_NTYPE(CODE) RESULT(TYPE)
+!
+! Description: gives back code for node
+!
+! History:
+! Version   Date       Patch number  CLA     Comment
+! -------   --------   --------      ---     -------
+! 1.1       10/10/16                         Initial implementation
+!
+!
+! External Modules used
+!  
+    USE FLL_TYPE_M
+    USE FLL_OUT_M
+
+    IMPLICIT NONE
+!
+! Declarations
+!
+! Arguments description
+! Name         In/Out     Function
+! PNODE        In         pointer data which is to be duplicated
+! TYPE         Out        type of node
+!
+! Arguments declaration
+!
+   INTEGER :: CODE
+   CHARACTER(LEN=TYPE_LENGTH):: TYPE
+!
+! Local declaration
+!
+
+    SELECT CASE(CODE)
+
+    CASE(0)
+      TYPE = 'DIR'
+    CASE(1)
+      TYPE = 'R'
+    CASE(2)
+      TYPE = 'D'
+    CASE(3)
+      TYPE = 'I'
+    CASE(4)
+      TYPE = 'L'
+    CASE(5)
+      TYPE = 'S'
+    CASE(6)
+      TYPE = 'C'
+    CASE DEFAULT
+      TYPE = '0'
+  
+    END SELECT
+
+
+  END FUNCTION GET_NTYPE
+
  
 
 END MODULE FLL_MPI_DUPLICATE_M
