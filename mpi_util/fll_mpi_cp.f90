@@ -19,9 +19,9 @@
 !
 !
 !
-MODULE FLL_MPI_CP_ALL_M
+MODULE FLL_MPI_CP_M
 !
-! Description: Distributes FLL list from one node to all others in communicator
+! Description: Sends FLL list from one node to another
 !
 ! 
 ! History:
@@ -33,9 +33,9 @@ MODULE FLL_MPI_CP_ALL_M
 ! External Modules used
 !
 CONTAINS
-   FUNCTION FLL_MPI_CP_ALL(PNODE,COMMUNICATOR,SENDPART,FPAR) RESULT(PNEW)
+   FUNCTION FLL_MPI_CP(PNODE,COMMUNICATOR,SENDPART,RECPART,FPAR) RESULT(PNEW)
 !
-! Description: Broadcasts FLL subset to all processes in comunicator
+! Description: Sends FLL subset to a specified process in comunicator
 !              if process ID == sending proceess ID, do not create
 !              data set, just return the pointer on existing data set
 !
@@ -91,7 +91,7 @@ CONTAINS
 
      PNEW => BROADCAST_NODE_RECEIVE(COMMUNICATOR, SENDPART, FPAR)
 !
-!  If dir has children loop over them
+!  If dir has childrenm loop over them
 !  the number of children in this routine is stored in 
 !  NLINK, not ndim, ndim is set to 0 and then incremented automatically
 !  when adding children
@@ -137,7 +137,7 @@ CONTAINS
 
    RETURN
 
-   END FUNCTION FLL_MPI_CP_ALL
+   END FUNCTION FLL_MPI_CP
 !
 !  DELETE CHID WITH ALL ITS CHILDREN
 !
@@ -658,4 +658,4 @@ CONTAINS
 
  
 
-END MODULE FLL_MPI_CP_ALL_M
+END MODULE FLL_MPI_CP_M

@@ -8,3 +8,9 @@ fll_mpi_cp_all.o :  \
 
 fll_mpi_mods.o :  \
 	fll_mpi_cp_all.o
+
+fll_mpi_cp.o :  \
+	../data_util/fll_mv.o \
+	../data_util/fll_mk.o \
+	../data_util/fll_out.o \
+	../data_util/fll_type.o
