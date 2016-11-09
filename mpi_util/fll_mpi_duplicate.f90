@@ -99,7 +99,7 @@ CONTAINS
 !
 !  Node has children
 !
-       CALL FLL_RECEIVE_RECURSIVE(PCHILD,COMMUNICATOR,SENDPART,FPAR)
+       CALL FLL_RECEIVE_RECURSIVE(PNEW,COMMUNICATOR,SENDPART,FPAR)
 
      END IF
 
@@ -134,8 +134,6 @@ CONTAINS
 
    FPAR%SUCCESS = .TRUE.
 
-
-   write(*,*)'----------  partition returning from main subr ', RANK
    RETURN
 
    END FUNCTION FLL_MPI_DUPLICATE
@@ -180,7 +178,6 @@ CONTAINS
 !  NODE IS DIR
 !  LOOP OVER CHILDREN
 !
-!     WRITE(*,*)' ....................  sub - sendind child ', PCURR%lname
     DO WHILE(ASSOCIATED(PCURR))
 
        PNEXT => PCURR%PNEXT
@@ -200,7 +197,6 @@ CONTAINS
 !  ADD TO PDUPL LIST
 !
        PCURR => PNEXT
-!     WRITE(*,*)' ....................  sub - next sendind child ', PCURR%lname
 
     END DO
     
@@ -238,25 +234,23 @@ CONTAINS
     TYPE(DNODE), POINTER :: PNODE,PNEW
     TYPE(FUNC_DATA_SET)  :: FPAR
     INTEGER              :: SENDPART,COMMUNICATOR
+    INTEGER(LINT) :: I
 !
 ! Local declarations
 !
     TYPE(DNODE), POINTER  :: PCURR,PNEXT,PCHILD
     LOGICAL :: OK
     
-    integer :: incrm
-
-    incrm = 0
-
-    DO 
-
-     incrm = incrm + 1
-     write(*,*)' <<<<<<<<<<<<<<  receving child # ', incrm
+    PCURR => PNODE
+    PCHILD => PNODE%PCHILD
+    
+    DO I = 1, PCURR%NLINK
 
      PNEW => BROADCAST_NODE_RECEIVE(COMMUNICATOR,SENDPART,FPAR)
-     WRITE(*,*)'<<<<<<<<<<<<<<  RECEIVED NODE NAME ', PNEW%LNAME
-     if(incrm == 19)return
-
+     OK = FLL_MV(PNEW,PCURR, FPAR)
+     
+     IF(PNEW%NLINK >0) CALL FLL_RECEIVE_RECURSIVE(PNEW,COMMUNICATOR,SENDPART,FPAR)
+     
    END DO
 !
 

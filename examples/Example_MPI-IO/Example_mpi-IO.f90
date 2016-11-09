@@ -64,11 +64,16 @@ PROGRAM  EXAMPLE_MPI_IO
 
   INTEGER(LINT) :: NFILES,NPROC
   CHARACTER(LEN=FILE_NAME_LENGTH) :: NAME_OF_FILE
+  LOGICAL :: OK
 !
 !  Initialize MPI
 !
    CALL MPI_INIT(IERR)
+   
+   FLL_MPI_STRUCT => NULL()
+   
    CALL MPI_Comm_rank ( MPI_COMM_WORLD, WORLD_RANK, IERR )
+   write(*,*)' IRANK is ', WORLD_RANK
 
    IF(WORLD_RANK == 0) THEN 
      CALL READ_INPUT(NAME_OF_FILE,NFILES,NPROC)
@@ -77,14 +82,27 @@ PROGRAM  EXAMPLE_MPI_IO
 !
      FLL_MPI_STRUCT => NULL()
      CALL CREATE_MPI_STRUCT(FLL_MPI_STRUCT,NAME_OF_FILE,NFILES,NPROC)
-!     WRITE(*,*)'              duplicating'
-!     PNEW => FLL_CP(FLL_MPI_STRUCT, NULL(), FPAR)
-!     WRITE(*,*)'              duplicate'
-!     CALL FLL_CAT(PNEW,6,.false., FPAR)
+     WRITE(*,*)'              duplicating'
+     PNEW => FLL_CP(FLL_MPI_STRUCT, NULL(), FPAR)
+     WRITE(*,*)'              duplicate'
+!      CALL FLL_CAT(PNEW,6,.false., FPAR)
+     
+     OK = FLL_MV(PNEW, FLL_MPI_STRUCT,FPAR)
+          
+     CALL FLL_CAT(FLL_MPI_STRUCT,6,.false., FPAR)
+
 
    END IF
-
    PNEW => FLL_MPI_DUPLICATE(FLL_MPI_STRUCT,MPI_COMM_WORLD,0,FPAR)
+   
+   if(WORLD_RANK == 1)THEN
+      CALL FLL_CAT(PNEW,6,.false., FPAR)
+      CALL FLL_RM(PNEW,FPAR)
+!       CALL FLL_RM(FLL_MPI_STRUCT,FPAR)
+! 
+  END IF
+
+      
 !
 !  make some data set
 !
@@ -92,6 +110,12 @@ PROGRAM  EXAMPLE_MPI_IO
 
   ! CALL MPI_Comm_group ( MPI_COMM_WORLD, world_group_id, ierr )
 
+   if(WORLD_RANK == 0)then
+      CALL FLL_RM(FLL_MPI_STRUCT,FPAR)
+!       CALL FLL_RM(PNEW,FPAR)
+  end if
+
+  
    CALL MPI_FINALIZE(IERR)
   
 END PROGRAM
