@@ -82,38 +82,52 @@ PROGRAM  EXAMPLE_MPI_IO
 !
      FLL_MPI_STRUCT => NULL()
      CALL CREATE_MPI_STRUCT(FLL_MPI_STRUCT,NAME_OF_FILE,NFILES,NPROC)
-     WRITE(*,*)'              duplicating'
-     PNEW => FLL_CP(FLL_MPI_STRUCT, NULL(), FPAR)
-     WRITE(*,*)'              duplicate'
-!      CALL FLL_CAT(PNEW,6,.false., FPAR)
-     
-     OK = FLL_MV(PNEW, FLL_MPI_STRUCT,FPAR)
-          
-     CALL FLL_CAT(FLL_MPI_STRUCT,6,.false., FPAR)
+
+!     WRITE(*,*)'              duplicating'
+!     PNEW => FLL_CP(FLL_MPI_STRUCT, NULL(), FPAR)
+!     WRITE(*,*)'              duplicate'    
+!     OK = FLL_MV(PNEW, FLL_MPI_STRUCT,FPAR)         
+!     CALL FLL_CAT(FLL_MPI_STRUCT,6,.false., FPAR)
 
 
    END IF
-   PNEW => FLL_MPI_DUPLICATE(FLL_MPI_STRUCT,MPI_COMM_WORLD,0,FPAR)
-   
-   if(WORLD_RANK == 1)THEN
-      CALL FLL_CAT(PNEW,6,.false., FPAR)
-      CALL FLL_RM(PNEW,FPAR)
-!       CALL FLL_RM(FLL_MPI_STRUCT,FPAR)
-! 
-  END IF
-
-      
 !
-!  make some data set
+!  Copy FLL_MPI_STRUCT date set which now exists on root partition only
+!  to all other partitions
+!  upon return, the function will return pointer to newly allocated data
+!  for all other partition then root partition
+!  On root partition, the PNEW pointer is pointing on FLL_MPI_STRUCT
 !
- !  CALL CREATE_DATA_SET(PDATA_SET,100_LINT, WORLD_RANK)
+   PNEW => FLL_MPI_CP_ALL(FLL_MPI_STRUCT,MPI_COMM_WORLD,0,FPAR)
+   IF(WORLD_RANK /= 0)THEN
+!
+!  make FLL_MPI_STRUCT point to PNEW so that we cane use the same names for all partitions
+!  
+     FLL_MPI_STRUCT => PNEW
+   END IF
+!
+!  just test - if partition #1, print received data set
+   IF(WORLD_RANK == 1)THEN
+      CALL FLL_CAT(FLL_MPI_STRUCT,6,.FALSE., FPAR)
+   END IF
+!
+!  make some data set similar to solution
+!
+  IF(WORLD_RANK==0)WRITE(*,*)' creating data set'
+  CALL CREATE_DATA_SET(PDATA_SET,100_LINT, WORLD_RANK)
 
   ! CALL MPI_Comm_group ( MPI_COMM_WORLD, world_group_id, ierr )
-
-   if(WORLD_RANK == 0)then
-      CALL FLL_RM(FLL_MPI_STRUCT,FPAR)
-!       CALL FLL_RM(PNEW,FPAR)
-  end if
+!
+!  MPI_Barrier does not need to be here, 
+!  just for testing purposes 
+!
+  CALL MPI_BARRIER(MPI_COMM_WORLD,ierr)
+!
+!  CLEAN MEMORY
+!
+  IF(WORLD_RANK==0)write(*,*)' Releasing memory'
+  CALL FLL_RM(FLL_MPI_STRUCT,FPAR)
+  CALL FLL_RM(PDATA_SET,FPAR)
 
   
    CALL MPI_FINALIZE(IERR)

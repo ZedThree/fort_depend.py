@@ -1,10 +1,10 @@
 # This file is generated automatically. DO NOT EDIT!
 
-fll_mpi_mods.o :  \
-	fll_mpi_duplicate.o
-
-fll_mpi_duplicate.o :  \
+fll_mpi_cp_all.o :  \
 	../data_util/fll_mv.o \
 	../data_util/fll_mk.o \
 	../data_util/fll_out.o \
 	../data_util/fll_type.o
+
+fll_mpi_mods.o :  \
+	fll_mpi_cp_all.o
