@@ -63,11 +63,15 @@ def write_depend(path,cwd,outfile="makefile.dep",dep=[],overwrite=False,build=''
             return
 
     #Open file
+    print("  ")
+    print("\033[031m Opening dependency file \033[032m"+outfile+"\033[039m ...")
+    print("  ")
     f=open(outfile,'w')
     f.write('# This file is generated automatically. DO NOT EDIT!\n')
     for i in dep.keys():
         tmp,fil=os.path.split(i)
         stri="\n"+os.path.join(build, fil.split(".")[0]+".o"+" : ")
+        print("\033[031m Writing dependency info for \033[032m"+i+"\033[039m module")
         for j in dep[i]:
             npathseg = j.count('/')
             if npathseg == 0:
@@ -83,6 +87,8 @@ def write_depend(path,cwd,outfile="makefile.dep",dep=[],overwrite=False,build=''
         stri=stri+"\n"
         f.write(stri)
     f.close()
+    print("\033[031m Finished ... \033[039m")
+    print("  ")
     return
 
 def get_source(ext=[".f90",".F90"]):
@@ -109,7 +115,9 @@ def check_if_there(use,file):
                 extrline = line.lower()
                 extrline = extrline.replace("module", "")
                 if use.lower().strip() == extrline.strip():
+                    f.close()
                     return 1
+
                 
     f.close()
     return 0
@@ -195,14 +203,22 @@ def get_depends(fob=[],m2f=[], ffiles=[]):
 #
 #  module is not, loop through all other files
 #
+                istat = 0
                 for k in ffiles:
                     retval=check_if_there(use=j,file=k)
                     if retval > 0:
+                        istat = 1
                         name=os.path.splitext(k)[0]+'.o'
                         tmp.append(name.lower())
                         print ("\033[031mNote: \033[039m module \033[032m"+j+"\033[039m not defined in any file in this directory")
-                        print ("\033[031m..... \033[039m module is in \033[032m"+name+"\033[039m file")
-                        print ("\033[031m..... \033[039m adding the module to dependency file, not checking its dependency further \033[032m\033[039m")
+                        print ("\033[031m..... \033[039m module found in \033[032m"+name+"\033[039m file")
+                        print ("\033[031m      \033[039m adding the module to dependency file, not checking its dependency further \033[032m\033[039m")
+                
+                if istat== 0 and not(j == ""):
+                    print("")
+                    print ("\033[031mNote!!!!: \033[039m module \033[032m"+j+"\033[039m not defined in any file")
+                    print ("\033[031m..... \033[039m assuming intrinsic module, not adding to dependency tree ... \033[032m\033[039m")
+                    print("")
 
         deps[i.file_name]=tmp
 
