@@ -68,15 +68,15 @@ fll_match_pattern.o :  \
 	fll_out.o \
 	fll_type.o
 
-fll_locate.o :  \
-	fll_funct_prt.o \
-	fll_out.o \
-	fll_type.o
-
 fll_read_ffa.o :  \
 	fll_mv.o \
 	fll_funct_prt.o \
 	fll_mk.o \
+	fll_out.o \
+	fll_type.o
+
+fll_locate.o :  \
+	fll_funct_prt.o \
 	fll_out.o \
 	fll_type.o
 
