@@ -19,7 +19,7 @@ import sys
 
 #Definitions
 
-def run(path,files=None,verbose=True,overwrite=None,output=None,macros={},build=''):
+def run(path,dep=None,files=None,verbose=True,overwrite=None,output=None,macros={},build=''):
    
     cwd = os.getcwd()
     
@@ -29,11 +29,23 @@ def run(path,files=None,verbose=True,overwrite=None,output=None,macros={},build=
     print("  ")
     print("\033[031m Making dependencies in \033[032m"+cwd+"\033[039m directory")
     print("  ")
-
-    ff=get_all_files(path=path) 
+#
+#  get rid of ../ in deps
+#
+    if not(dep == None):
+        dep = [w.replace('../', ' ') for w in dep]
+#
+#  get files where to look for modules
+#
+    ff=get_all_files(path=path, dep =dep) 
+    
+    print(" ")
+    print(" Looking for modules in files:")
+    print(ff)
+    
     l=create_file_objs(files,macros)
     mod2fil=file_objs_to_mod_dict(file_objs=l)
-    depends=get_depends(fob=l,m2f=mod2fil,ffiles=ff)
+    depends=get_depends(cwd=cwd,fob=l,m2f=mod2fil,ffiles=ff)
 
     if verbose:
        for i in depends.keys():
@@ -91,25 +103,34 @@ def write_depend(path,cwd,outfile="makefile.dep",dep=[],overwrite=False,build=''
     print("  ")
     return
 
-def get_source(ext=[".f90",".F90"]):
+def get_source(ext=[".f90",".F90",".f",".F"]):
     "Return all files ending with any of ext"
     tmp=os.listdir(".")
+    
     fil=[]
     for i in ext:
         fil.extend(filter(lambda x: x.endswith(i),tmp))
     return fil
 
-def get_all_files(path): 
+def get_all_files(path,dep): 
     matches = []
     for root, dirnames, filenames in os.walk(path):
-        for filename in fnmatch.filter(filenames, '*.f90'):
-            matches.append(os.path.join(root, filename))
+        
+        if not(dep == None):
+            for i in dep:                
+                if i.strip() in root:
+                     for filename in fnmatch.filter(filenames, '*.f*'):
+                         matches.append(os.path.join(root, filename))
+                         
+        else:
+            for filename in fnmatch.filter(filenames, '*.f*'):
+              matches.append(os.path.join(root, filename))
         
     return matches
 
 def check_if_there(use,file):
     "return if you see module name"
-    with open(file) as f:
+    with open(file, errors='ignore') as f:
         for line in f:
             if "module" in line.lower():
                 extrline = line.lower()
@@ -129,6 +150,8 @@ def create_file_objs(files=None, macros={}):
     if files is None:
         files = get_source()
 
+    files = get_source()
+
     for i in files:
         source_file = file_obj()
 
@@ -146,7 +169,7 @@ def get_uses(infile=None, macros={}):
 
     uses=[]
 
-    with open(infile,'r') as f:
+    with open(infile,'r', errors='ignore') as f:
         t=f.readlines()
 
     for i in t:
@@ -170,7 +193,7 @@ def get_contains(infile=None):
 
     contains=[]
 
-    with open(infile,'r') as f:
+    with open(infile,'r', errors='ignore') as f:
         t=f.readlines()
 
     for i in t:
@@ -189,8 +212,9 @@ def file_objs_to_mod_dict(file_objs=[]):
             dic[j.lower()]=i.file_name
     return dic
 
-def get_depends(fob=[],m2f=[], ffiles=[]):
+def get_depends(cwd,fob=[],m2f=[], ffiles=[]):
     deps={}
+    istat = 0
     for i in fob:
         tmp=[]
         for j in i.uses:
@@ -199,28 +223,37 @@ def get_depends(fob=[],m2f=[], ffiles=[]):
 #  module is in the same directory
 #
                 tmp.append(m2f[j.lower()])
+                istat = 1
             except KeyError:
 #
 #  module is not, loop through all other files
 #
                 istat = 0
                 for k in ffiles:
-                    retval=check_if_there(use=j,file=k)
-                    if retval > 0:
-                        istat = 1
-                        name=os.path.splitext(k)[0]+'.o'
-                        tmp.append(name.lower())
-                        print ("\033[031mNote: \033[039m module \033[032m"+j+"\033[039m not defined in any file in this directory")
-                        print ("\033[031m..... \033[039m module found in \033[032m"+name+"\033[039m file")
-                        print ("\033[031m      \033[039m adding the module to dependency file, not checking its dependency further \033[032m\033[039m")
+                    dir,fil=os.path.split(k)
+                    dir = dir+ "/"
+                    retval = 0
+                    
+                    if not(cwd.strip() == dir):
+                        retval=check_if_there(use=j,file=k)
+                       
+                        if retval > 0:
+                          istat = 1
+                          name=os.path.splitext(k)[0]+'.o'
+                          tmp.append(name.lower())
+                          print ("\033[031mNote: \033[039m module \033[032m"+j+"\033[039m not defined in any file in this directory")
+                          print ("\033[031m..... \033[039m module found in \033[032m"+name+"\033[039m file")
+                          print ("\033[031m      \033[039m adding the module to dependency file, not checking its dependency further \033[032m\033[039m")
+                          break
                 
                 if istat== 0 and not(j == ""):
-                    print("")
-                    print ("\033[031mNote!!!!: \033[039m module \033[032m"+j+"\033[039m not defined in any file")
-                    print ("\033[031m..... \033[039m assuming intrinsic module, not adding to dependency tree ... \033[032m\033[039m")
-                    print("")
-
-        deps[i.file_name]=tmp
+                         print("")
+                         print ("\033[031mNote!!!!: \033[039m module \033[032m"+j+"\033[039m not defined in any file")
+                         print ("\033[031m..... \033[039m assuming intrinsic module, not adding to dependency tree ... \033[032m\033[039m")
+                         print("")
+        
+        if not(istat == 0):
+             deps[i.file_name]=tmp
 
     return deps
 
@@ -272,6 +305,7 @@ if __name__ == "__main__":
     parser.add_argument('-v','--verbose',action='store_true',help='explain what is done')
     parser.add_argument('-w','--overwrite',action='store_true',help='Overwrite output file without warning')
     parser.add_argument('-r','--root_dir',nargs=1,help='Project root directory')
+    parser.add_argument('-d','--dep_dir',nargs='+',action='append',help='Preferred dependecy directory')
 
     # Parse the command line arguments
     args = parser.parse_args()
@@ -287,9 +321,10 @@ if __name__ == "__main__":
     output = args.output[0] if args.output else None
     build = args.build[0] if args.build else ''
     root_dir = args.root_dir[0] if args.root_dir else None
+    dep_dir = args.dep_dir[0] if args.dep_dir else None
     
     if not root_dir:
         print ("\033[031mError: \033[039m missing path to project root directory \033[032m")
         sys.exit()
 
-    run(path=root_dir, files=args.files, verbose=args.verbose, overwrite=args.overwrite, macros=macros, output=output, build=build)
+    run(path=root_dir, dep=dep_dir, files=args.files, verbose=args.verbose, overwrite=args.overwrite, macros=macros, output=output, build=build)
