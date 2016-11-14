@@ -65,7 +65,7 @@ use, intrinsic :: iso_fortran_env, only : stdin=>input_unit, &
 !  ERR_MSG_LENGTH        length of string for error message
 !  ERR_PATH_LENGTH       length of string for path of in err message
 !  FILE_NAME_LENGTH      length of string for file names
-!  STRING_LENGHT         length of long string 
+!  LSTRING_LENGTH         length of long string 
 
 !  MAX_SUB               maximum number of subsets in each node
 !
@@ -90,38 +90,39 @@ use, intrinsic :: iso_fortran_env, only : stdin=>input_unit, &
   INTEGER,  PARAMETER :: ERR_MSG_LENGTH = 256
   INTEGER,  PARAMETER :: ERR_PATH_LENGTH = 1024
   INTEGER,  PARAMETER :: FILE_NAME_LENGTH = 1024
-  INTEGER,  PARAMETER :: STRING_LENGHT = 72
+  INTEGER,  PARAMETER :: LSTRING_LENGTH = 72
+  INTEGER,  PARAMETER :: SSTRING_LENGTH = NAME_LENGTH
 
   INTEGER, PARAMETER :: MAX_SUB = 32000
 !
 ! DEFINITION OF THE DATA SET OF THE NODE IN LINKED LIST
 !
   TYPE DNODE
-    CHARACTER(LEN=NAME_LENGTH)     :: LNAME = ''   ! name the list
+    CHARACTER(LEN=NAME_LENGTH)     :: LNAME = ''  ! name the list
     CHARACTER(LEN=TYPE_LENGTH)     :: LTYPE = ''  ! type of the list
     CHARACTER(LEN=TYPE_LENGTH)     :: FTYPE = ''  ! type of the list
     INTEGER(LINT) :: NDIM = 0, NSIZE = 0, NLINK = 0
-    INTEGER(LINT) :: POS  = 0, LENGTH = 0 
+    INTEGER(LINT) :: DATA_LENGTH = 0
 
     TYPE (DNODE), POINTER :: &
-         PPAR     =>NULL(),&     ! Pointer to parent list
+         PPAR    =>NULL(),&     ! Pointer to parent list
          PCHILD  =>NULL(),&      ! Pointer to first child list
          PNEXT   =>NULL(),&      ! Pointer to next list
          PPREV   =>NULL(),&      ! Pointer to previous list
-         PLINK     =>NULL()      ! Pointer to link target
+         PLINK   =>NULL()      ! Pointer to link target
          
-    REAL(RSINGLE)   , POINTER, CONTIGUOUS :: R1(:) =>NULL(), R2(:,:) =>NULL()  ! real arrays
-    REAL(RDOUBLE)   , POINTER, CONTIGUOUS :: D1(:) =>NULL(), D2(:,:) =>NULL()  ! double arrays
-    INTEGER(SINT)   , POINTER, CONTIGUOUS :: I1(:) =>NULL(), I2(:,:) =>NULL()  ! integer arrays
-    INTEGER(LINT)   , POINTER, CONTIGUOUS :: L1(:) =>NULL(), L2(:,:) =>NULL()  ! long integer arrays
-    CHARACTER(LEN=STRING_LENGHT), POINTER, CONTIGUOUS  :: S1(:)=>NULL()        ! 1D array of strings
-    CHARACTER(LEN=STRING_LENGHT), POINTER, CONTIGUOUS  :: S2(:,:)=>NULL()      ! 2D array of strings
+    REAL(RSINGLE)   , POINTER, CONTIGUOUS :: R1(:) =>NULL(), R2(:,:) => NULL()  ! real arrays
+    REAL(RDOUBLE)   , POINTER, CONTIGUOUS :: D1(:) =>NULL(), D2(:,:) => NULL()  ! double arrays
+    INTEGER(SINT)   , POINTER, CONTIGUOUS :: I1(:) =>NULL(), I2(:,:) => NULL()  ! integer arrays
+    INTEGER(LINT)   , POINTER, CONTIGUOUS :: L1(:) =>NULL(), L2(:,:) => NULL()  ! long integer arrays
+    CHARACTER(LEN=LSTRING_LENGTH), POINTER, CONTIGUOUS  :: S1(:)  => NULL()        ! 1D array of strings
+    CHARACTER(LEN=LSTRING_LENGTH), POINTER, CONTIGUOUS  :: S2(:,:)=> NULL()      ! 2D array of strings
     
     REAL(RSINGLE)   :: R0                                     ! real 
     REAL(RDOUBLE)   :: D0                                     ! double
     INTEGER(SINT)   :: I0                                     ! integer
     INTEGER(LINT)   :: L0                                     ! long integer
-    CHARACTER(LEN=STRING_LENGHT) :: S0   ! string
+    CHARACTER(LEN=LSTRING_LENGTH) :: S0   ! string
     CHARACTER       :: C                                      ! character
     
   END TYPE DNODE
