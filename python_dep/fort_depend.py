@@ -43,7 +43,7 @@ def run(path,dep=None,files=None,verbose=True,overwrite=None,output=None,macros=
     ff=get_all_files(path=path, dep=dep) 
     
     print(" ")
-    print(" Looking for modules in files:")
+    print("\033[031m Looking for modules in files:\033[039m")
     print(ff)
     
     l=create_file_objs(files,macros)
@@ -93,11 +93,19 @@ def write_depend(path,cwd,outfile="makefile.dep",dep=[],overwrite=False,build=''
         tmp,fil=os.path.split(i)
         stri="\n"+os.path.join(build, fil.split(".")[0]+".o"+" : ")
         print("\033[031m Writing dependency info for \033[032m"+i+"\033[039m module")
-        for j in dep[i]:
+        if not(dep[i] == ""):
+
+          for j in dep[i]:
             npathseg = j.count('/')
             if npathseg == 0:
+#
+#  module is in the file located in the same directory
+#
                 tmp,fil=os.path.split(j)
             else:
+#
+#  module is in file located in different directory
+#
                 fil = get_relative_path_name(j,path=path,cwd=cwd)
 
             if "../" in fil:
@@ -107,6 +115,7 @@ def write_depend(path,cwd,outfile="makefile.dep",dep=[],overwrite=False,build=''
                 
         stri=stri+"\n"
         f.write(stri)
+
     f.close()
     print("\033[031m Finished ... \033[039m")
     print("  ")
@@ -119,6 +128,7 @@ def get_source(ext=[".f90",".F90",".f",".F"]):
     fil=[]
     for i in ext:
         fil.extend(filter(lambda x: x.endswith(i),tmp))
+
     return fil
 
 def get_all_files(path,dep):
@@ -179,14 +189,23 @@ def create_file_objs(files=None, macros={}):
 
     files = get_source()
 
+    print(" ")
+    print("\033[031m Looking for modules for files:\033[039m")
+    print(" ")
+
+
     for i in files:
         source_file = file_obj()
 
+
+        print(i)
         source_file.file_name = i
         source_file.uses = get_uses(i,macros)
         source_file.contains = get_contains(i)
 
         l.append(source_file)
+
+    print(" ")
 
     return l
 
@@ -250,7 +269,10 @@ def file_objs_to_mod_dict(file_objs=[]):
 def get_depends(verbose,cwd,fob=[],m2f=[], ffiles=[]):
     deps={}
     istat = 0
+
     for i in fob:
+        print("")
+        print("\033[031mChecking dependency for file: \033[032m"+i.file_name+"\033[039m")
         tmp=[]
         for j in i.uses:
             try:
@@ -264,7 +286,6 @@ def get_depends(verbose,cwd,fob=[],m2f=[], ffiles=[]):
 #  module is not, loop through all other files specified in ffiles
 #  these are files found in function get_all_files
 #
-                istat = 0
                 for k in ffiles:
                     dir,fil=os.path.split(k)
                     dir = dir+ "/"
@@ -289,6 +310,8 @@ def get_depends(verbose,cwd,fob=[],m2f=[], ffiles=[]):
         
         if not(istat == 0):
              deps[i.file_name]=tmp
+        else:
+             deps[i.file_name]="" 
 
     return deps
 
