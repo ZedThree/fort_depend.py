@@ -130,7 +130,9 @@ def get_all_files(path,dep):
 
 def check_if_there(use,file):
     "return if you see module name"
-    with open(file, errors='ignore') as f:
+
+    if sys.version_info < (3,0):
+      with open(file) as f:
         for line in f:
             if "module" in line.lower():
                 extrline = line.lower()
@@ -138,7 +140,15 @@ def check_if_there(use,file):
                 if use.lower().strip() == extrline.strip():
                     f.close()
                     return 1
-
+    else:
+       with open(file) as f:
+         with open(file, errors='ignore') as f:
+            if "module" in line.lower():
+                extrline = line.lower()
+                extrline = extrline.replace("module", "")
+                if use.lower().strip() == extrline.strip():
+                    f.close()
+                    return 1
                 
     f.close()
     return 0
@@ -169,7 +179,11 @@ def get_uses(infile=None, macros={}):
 
     uses=[]
 
-    with open(infile,'r', errors='ignore') as f:
+    if sys.version_info < (3,0):
+      with open(infile,'r') as f:
+        t=f.readlines()
+    else:
+      with open(infile,'r',errors='ignore') as f:
         t=f.readlines()
 
     for i in t:
@@ -193,7 +207,12 @@ def get_contains(infile=None):
 
     contains=[]
 
-    with open(infile,'r', errors='ignore') as f:
+#    with open(infile,'r', errors='ignore') as f:
+    if sys.version_info < (3,0):
+      with open(infile,'r') as f:
+        t=f.readlines()
+    else:
+      with open(infile,'r', errors='ignore') as f:
         t=f.readlines()
 
     for i in t:
