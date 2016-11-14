@@ -105,14 +105,14 @@ CONTAINS
    POS = 0
 
    POS(RANK+2) = FLL_GETNBYTES(PNODE,FPAR)
+
    IF(RANK == ROOT_RANK) POS(1) = 36 + 36 + (NPROC+1)*8
    CALL FLL_MPI_SUM(COMMUNICATOR, NPROC+1_LINT,L1=POS)
-
-   WRITE(*,*)' --------   Size of data is ',POS
 !
 !  ... and distribute to all partitions
 !
-   CALL FLL_MPI_SUM(COMMUNICATOR, 1_LINT*NPROC,L1=POS)
+   CALL FLL_MPI_SUM(COMMUNICATOR, 1_LINT*NPROC+1,L1=POS)
+   write(*,*)' POS   ', part_num, POS
 !
 !  Calculate displacement
 !
@@ -120,10 +120,11 @@ CONTAINS
 
    DISPL = 0
 
-   DO I=1,PART_NUM+1
-     DISPL(I) = DISPL(I) + POS(I)
+   DO I=2,PART_NUM+1
+     DISPL(I) = DISPL(I-1) + POS(I-1)
    END DO
-   CALL FLL_MPI_SUM(COMMUNICATOR, NPROC+1_LINT,L1=DISPL)
+!   CALL FLL_MPI_SUM(COMMUNICATOR, NPROC+1_LINT+1,L1=DISPL)
+   write(*,*)' DISPL ', part_num, displ
 !
 !  Position in file with empty write statement
 !
@@ -131,6 +132,7 @@ CONTAINS
     WRITE(IOUNIT,POS=0)
     POS1 = FLL_PART_FILE_HEADER(IOUNIT, NPROC, DISPL, FPAR) 
    ELSE
+     write(*,*)' POS is ', rank, displ(rank+2)
      WRITE(IOUNIT,POS=DISPL(RANK+2))
    END IF
 !

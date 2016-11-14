@@ -75,7 +75,6 @@ PROGRAM  EXAMPLE_MPI_IO
    FLL_MPI_STRUCT => NULL()
    
    CALL MPI_Comm_rank ( MPI_COMM_WORLD, WORLD_RANK, IERR )
-   write(*,*)' IRANK is ', WORLD_RANK
 
    call MPI_Comm_size ( MPI_COMM_WORLD, NPROC, ierr )
 
@@ -109,21 +108,12 @@ PROGRAM  EXAMPLE_MPI_IO
      FLL_MPI_STRUCT => PNEW
    END IF
 !
-!  just test - if partition #1, print received data set
-!
-   IF(WORLD_RANK == 1)THEN
-      CALL FLL_CAT(FLL_MPI_STRUCT,6,.FALSE., FPAR)
-   END IF
-!
 !  make some data set similar to solution
 !
   IF(WORLD_RANK==0)WRITE(*,*)' creating data set'
-  CALL CREATE_DATA_SET(PDATA_SET,100000_LINT+10000*WORLD_RANK, WORLD_RANK)
+!  CALL CREATE_DATA_SET(PDATA_SET,100000_LINT+10000*WORLD_RANK, WORLD_RANK)
 
-  ALLOCATE(POS(NPROC))
-  POS = 0
-  POS(WORLD_RANK+1) = FLL_GETNBYTES(PDATA_SET,FPAR)
-  WRITE(*,*)' --------   Size of data is ',POS
+  CALL CREATE_DATA_SET(PDATA_SET,1000_LINT, WORLD_RANK)
 
   ! CALL MPI_Comm_group ( MPI_COMM_WORLD, world_group_id, ierr )
 !
@@ -132,8 +122,9 @@ PROGRAM  EXAMPLE_MPI_IO
 !
   CALL MPI_BARRIER(MPI_COMM_WORLD,ierr)
 
-  CALL FLL_MPI_SUM(MPI_COMM_WORLD, 1_LINT*NPROC,L1=POS)
-  WRITE(*,*)' SUM is ', POS
+  OK = FLL_MPI_WRITE(PDATA_SET,'PartitionedFile',10,0, world_rank, MPI_COMM_WORLD, 'A', FPAR)
+
+
 !
 !  CLEAN MEMORY
 !

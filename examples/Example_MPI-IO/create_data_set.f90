@@ -71,9 +71,9 @@ CONTAINS
 !
 !  add number of partition
 !
-  PTMP  => FLL_MK('part_number','L', 1_lint, 1_LINT, FPAR)
-  IF(.NOT.FLL_MV(PTMP, PNODE, FPAR))STOP' ERROR MOVING NODE'
+  PTMP  => FLL_MK('part_number','L', 1_LINT, 1_LINT, FPAR)
   PTMP%L0 = RANK+1
+  IF(.NOT.FLL_MV(PTMP, PNODE, FPAR))STOP' ERROR MOVING NODE'
 !
 !  create 1-D double array of pressure fill it up with 101323 value and attach to PNODE
 !
