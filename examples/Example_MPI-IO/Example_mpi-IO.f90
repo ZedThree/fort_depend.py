@@ -62,7 +62,7 @@ PROGRAM  EXAMPLE_MPI_IO
    INTEGER :: IOUNIT,I,IERR,WORLD_RANK,world_group_id
    CHARACTER :: FMT
 
-  INTEGER(LINT) :: NFILES,NPROC
+  INTEGER(LINT) :: NFILES,NPROC,BYTES
   CHARACTER(LEN=FILE_NAME_LENGTH) :: NAME_OF_FILE
   LOGICAL :: OK
 !
@@ -89,6 +89,9 @@ PROGRAM  EXAMPLE_MPI_IO
 !     OK = FLL_MV(PNEW, FLL_MPI_STRUCT,FPAR)         
 !     CALL FLL_CAT(FLL_MPI_STRUCT,6,.false., FPAR)
 
+     BYTES = FLL_GETNBYTES(FLL_MPI_STRUCT,FPAR)
+     WRITE(*,*)' Length of data set is ',BYTES
+
 
    END IF
 !
@@ -105,8 +108,12 @@ PROGRAM  EXAMPLE_MPI_IO
 !  
      FLL_MPI_STRUCT => PNEW
    END IF
+
+   BYTES = FLL_GETNBYTES(FLL_MPI_STRUCT,FPAR)
+   WRITE(*,*)' --------   Length of data is ',WORLD_RANK,BYTES
 !
 !  just test - if partition #1, print received data set
+!
    IF(WORLD_RANK == 1)THEN
       CALL FLL_CAT(FLL_MPI_STRUCT,6,.FALSE., FPAR)
    END IF
@@ -114,7 +121,10 @@ PROGRAM  EXAMPLE_MPI_IO
 !  make some data set similar to solution
 !
   IF(WORLD_RANK==0)WRITE(*,*)' creating data set'
-  CALL CREATE_DATA_SET(PDATA_SET,100_LINT, WORLD_RANK)
+  CALL CREATE_DATA_SET(PDATA_SET,100000_LINT, WORLD_RANK)
+
+  BYTES = FLL_GETNBYTES(PDATA_SET,FPAR)
+  WRITE(*,*)' --------   Size of data is ',WORLD_RANK,BYTES
 
   ! CALL MPI_Comm_group ( MPI_COMM_WORLD, world_group_id, ierr )
 !
