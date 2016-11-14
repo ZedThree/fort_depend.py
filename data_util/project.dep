@@ -11,8 +11,6 @@ fll_nnodes.o :  \
 	fll_type.o
 
 fll_getnbytes.o :  \
-	fll_mv.o \
-	fll_mk.o \
 	fll_out.o \
 	fll_type.o
 
