@@ -67,7 +67,13 @@ CONTAINS
 !
 !  MAKE STRUCTURE
 !
-  PNODE => FLL_MKDIR('Main_Data_Set',FPAR)
+  PNODE => FLL_MKDIR('partition',FPAR)
+!
+!  add number of partition
+!
+  PTMP  => FLL_MK('part_number','L', 1_lint, 1_LINT, FPAR)
+  IF(.NOT.FLL_MV(PTMP, PNODE, FPAR))STOP' ERROR MOVING NODE'
+  PTMP%L0 = RANK+1
 !
 !  create 1-D double array of pressure fill it up with 101323 value and attach to PNODE
 !
