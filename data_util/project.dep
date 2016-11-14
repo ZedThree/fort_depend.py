@@ -22,6 +22,8 @@ fll_cat.o :  \
 	fll_out.o \
 	fll_type.o
 
+fll_type.o : 
+
 fll_stich.o :  \
 	fll_out.o \
 	fll_type.o
