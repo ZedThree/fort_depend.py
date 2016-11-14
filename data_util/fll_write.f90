@@ -84,7 +84,7 @@ CONTAINS
     CASE('U','u','*')! UNKNOWN - UNSPECIFIED FORMAT
       FMT_LOC = 'U'
     CASE DEFAULT
-      WRITE(FPAR%MESG,'(A,A)')' Write_ffaunknown format',TRIM(FMT)
+      WRITE(FPAR%MESG,'(A,A)')' Write unknown format',TRIM(FMT)
       CALL FLL_OUT('ALL',FPAR)
       FPAR%SUCCESS = .FALSE.
       PNODE => NULL()
@@ -104,7 +104,7 @@ CONTAINS
     END SELECT
 
     IF(ISTAT/=0) THEN
-      WRITE(FPAR%MESG,'(A,A)')' Write_ffaerror opening file ',TRIM(FILE)
+      WRITE(FPAR%MESG,'(A,A)')' Write error opening file ',TRIM(FILE)
       CALL FLL_OUT('ALL',FPAR)
       FPAR%SUCCESS = .FALSE.
       OK = .FALSE.
@@ -175,7 +175,7 @@ CONTAINS
    POS = 0
    FPAR%SUCCESS = .FALSE.
    IF(.NOT.ASSOCIATED(PNODE))THEN
-      WRITE(FPAR%MESG,'(A)')' Write_ffa - null node '
+      WRITE(FPAR%MESG,'(A)')' Write - null node '
       CALL FLL_OUT('ALL',FPAR)
       FPAR%SUCCESS = .FALSE.
       RETURN
