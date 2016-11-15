@@ -77,7 +77,7 @@ CONTAINS
 !
    INTEGER :: ISTAT,IERR,NPROC
    INTEGER(LINT), ALLOCATABLE :: POS(:),DISPL(:)
-   INTEGER(LINT) :: POS1,I,PART_NUM
+   INTEGER(LINT) :: POS1,I,PART_NUM,LOC_DISPL
 !
 !   DETERMINE RORMAT'
 !
@@ -101,35 +101,48 @@ CONTAINS
 !  Get length of each data set
 !
    ALLOCATE(POS(NPROC+1), DISPL(NPROC+1), STAT = ISTAT)
-    IF(ISTAT /= 0)STOP'ERROR ALLOCATING MEMORY'
+    IF(ISTAT /= 0)STOP'ERROR ALLOCATING MEMORY ==> fll_mpi_write ERR:104 '
+
    POS = 0
-
    POS(RANK+2) = FLL_GETNBYTES(PNODE,FPAR)
+!
+!  header = 16 + 4 + 8 + 8 (name, type, ndim, nsize)
+!
+!  header + long int array 
+!
+   IF(RANK == ROOT_RANK) THEN
+        POS(1) = 36 + 36 + (NPROC+1)*8
+   END IF
 
-   IF(RANK == ROOT_RANK) POS(1) = 36 + 36 + (NPROC+1)*8
-   CALL FLL_MPI_SUM(COMMUNICATOR, NPROC+1_LINT,L1=POS)
+   CALL MPI_BARRIER(COMMUNICATOR, IERR)
 !
 !  ... and distribute to all partitions
 !
-   CALL FLL_MPI_SUM(COMMUNICATOR, 1_LINT*NPROC+1,L1=POS)
-   write(*,*)' POS   ', part_num, POS
+   CALL FLL_MPI_SUM(COMMUNICATOR, 1_LINT+NPROC,L1=POS)
 !
 !  Calculate displacement
 !
    PART_NUM = FLL_GETNDATA_L0(PNODE, 'part_number',1_LINT, FPAR)
+   write(*,*)' POS   ', part_num, POS
+   
+       CALL MPI_BARRIER(COMMUNICATOR, IERR)
 
+
+   LOC_DISPL = 1
    DISPL = 0
 
    DO I=2,PART_NUM+1
-     DISPL(I) = DISPL(I-1) + POS(I-1)
+     LOC_DISPL = LOC_DISPL + POS(I-1)
    END DO
-!   CALL FLL_MPI_SUM(COMMUNICATOR, NPROC+1_LINT+1,L1=DISPL)
+   DISPL(PART_NUM+1) = LOC_DISPL
+   CALL FLL_MPI_SUM(COMMUNICATOR, NPROC+1_LINT,L1=DISPL)
+   DISPL(1) = 1
    write(*,*)' DISPL ', part_num, displ
 !
 !  Position in file with empty write statement
 !
    IF(RANK == ROOT_RANK)THEN
-    WRITE(IOUNIT,POS=0)
+    WRITE(IOUNIT,POS=1)
     POS1 = FLL_PART_FILE_HEADER(IOUNIT, NPROC, DISPL, FPAR) 
    ELSE
      write(*,*)' POS is ', rank, displ(rank+2)
@@ -153,7 +166,7 @@ CONTAINS
    END IF
 
    DEALLOCATE(POS, DISPL, STAT = ISTAT)
-    IF(ISTAT /= 0)STOP'ERROR ALLOCATING MEMORY'
+    IF(ISTAT /= 0)STOP'ERROR ALLOCATING MEMORY ==> fll_mpi_write ERR:156 '
     
    OK = .TRUE.
    RETURN

@@ -69,13 +69,15 @@
 !  read TEST file and store it in PNODE
 !  file is an ASCII file
 !
-   PNODE => FLL_READ('TEST',8,'A',FPAR)
+!    PNODE => FLL_READ('TEST',8,'A',FPAR)
+    PNODE => FLL_READ('PartitionedFile',8,'B',FPAR)
 !
 !  print node on the screen
 !
    CALL FLL_CAT(PNODE, 6, .TRUE.,FPAR)
    WRITE(*,*)
    WRITE(*,*)'------------------------------------------------------1'
+   stop
 !
 !  read TEST1 ASCII file and store it in PNODE1
 !

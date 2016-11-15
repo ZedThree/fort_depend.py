@@ -131,8 +131,6 @@ PROGRAM  EXAMPLE_MPI_IO
   IF(WORLD_RANK==0)write(*,*)' Releasing memory'
   CALL FLL_RM(FLL_MPI_STRUCT,FPAR)
   CALL FLL_RM(PDATA_SET,FPAR)
-
-  deallocate(pos)
   
    CALL MPI_FINALIZE(IERR)
   
