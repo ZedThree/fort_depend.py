@@ -149,6 +149,7 @@ CONTAINS
 !
 !   READ INITIAL NODE
 !
+    POS = 1
     PNODE => READ_NODE(IOUNIT,FMT_LOC,POS,FPAR)
     
     CLOSE(IOUNIT)
@@ -257,7 +258,7 @@ CONTAINS
       CASE('A')
          CALL READ_DATA_ASCII(IOUNIT,PNODE,PNODE%LTYPE,PNODE%NDIM,PNODE%NSIZE,FPAR_H)
       CASE('B')
-        CALL READ_DATA_BIN(IOUNIT,PNODE,PNODE%LTYPE,PNODE%NDIM,PNODE%NSIZE,FPAR_H)
+        CALL READ_DATA_BIN(IOUNIT,PNODE,PNODE%LTYPE,PNODE%NDIM,PNODE%NSIZE,POS,FPAR_H)
       END SELECT
     
     END IF
@@ -398,9 +399,10 @@ CONTAINS
       
     CASE('B')
        NSIZE = 0
-       READ(IOUNIT,IOSTAT=IOSTAT)NAME,LTYPE,NDIM,nsize
-      FPAR%SUCCESS = .TRUE.
-      RETURN
+       READ(IOUNIT,IOSTAT=IOSTAT,POS = POS)NAME,LTYPE,NDIM,NSIZE
+       INQUIRE(UNIT = IOUNIT, POS=POS)
+       FPAR%SUCCESS = .TRUE.
+       RETURN
     END SELECT
     
     WRITE(FPAR%MESG,'(A)')' Read  - reading header error '
@@ -561,7 +563,7 @@ CONTAINS
 !
 !  READ DATA 
 !
-    SUBROUTINE READ_DATA_BIN(IOUNIT,PNODE,LTYPE,NDIM,NSIZE,FPAR)
+    SUBROUTINE READ_DATA_BIN(IOUNIT,PNODE,LTYPE,NDIM,NSIZE,POS,FPAR)
 !
 ! Description: Function reads data contained in Pnode, bindary file
 !
@@ -583,18 +585,19 @@ CONTAINS
 !
 ! Arguments description
 ! Name         In/Out     Function
-! PNODE        In         Pointer to node
+! PNODE     In         Pointer to node
 ! IOUNIT       In         Number of unit
-! LTYPE        In         type of node
-! NDIM         In         1st dimension of array in the node
-! NSIZE        In         2nd dimension of array in the node
+! LTYPE       In         type of node
+! NDIM          In         1st dimension of array in the node
+! NSIZE         In         2nd dimension of array in the node
+! POS           In         Position in file
 ! FPAR         In/Out     structure containing function specific data
 !
 ! Arguments declaration
 !    
     TYPE(DNODE), POINTER :: PNODE
     INTEGER :: IOUNIT
-    INTEGER(LINT) :: NDIM,NSIZE
+    INTEGER(LINT) :: NDIM,NSIZE,POS
     CHARACTER(*) :: LTYPE
     TYPE(FUNC_DATA_SET) :: FPAR
 !
@@ -610,30 +613,38 @@ CONTAINS
      CASE('R')
        IF(NDIM == 1)THEN
          IF(NSIZE > 1)THEN
-           READ(IOUNIT,IOSTAT=IOSTAT)(PNODE%R1(I),I=1,NSIZE)
+           READ(IOUNIT,IOSTAT=IOSTAT, POS=POS)(PNODE%R1(I),I=1,NSIZE)
+           INQUIRE(UNIT = IOUNIT, POS=POS)
          ELSE
-           READ(IOUNIT,IOSTAT=IOSTAT)PNODE%R0
+           READ(IOUNIT,IOSTAT=IOSTAT, POS=POS)PNODE%R0
+           INQUIRE(UNIT = IOUNIT, POS=POS)
          END IF
        ELSE
          IF(NSIZE == 1)THEN
-           READ(IOUNIT,IOSTAT=IOSTAT)(PNODE%R1(I),I=1,NDIM)
+           READ(IOUNIT,IOSTAT=IOSTAT, POS=POS)(PNODE%R1(I),I=1,NDIM)
+           INQUIRE(UNIT = IOUNIT, POS=POS)
          ELSE
-           READ(IOUNIT,IOSTAT=IOSTAT)((PNODE%R2(I,J),J=1,NSIZE),I=1,NDIM)
+           READ(IOUNIT,IOSTAT=IOSTAT, POS=POS)((PNODE%R2(I,J),J=1,NSIZE),I=1,NDIM)
+           INQUIRE(UNIT = IOUNIT, POS=POS)
          END IF
        END IF
 
      CASE('D')
        IF(NDIM == 1)THEN
          IF(NSIZE > 1)THEN
-           READ(IOUNIT,IOSTAT=IOSTAT)(PNODE%D1(I),I=1,NSIZE)
+           READ(IOUNIT,IOSTAT=IOSTAT, POS=POS)(PNODE%D1(I),I=1,NSIZE)
+           INQUIRE(UNIT = IOUNIT, POS=POS)
          ELSE
-           READ(IOUNIT,IOSTAT=IOSTAT)PNODE%D0
+           READ(IOUNIT,IOSTAT=IOSTAT, POS=POS)PNODE%D0
+           INQUIRE(UNIT = IOUNIT, POS=POS)
          END IF
        ELSE
          IF(NSIZE == 1)THEN
-           READ(IOUNIT,IOSTAT=IOSTAT)(PNODE%D1(I),I=1,NDIM)
+           READ(IOUNIT,IOSTAT=IOSTAT, POS=POS)(PNODE%D1(I),I=1,NDIM)
+           INQUIRE(UNIT = IOUNIT, POS=POS)
          ELSE
-           READ(IOUNIT,IOSTAT=IOSTAT)((PNODE%D2(I,J),J=1,NSIZE),I=1,NDIM)
+           READ(IOUNIT,IOSTAT=IOSTAT, POS=POS)((PNODE%D2(I,J),J=1,NSIZE),I=1,NDIM)
+           INQUIRE(UNIT = IOUNIT, POS=POS)
          END IF
        END IF
        
@@ -641,15 +652,19 @@ CONTAINS
      CASE('I')
        IF(NDIM == 1)THEN
          IF(NSIZE > 1)THEN
-           READ(IOUNIT,IOSTAT=IOSTAT)(PNODE%I1(I),I=1,NSIZE)
+           READ(IOUNIT,IOSTAT=IOSTAT, POS=POS)(PNODE%I1(I),I=1,NSIZE)
+           INQUIRE(UNIT = IOUNIT, POS=POS)
          ELSE
-           READ(IOUNIT,IOSTAT=IOSTAT)PNODE%I0
+           READ(IOUNIT,IOSTAT=IOSTAT, POS=POS)PNODE%I0
+           INQUIRE(UNIT = IOUNIT, POS=POS)
          END IF
        ELSE
          IF(NSIZE == 1)THEN
-           READ(IOUNIT,IOSTAT=IOSTAT)(PNODE%I1(I),I=1,NDIM)
+           READ(IOUNIT,IOSTAT=IOSTAT, POS=POS)(PNODE%I1(I),I=1,NDIM)
+           INQUIRE(UNIT = IOUNIT, POS=POS)
          ELSE
-           READ(IOUNIT,IOSTAT=IOSTAT)((PNODE%I2(I,J),J=1,NSIZE),I=1,NDIM)
+           READ(IOUNIT,IOSTAT=IOSTAT, POS=POS)((PNODE%I2(I,J),J=1,NSIZE),I=1,NDIM)
+           INQUIRE(UNIT = IOUNIT, POS=POS)
          END IF
        END IF
        
@@ -657,15 +672,19 @@ CONTAINS
      CASE('L')
        IF(NDIM == 1)THEN
          IF(NSIZE > 1)THEN
-           READ(IOUNIT,IOSTAT=IOSTAT)(PNODE%L1(I),I=1,NSIZE)
+           READ(IOUNIT,IOSTAT=IOSTAT, POS=POS)(PNODE%L1(I),I=1,NSIZE)
+           INQUIRE(UNIT = IOUNIT, POS=POS)
          ELSE
-           READ(IOUNIT,IOSTAT=IOSTAT)PNODE%L0
+           READ(IOUNIT,IOSTAT=IOSTAT, POS=POS)PNODE%L0
+           INQUIRE(UNIT = IOUNIT, POS=POS)
          END IF
        ELSE
          IF(NSIZE == 1)THEN
-           READ(IOUNIT,IOSTAT=IOSTAT)(PNODE%L1(I),I=1,NDIM)
-         ELSE
-           READ(IOUNIT,IOSTAT=IOSTAT)((PNODE%L2(I,J),J=1,NSIZE),I=1,NDIM)
+           READ(IOUNIT,IOSTAT=IOSTAT, POS=POS)(PNODE%L1(I),I=1,NDIM)
+            INQUIRE(UNIT = IOUNIT, POS=POS)
+        ELSE
+           READ(IOUNIT,IOSTAT=IOSTAT, POS=POS)((PNODE%L2(I,J),J=1,NSIZE),I=1,NDIM)
+           INQUIRE(UNIT = IOUNIT, POS=POS)
          END IF
        END IF
        
@@ -673,15 +692,19 @@ CONTAINS
       CASE('S')
        IF(NDIM == 1)THEN
          IF(NSIZE > 1)THEN
-           READ(IOUNIT,*,IOSTAT=IOSTAT)(PNODE%S1(I),I=1,NSIZE)
+           READ(IOUNIT,*,IOSTAT=IOSTAT, POS=POS)(PNODE%S1(I),I=1,NSIZE)
+           INQUIRE(UNIT = IOUNIT, POS=POS)
          ELSE
-           READ(IOUNIT,*,IOSTAT=IOSTAT)PNODE%S0
+           READ(IOUNIT,*,IOSTAT=IOSTAT, POS=POS)PNODE%S0
+           INQUIRE(UNIT = IOUNIT, POS=POS)
          END IF
        ELSE
          IF(NSIZE == 1)THEN
-           READ(IOUNIT,IOSTAT=IOSTAT)(PNODE%S1(I),I=1,NDIM)
+           READ(IOUNIT,IOSTAT=IOSTAT, POS=POS)(PNODE%S1(I),I=1,NDIM)
+           INQUIRE(UNIT = IOUNIT, POS=POS)
          ELSE
-           READ(IOUNIT,IOSTAT=IOSTAT)((PNODE%S2(I,J),J=1,NSIZE),I=1,NDIM)
+           READ(IOUNIT,IOSTAT=IOSTAT, POS=POS)((PNODE%S2(I,J),J=1,NSIZE),I=1,NDIM)
+           INQUIRE(UNIT = IOUNIT, POS=POS)
          END IF
        END IF
 
