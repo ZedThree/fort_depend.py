@@ -43,6 +43,39 @@ CONTAINS
 ! 1.1       10/10/16                         Initial implementation
 !
 !
+!  structure of the MPI file is as follows
+!
+!  the main directory is a partitioned_file
+!     followed by displacement which is a byte position of each partiton in the file 
+!     each data on patition is in subset partition
+!  
+!   this is an example of a file with four partitions
+!
+! -DIR-   5\           partitioned_file
+!   -L-     5x1            displacements                                1                  113             40000301
+!   -DIR-   4\              partition
+!   -L-     1x1               part_number                                   1
+!   -D-     1000000x1               pressure     
+!   -D-     1000000x1               density     
+!   -D-     1000000x3               velocity        
+!   -DIR-   4\              partition
+!   -L-     1x1               part_number                                   2
+!   -D-     1100000x1               pressure     
+!   -D-     1100000x1               density     
+!   -D-     1100000x3               velocity     
+!   -DIR-   4\              partition
+!   -L-     1x1               part_number                                   3
+!   -D-     1200000x1               pressure   
+!   -D-     1200000x1               density   
+!   -D-     1200000x3               velocity    
+!   -DIR-   4\              partition
+!   -L-     1x1               part_number                                   4
+!   -D-     1300000x1               pressure  
+!   -D-     1300000x1               density   
+!   -D-     1300000x3               velocity    
+
+
+!
 ! External Modules used
 !
   USE MPI
@@ -79,7 +112,7 @@ CONTAINS
    INTEGER(LINT), ALLOCATABLE :: POS(:),DISPL(:)
    INTEGER(LINT) :: POS1,I,PART_NUM,LOC_DISPL
 !
-!   DETERMINE RORMAT'
+!   use always binary fomat
 !
    OPEN(UNIT=IOUNIT,STATUS='UNKNOWN',FILE=TRIM(FILE),FORM='UNFORMATTED',&
       ACCESS='STREAM',IOSTAT=ISTAT)
@@ -123,10 +156,6 @@ CONTAINS
 !  Calculate displacement
 !
    PART_NUM = FLL_GETNDATA_L0(PNODE, 'part_number',1_LINT, FPAR)
-   write(*,*)' POS   ', part_num, POS
-   
-       CALL MPI_BARRIER(COMMUNICATOR, IERR)
-
 
    LOC_DISPL = 1
    DISPL = 0
@@ -137,7 +166,6 @@ CONTAINS
    DISPL(PART_NUM+1) = LOC_DISPL
    CALL FLL_MPI_SUM(COMMUNICATOR, NPROC+1_LINT,L1=DISPL)
    DISPL(1) = 1
-   write(*,*)' DISPL ', part_num, displ
 !
 !  Position in file with empty write statement
 !
@@ -145,7 +173,6 @@ CONTAINS
     WRITE(IOUNIT,POS=1)
     POS1 = FLL_PART_FILE_HEADER(IOUNIT, NPROC, DISPL, FPAR) 
    ELSE
-     write(*,*)' POS is ', rank, displ(rank+2)
      WRITE(IOUNIT,POS=DISPL(RANK+2))
    END IF
 !
@@ -221,7 +248,6 @@ CONTAINS
 ! THE DATA CAN BE ACCESSE DIRECTLY THROUGH PTMP%D(:)
 !
    POS = POS + FLL_GETNBYTES(PTMP,FPAR)
-   DISPL(1) = POS
 
    PTMP%L1 = DISPL
    CALL FLL_SAVE_NODE_B(PTMP, IOUNIT, 0_LINT, FPAR)
