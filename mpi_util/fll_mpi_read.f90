@@ -138,9 +138,10 @@ CONTAINS
 !
 !  Read linked list
 ! 
-   PNODE => READ_NODE(IOUNIT,'B',DISPL(RANK+2),FPAR)
+   POS = DISPL(RANK+2)
+   PNODE => READ_NODE(IOUNIT,'B',POS,FPAR)
    
-   if(rank ==0)CALL FLL_CAT(PNODE,6,.false., FPAR)
+   if(rank ==1)CALL FLL_CAT(PNODE,6,.false., FPAR)
 !
 !  MPI_Barrier does not need to be here, 
 !  just for testing purposes 
