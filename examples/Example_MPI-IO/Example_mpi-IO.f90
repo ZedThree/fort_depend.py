@@ -62,7 +62,7 @@ PROGRAM  EXAMPLE_MPI_IO
    INTEGER :: IOUNIT,I,IERR,WORLD_RANK,world_group_id,NPROC,ISTAT
    CHARACTER :: FMT
 
-  INTEGER(LINT) :: NFILES,BYTES,BYTESN,J
+  INTEGER(LINT) :: NFILES,BYTES,BYTESN,NSIZE
   integer :: EVEN_COMM_ID,EVEN_P,EVEN_GROUP_ID
   CHARACTER(LEN=FILE_NAME_LENGTH) :: NAME_OF_FILE
   LOGICAL :: OK
@@ -70,6 +70,7 @@ PROGRAM  EXAMPLE_MPI_IO
   INTEGER(LINT), ALLOCATABLE :: POS(:)
   INTEGER, ALLOCATABLE :: EVEN_RANK(:)
   INTEGER :: E_RANK
+  REAL :: RANDNUM
 !
 !  Initialize MPI
 !
@@ -89,17 +90,11 @@ PROGRAM  EXAMPLE_MPI_IO
      FLL_MPI_STRUCT => NULL()
      CALL CREATE_MPI_STRUCT(FLL_MPI_STRUCT,NAME_OF_FILE,NFILES,1_LINT*NPROC)
 
-!     WRITE(*,*)'              duplicating'
-!     PNEW => FLL_CP(FLL_MPI_STRUCT, NULL(), FPAR)
-!     WRITE(*,*)'              duplicate'    
-!     OK = FLL_MV(PNEW, FLL_MPI_STRUCT,FPAR)         
-!     CALL FLL_CAT(FLL_MPI_STRUCT,6,.false., FPAR)
-
    END IF
 !
 !  Copy FLL_MPI_STRUCT date set which now exists on root partition onlyc
 !  to all other partitions
-!  upon return, the function will return pointer to newly allocated data
+!  Upon return, the function will return pointer to newly allocated data
 !  for all other partition then root partition
 !  On root partition, the PNEW pointer is pointing on FLL_MPI_STRUCT
 !
@@ -112,13 +107,13 @@ PROGRAM  EXAMPLE_MPI_IO
    END IF
 !
 !  make some data set similar to solution
-!
-  IF(WORLD_RANK==0)WRITE(*,*)' creating data set'
-  CALL CREATE_DATA_SET(PDATA_SET,100000_LINT+10000*WORLD_RANK, WORLD_RANK)
+  NSIZE = 100000
+
+  CALL CREATE_DATA_SET(PDATA_SET,NSIZE, WORLD_RANK)
   BYTESN = FLL_GETNBYTES(PDATA_SET,FPAR)
   WRITE(*,*)' Partition created data set size of ', WORLD_RANK,BYTESN
-
-!  CALL CREATE_DATA_SET(PDATA_SET,10_LINT, WORLD_RANK)
+!
+! Write - each partition to one common file
 !
   CALL MPI_BARRIER(MPI_COMM_WORLD,ierr)
 
