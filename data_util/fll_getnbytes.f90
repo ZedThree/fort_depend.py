@@ -71,10 +71,11 @@ CONTAINS
 !
 !  check the node is not null
 !
+   BYTES = 0
    FPAR%SUCCESS = .FALSE.
    IF(.NOT.ASSOCIATED(PNODE))THEN
       WRITE(FPAR%MESG,'(A)')' GETNBYTES - null node '
-      CALL FLL_OUT('ALL',FPAR)
+      CALL FLL_OUT('LOG',FPAR)
       FPAR%SUCCESS = .FALSE.
       RETURN
    END IF
