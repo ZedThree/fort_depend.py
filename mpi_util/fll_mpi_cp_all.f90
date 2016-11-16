@@ -79,7 +79,10 @@ CONTAINS
 !
 !  if not in group, return
 !
-   IF(COMMUNICATOR == MPI_COMM_NULL)RETURN
+   IF(COMMUNICATOR == MPI_COMM_NULL)THEN
+     PNEW => NULL()
+     RETURN
+   END IF
 !
 !  check the node is not null
 !

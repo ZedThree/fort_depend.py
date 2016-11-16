@@ -114,7 +114,10 @@ CONTAINS
 !
 !  if not in group, return
 !
-   IF(COMMUNICATOR == MPI_COMM_NULL)RETURN
+   IF(COMMUNICATOR == MPI_COMM_NULL)THEN
+     OK = .FALSE.
+     RETURN
+   END IF
 !
 !  use always binary fomat
 !
