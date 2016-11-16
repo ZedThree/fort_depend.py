@@ -62,7 +62,7 @@ PROGRAM  EXAMPLE_MPI_IO
    INTEGER :: IOUNIT,I,IERR,WORLD_RANK,world_group_id,NPROC
    CHARACTER :: FMT
 
-  INTEGER(LINT) :: NFILES,BYTES
+  INTEGER(LINT) :: NFILES,BYTES,BYTESN
   CHARACTER(LEN=FILE_NAME_LENGTH) :: NAME_OF_FILE
   LOGICAL :: OK
 
@@ -94,7 +94,7 @@ PROGRAM  EXAMPLE_MPI_IO
 
    END IF
 !
-!  Copy FLL_MPI_STRUCT date set which now exists on root partition only
+!  Copy FLL_MPI_STRUCT date set which now exists on root partition onlyc
 !  to all other partitions
 !  upon return, the function will return pointer to newly allocated data
 !  for all other partition then root partition
@@ -111,9 +111,11 @@ PROGRAM  EXAMPLE_MPI_IO
 !  make some data set similar to solution
 !
   IF(WORLD_RANK==0)WRITE(*,*)' creating data set'
- !CALL CREATE_DATA_SET(PDATA_SET,1000000_LINT+100000*WORLD_RANK, WORLD_RANK)
+  CALL CREATE_DATA_SET(PDATA_SET,1000000_LINT+100000*WORLD_RANK, WORLD_RANK)
+  BYTESN = FLL_GETNBYTES(PDATA_SET,FPAR)
+  WRITE(*,*)' Partition created data set size of ', WORLD_RANK,BYTESN
 
-  CALL CREATE_DATA_SET(PDATA_SET,10_LINT, WORLD_RANK)
+!  CALL CREATE_DATA_SET(PDATA_SET,10_LINT, WORLD_RANK)
 
   ! CALL MPI_Comm_group ( MPI_COMM_WORLD, world_group_id, ierr )
 !
@@ -126,7 +128,9 @@ PROGRAM  EXAMPLE_MPI_IO
 
   CALL MPI_BARRIER(MPI_COMM_WORLD,ierr)
   
-   PTMP => FLL_MPI_READ('PartitionedFile',10,0, world_rank, MPI_COMM_WORLD, 'A', FPAR)
+  PTMP => FLL_MPI_READ('PartitionedFile',10,0, world_rank, MPI_COMM_WORLD, 'A', FPAR)
+  BYTESN = FLL_GETNBYTES(PTMP,FPAR)
+  WRITE(*,*)' Partition reads data set size of ', WORLD_RANK,BYTESN
 !
 !  CLEAN MEMORY
 !
