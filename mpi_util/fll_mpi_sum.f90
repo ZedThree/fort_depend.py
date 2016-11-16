@@ -97,6 +97,10 @@ CONTAINS
 ! Body of subroutine
 !
 !
+!  if not in group, return
+!
+   IF(COMMUNICATOR == MPI_COMM_NULL)RETURN
+!
 !  vector/matrix
 !
     VECSCAL: IF(NDIM > 1)THEN

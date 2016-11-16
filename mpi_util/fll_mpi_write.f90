@@ -112,7 +112,11 @@ CONTAINS
    INTEGER(LINT), ALLOCATABLE :: POS(:),DISPL(:)
    INTEGER(LINT) :: POS1,I,PART_NUM,LOC_DISPL
 !
-!   use always binary fomat
+!  if not in group, return
+!
+   IF(COMMUNICATOR == MPI_COMM_NULL)RETURN
+!
+!  use always binary fomat
 !
    OPEN(UNIT=IOUNIT,STATUS='UNKNOWN',FILE=TRIM(FILE),FORM='UNFORMATTED',&
       ACCESS='STREAM',IOSTAT=ISTAT)

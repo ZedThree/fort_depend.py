@@ -112,6 +112,10 @@ CONTAINS
    INTEGER(LINT), POINTER :: DISPL(:)
    INTEGER(LINT) :: POS
 !
+!  if not in group, return
+!
+   IF(COMMUNICATOR == MPI_COMM_NULL)RETURN
+!
 !   use always binary fomat
 !
    OPEN(UNIT=IOUNIT,STATUS='UNKNOWN',FILE=TRIM(FILE),FORM='UNFORMATTED',&

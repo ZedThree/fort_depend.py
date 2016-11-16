@@ -48,6 +48,7 @@ CONTAINS
 !
 ! External Modules used
 !
+    USE MPI
     USE FLL_TYPE_M
     USE FLL_MPI_CP_M
     USE FLL_RM_M
@@ -76,6 +77,10 @@ CONTAINS
 !
    TYPE(DNODE), POINTER :: PCHILD
    INTEGER :: RANK, IERR
+!
+!  if not in group, return
+!
+   IF(COMMUNICATOR == MPI_COMM_NULL)RETURN
 !
 !  check the node is not null
 !
