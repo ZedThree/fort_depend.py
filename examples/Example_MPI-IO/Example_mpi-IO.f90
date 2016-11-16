@@ -59,14 +59,17 @@ PROGRAM  EXAMPLE_MPI_IO
    CHARACTER(LEN=FILE_NAME_LENGTH) FILE
    TYPE(DNODE), POINTER  :: PNODE, FLL_MPI_STRUCT, PDATA_SET, PNEW,PTMP
    TYPE(FUNC_DATA_SET) :: FPAR
-   INTEGER :: IOUNIT,I,IERR,WORLD_RANK,world_group_id,NPROC
+   INTEGER :: IOUNIT,I,IERR,WORLD_RANK,world_group_id,NPROC,ISTAT
    CHARACTER :: FMT
 
-  INTEGER(LINT) :: NFILES,BYTES,BYTESN
+  INTEGER(LINT) :: NFILES,BYTES,BYTESN,J
+  integer :: EVEN_COMM_ID,EVEN_P,EVEN_GROUP_ID
   CHARACTER(LEN=FILE_NAME_LENGTH) :: NAME_OF_FILE
   LOGICAL :: OK
 
   INTEGER(LINT), ALLOCATABLE :: POS(:)
+  INTEGER, ALLOCATABLE :: EVEN_RANK(:)
+  INTEGER :: E_RANK
 !
 !  Initialize MPI
 !
@@ -111,33 +114,71 @@ PROGRAM  EXAMPLE_MPI_IO
 !  make some data set similar to solution
 !
   IF(WORLD_RANK==0)WRITE(*,*)' creating data set'
-  CALL CREATE_DATA_SET(PDATA_SET,1000000_LINT+100000*WORLD_RANK, WORLD_RANK)
+  CALL CREATE_DATA_SET(PDATA_SET,100000_LINT+10000*WORLD_RANK, WORLD_RANK)
   BYTESN = FLL_GETNBYTES(PDATA_SET,FPAR)
   WRITE(*,*)' Partition created data set size of ', WORLD_RANK,BYTESN
 
 !  CALL CREATE_DATA_SET(PDATA_SET,10_LINT, WORLD_RANK)
-
-  ! CALL MPI_Comm_group ( MPI_COMM_WORLD, world_group_id, ierr )
-!
-!  MPI_Barrier does not need to be here, 
-!  just for testing purposes 
 !
   CALL MPI_BARRIER(MPI_COMM_WORLD,ierr)
 
   OK = FLL_MPI_WRITE(PDATA_SET,'PartitionedFile',10,0, world_rank, MPI_COMM_WORLD, 'A', FPAR)
 
+  WRITE(*,*)' READING FILES'
   CALL MPI_BARRIER(MPI_COMM_WORLD,ierr)
   
   PTMP => FLL_MPI_READ('PartitionedFile',10,0, world_rank, MPI_COMM_WORLD, 'A', FPAR)
   BYTESN = FLL_GETNBYTES(PTMP,FPAR)
   WRITE(*,*)' Partition reads data set size of ', WORLD_RANK,BYTESN
+  CALL FLL_RM(PTMP,FPAR)
+
+!
+!  make a group and save to a separate file 
+!
+!
+!  Get a group identifier for MPI_COMM_WORLD.
+!
+  CALL MPI_Comm_group ( MPI_COMM_WORLD, WORLD_GROUP_ID, IERR )
+!
+  EVEN_P = ( NPROC + 1 ) / 2
+  ALLOCATE ( EVEN_RANK(1:EVEN_P), STAT = ISTAT )
+   IF(ISTAT /= 0)STOP'ERROR ALLOCATING MEMORY'
+
+  ISTAT = 0
+  DO I = 0, NPROC - 1, 2
+    ISTAT = ISTAT + 1
+    EVEN_RANK(ISTAT) = I+1
+  END DO
+!
+!  create group in parent group:  world_group_id, number of processes 
+!  in that group is: even_p
+!  the processesare: even_rank(:)
+!  the group ID is then 
+!
+  CALL MPI_Group_incl(WORLD_GROUP_ID, EVEN_P, EVEN_RANK, EVEN_GROUP_ID, IERR )
+  CALL MPI_BARRIER(MPI_COMM_WORLD,ierr)
+  CALL MPI_Comm_create(MPI_COMM_WORLD, EVEN_GROUP_ID, EVEN_COMM_ID, IERR )
+
+  IF(EVEN_COMM_ID /= MPI_COMM_NULL)THEN
+   CALL MPI_Comm_rank(EVEN_COMM_ID, E_RANK, IERR )
+  END IF
+   OK = FLL_MPI_WRITE(PDATA_SET,'PartitionedFile_group',10,0, E_RANK, EVEN_COMM_ID, 'A', FPAR)
+
+
+  CALL MPI_BARRIER(MPI_COMM_WORLD,ierr)
+
+  PTMP => NULL()
+  PTMP => FLL_MPI_READ('PartitionedFile',10,0, E_RANK, EVEN_COMM_ID, 'A', FPAR)
+  BYTESN = FLL_GETNBYTES(PTMP,FPAR)
+  WRITE(*,*)' Partition reads data set size of ', WORLD_RANK,BYTESN
+  CALL FLL_RM(PTMP,FPAR)
+
 !
 !  CLEAN MEMORY
 !
   IF(WORLD_RANK==0)write(*,*)' Releasing memory'
   CALL FLL_RM(FLL_MPI_STRUCT,FPAR)
   CALL FLL_RM(PDATA_SET,FPAR)
-  CALL FLL_RM(PTMP,FPAR)
 
   
    CALL MPI_FINALIZE(IERR)
