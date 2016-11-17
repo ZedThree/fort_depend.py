@@ -202,7 +202,6 @@ CONTAINS
    NDIM  = PNODE%NDIM
    NSIZE = PNODE%NSIZE
    SPACE(:) = ' '
-
    WRITE(NAME, '(A16)')(PNODE%LNAME)
 !
 !   print headers
@@ -211,13 +210,17 @@ CONTAINS
      WRITE(NSSTR,'(I8)')PNODE%NSIZE
 
      IF(TRIM(PNODE%LTYPE) == 'DIR')THEN
-        WRITE(TEXT1,'(A,A3,A,A,A,A,A16)')&
-          "-",TRIM(PNODE%LTYPE),"-     ",(TRIM(NDSTR)),'/        ',SPACE,ADJUSTL(PNODE%LNAME)
+        WRITE(TEXT1,'(A,A,A3,A,A,A,A,A,A,A,A,A16,A,A)')&
+          achar(27),"[31m-",TRIM(PNODE%LTYPE),"-     ",achar(27),'[30m' ,(TRIM(NDSTR)),'/        ',&
+          achar(27),"[32m-",SPACE,ADJUSTL(PNODE%LNAME),achar(27),'[30m'
         WRITE(IOUNIT, *)TRIM(TEXT1)
         RETURN
      ELSE IF(TRIM(PNODE%LTYPE) == 'N')THEN
-        WRITE(TEXT1,'(A,A3,A,A,A,A,A16)')&
-          "-",TRIM(PNODE%LTYPE),"-       ",(TRIM(NDSTR)),'/        ',SPACE,ADJUSTL(PNODE%LNAME)
+!        WRITE(TEXT1,'(A,A3,A,A,A,A,A16)')&
+!          "-",TRIM(PNODE%LTYPE),"-       ",(TRIM(NDSTR)),'/        ',SPACE,ADJUSTL(PNODE%LNAME)
+        WRITE(TEXT1,'(A,A,A3,A,A,A,A,A,A,A,A,A16,A,A)')&
+          achar(27),"[31m-",TRIM(PNODE%LTYPE),"-     ",achar(27),'[30m' ,(TRIM(NDSTR)),'/        ',&
+          achar(27),"[32m-",SPACE,ADJUSTL(PNODE%LNAME),achar(27),'[30m'
         WRITE(IOUNIT, *)TRIM(TEXT1)
         RETURN
      ELSE 
