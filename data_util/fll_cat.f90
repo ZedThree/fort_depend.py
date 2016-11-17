@@ -198,7 +198,7 @@ CONTAINS
    
    SAVED = .FALSE.
    
-   NDIM = PNODE%NDIM
+   NDIM  = PNODE%NDIM
    NSIZE = PNODE%NSIZE
    SPACE(:) = ' '
 !
@@ -217,7 +217,7 @@ CONTAINS
         RETURN
      ELSE 
         WRITE(TEXT1,*)"-",TRIM(PNODE%LTYPE),"-     ",TRIM(ADJUSTL(NDSTR)),'x',TRIM(ADJUSTL(NSSTR)),'      ',SPACE,TRIM(PNODE%LNAME)
-        IF(SCAN == 'Y')THEN
+        IF(SCAN == 'Y' .AND. (NDIM*NSIZE /= 1) )THEN
           WRITE(IOUNIT, *)TRIM(TEXT1)
           RETURN
         END IF
