@@ -146,7 +146,7 @@ CONTAINS
 !  Read linked list
 ! 
    POS = DISPL(RANK+2)
-   PNODE => READ_NODE(IOUNIT,'B',POS,FPAR)
+   PNODE => READ_NODE(IOUNIT,'B',POS,'N',FPAR)
    
    if(rank ==1)CALL FLL_CAT(PNODE,6,.false., FPAR)
 !

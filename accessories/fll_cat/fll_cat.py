@@ -9,7 +9,7 @@ from subprocess import Popen, PIPE
 
 #Definitions
 
-def run(file,fmt):
+def run(file,fmt,scan):
 #
 #  execute 
 #
@@ -34,7 +34,7 @@ def run(file,fmt):
     print(" ")  
 
     p = Popen([executable], stdin=PIPE) #NOTE: no shell=True here
-    p.communicate(os.linesep.join([file, fmt]))
+    p.communicate(os.linesep.join([file, fmt, scan]))
 
 def print_header():
      print("  ")
@@ -64,13 +64,20 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='FLL configure script')
     parser.add_argument('-i','--file',nargs=1,help='Files to process')
     parser.add_argument('-f','--format',nargs=1,help='Format of the file')
+    parser.add_argument('-s','--scan',action='store_true',help='Scan file only',required=False)
 
     # Parse the command line arguments
     args = parser.parse_args()
 
     file = args.file[0]   if args.file else None
     format = args.format[0] if args.format else None
-    
+    scan = args.scan
+ 
+    if not scan:
+       scan = 'n'
+    else:
+       scan = 'Y'
+
     if not file:
         print ("\033[031mError: \033[039m missing name of file\033[031m-c \033[032m")
         sys.exit()
@@ -85,4 +92,4 @@ if __name__ == "__main__":
         print ("\033[031mError: \033[039m wrong specified file format\033[031m-c \033[032m")
         sys.exit()
 
-    run(file=file,fmt=format)
+    run(file=file,fmt=format, scan=scan)

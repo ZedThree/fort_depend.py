@@ -53,18 +53,19 @@
    CHARACTER(LEN=FILE_NAME_LENGTH) FILE
    TYPE(DNODE), POINTER  :: PNODE
    TYPE(FUNC_DATA_SET) :: FPAR
-   CHARACTER :: FMT
+   CHARACTER :: FMT, SCAN
 !
 !  read a file and print on screen
 !
     READ(*,*)FILE
     READ(*,*)FMT 
+    READ(*,*)SCAN 
   
-    PNODE => FLL_READ(FILE,8,FMT,FPAR)
+    PNODE => FLL_READ(FILE,8,FMT,FPAR,SCAN = SCAN)
 !
 !  print node on the screen
 !
-   CALL FLL_CAT(PNODE, 6, .TRUE.,FPAR)
+   CALL FLL_CAT(PNODE, 6, .TRUE.,FPAR,SCAN = SCAN)
    WRITE(*,*)
    CALL FLL_RM(PNODE,FPAR)
 
