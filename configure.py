@@ -184,8 +184,8 @@ def mkconfigfile(path, cwd,version, bin_dir):
 
     if not(os.path.exists(filename)):
         print ("\033[031mError: \033[039m \033[031m"+version+"\033[039m verion of compiler is not available")
-        print ("\033[031m       \033[039m available options are: \033[032m gfotran\033[039m")
-        print ("\033[031m       \033[039m                        \033[032m gfotran_debug\033[039m")
+        print ("\033[031m       \033[039m available options are: \033[032m gfortran\033[039m")
+        print ("\033[031m       \033[039m                        \033[032m gfortran_debug\033[039m")
         print ("\033[031m       \033[039m                        \033[032m x86_64\033[039m")
         print ("\033[031m       \033[039m                        \033[032m x86_64_debug\033[039m") 
         sys.exit()
@@ -285,8 +285,8 @@ if __name__ == "__main__":
     
     if not compiler:
         print ("\033[031mError: \033[039m missing compiler settings, specify option \033[031m-c \033[032m")
-        print ("\033[031m       \033[039m available options are: \033[032m gfotran\033[039m")
-        print ("\033[031m       \033[039m                        \033[032m gfotran_debug\033[039m")
+        print ("\033[031m       \033[039m available options are: \033[032m gfortran\033[039m")
+        print ("\033[031m       \033[039m                        \033[032m gfortran_debug\033[039m")
         print ("\033[031m       \033[039m                        \033[032m x86_64\033[039m")
         print ("\033[031m       \033[039m                        \033[032m x86_64_debug\033[039m") 
         sys.exit()
