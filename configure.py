@@ -20,7 +20,7 @@ def run(comp,files=None,verbose=True,overwrite=None,output=None,macros={},build=
 #  definition of parameters
 #
     print_header()
-    linkfiles =(['src_dir_path.mk', 'Makefile', 'project.dep'])
+    linkfiles =(['src_dir_path.mk', 'Makefile', 'project.dep', '*.py'])
     exclude =(['python_dep', 'config', '.git'])     
 #
 #  
@@ -165,6 +165,23 @@ def mkdir_structure(root_path,cwd, exclude, linkfiles):
              if os.path.exists(source):
                print ("\033[031mDIAG: \033[039m linking file \033[032m"+source+"\033[039m ....")
                linkfile = os.symlink( source, dest)
+
+#
+# check if python script
+#
+          if os.path.isdir(dirtmp):
+            for file in os.listdir(dirtmp):
+              if file.endswith(".py"):
+                source = dirtmp+'/'+file
+                dest   = newdir+'/'+file
+                try:
+                  os.remove(file)
+                  print ("\033[031mDIAG: \033[039m script file \033[032m"+file+"\033[039m already exists, removing ....")
+                except OSError:
+                  pass
+
+                print ("\033[031mDIAG: \033[039m linking sript file \033[032m"+source+"\033[039m ....")
+                linkfile = os.symlink( source, dest)
 
           os.chdir(cwd)
           print("  ")
