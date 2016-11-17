@@ -126,9 +126,8 @@ PROGRAM  EXAMPLE_MPI_IO
   
   PTMP => FLL_MPI_READ('PartitionedFile',10,0, world_rank, MPI_COMM_WORLD, 'A', FPAR)
   BYTESN = FLL_GETNBYTES(PTMP,FPAR)
-  WRITE(*,*)' Partition reads data set size of ', WORLD_RANK,BYTESN
+  WRITE(*,*)' Partition all-reads data set size of ', WORLD_RANK,BYTESN
   CALL FLL_RM(PTMP,FPAR)
-
 !
 !  make a group and save to a separate file 
 !

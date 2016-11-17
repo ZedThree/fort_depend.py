@@ -29,8 +29,15 @@ def run(file,fmt,scan):
       sys.exit()
 
     print(" ")  
-    print("\033[039m Specified file  is:       \033[032m"+file+"\033[039m")  
-    print("\033[039m Specified file format is: \033[032m"+fmt+"\033[039m")  
+    print("\033[039m Specified file  is:       \033[032m"+file+"\033[039m")
+    if fmt == 'b'  or fmt == 'B':
+      print("\033[039m Specified file format is: \033[032mbinary\033[039m") 
+    else:
+      print("\033[039m Specified file format is: \033[032mASCII \033[039m")  
+
+    if scan == 'Y':  
+        print(" ")
+        print("\033[035m ... running in scan only mode ... \033[039m")  
     print(" ")  
 
     p = Popen([executable], stdin=PIPE) #NOTE: no shell=True here
