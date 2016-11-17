@@ -34,6 +34,7 @@ include src_dir_path.mk
 SUBDIRS= \
 data_util\
 mpi_util \
+accessories\
 examples\
 
 ###########################################################################
