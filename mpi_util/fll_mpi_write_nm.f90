@@ -103,7 +103,7 @@ CONTAINS
 !
 !  Print some info
 !
-        IF(COMM /= MPI_COMM_NULL)write(*,*)' Partition saving :', world_rank,LOC_RANK,trim(NAME_OF_FILE), IOUNIT
+        IF(COMM /= MPI_COMM_NULL)write(*,*)' Partition ',WORLD_RANK,' saving to :',trim(NAME_OF_FILE)
 !
 !  save file, ROOT_RANK is always 0, use local rank
 ! 

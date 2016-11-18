@@ -202,6 +202,13 @@ CONTAINS
 !
     NSTEP = NPROC/NFILES
 
+    IF(NFILES == NPROC)THEN
+      FPAR%SUCCESS = .FALSE.
+      WRITE(FPAR%MESG,'(A)')' fll_mpi_write_nm  - error witing files, nfiles == npart  '
+      CALL FLL_OUT('ALL',FPAR)
+      RETURN
+    END IF
+
     ALLOCATE(EVEN_RANK(NSTEP), STAT = IERR)
      IF(IERR /= 0)STOP' ERROR ALLOCATING MEMORY'
 !
@@ -250,7 +257,7 @@ CONTAINS
 !  in this way, each file should be associated to one partition from each node
 !
       COUNT = 1
-      DO I=J,NPROC,NSTEP
+      DO I=J,NPROC,NFILES
 !
 !  fill partition numbers
 !
