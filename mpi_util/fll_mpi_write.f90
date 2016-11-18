@@ -88,8 +88,7 @@ CONTAINS
 ! Arguments description
 ! Name         In/Out     Function
 ! FILE         In         Name of file
-! PNODE        Out        Node to a first node in list from a file
-! IOUNIT       In         Number of unit
+! PNODE        Out        Node to be written! IOUNIT       In         Number of unit
 ! OPTION       In         Type of write
 ! COMMUNICATOR In         communicator
 ! FPAR         In/Out     structure containing function specific data
@@ -123,8 +122,10 @@ CONTAINS
 !
    OPEN(UNIT=IOUNIT,STATUS='UNKNOWN',FILE=TRIM(FILE),FORM='UNFORMATTED',&
       ACCESS='STREAM',IOSTAT=ISTAT)
-
-!    CALL MPI_BARRIER(COMMUNICATOR, IERR)
+!
+!  use barrier, without barrier there were problems on cluster
+!
+   CALL MPI_BARRIER(COMMUNICATOR, IERR)
 
    IF(ISTAT/=0) THEN
     WRITE(FPAR%MESG,'(A,A)')' Write error opening file ',TRIM(FILE)
@@ -138,14 +139,20 @@ CONTAINS
 !
    CALL MPI_Comm_size (COMMUNICATOR, NPROC, IERR )
 !
-!  Get length of each data set
+!  Get position and length of each data set
+!  there will be totally n+1 subset, 
+!  subset  #1 is a headet of the file 
+!  subsets #2:  are actual data from each partition
 !
    ALLOCATE(POS(NPROC+1), DISPL(NPROC+1), STAT = ISTAT)
     IF(ISTAT /= 0)STOP'ERROR ALLOCATING MEMORY ==> fll_mpi_write ERR:144 '
-
+!
+!  get length of each data subset of actual data
+!
    POS = 0
    POS(RANK+2) = FLL_GETNBYTES(PNODE,FPAR)
 !
+!  the first subset is a header
 !  header = 16 + 4 + 8 + 8 (name, type, ndim, nsize)
 !
 !  header + long int array 
@@ -154,27 +161,35 @@ CONTAINS
         POS(1) = 36 + 36 + (NPROC+1)*8
    END IF
 !
-!  ... and distribute to all partitions
+!  ... and distribute length of each subset to all partitions
 !
    CALL FLL_MPI_SUM(COMMUNICATOR, 1_LINT+NPROC,L1=POS)
 !
-!  Calculate displacement
+!  Calculate displacement, ie where each subset starts
 !
    PART_NUM = FLL_GETNDATA_L0(PNODE, 'part_number',1_LINT, FPAR)
-
+!
+!  the first subset will start always at position 1
+!  ie. beginning of the file
+!
    LOC_DISPL = 1
    DISPL = 0
 
-!   DO I=2,PART_NUM+1
    DO I=2,RANK+2
      LOC_DISPL = LOC_DISPL + POS(I-1)
    END DO
-!    DISPL(PART_NUM+1) = LOC_DISPL
+!
+!  define subset position for all other partitions
+!  and propagate this to all partitions
+!
    DISPL(RANK+2) = LOC_DISPL
    CALL FLL_MPI_SUM(COMMUNICATOR, NPROC+1_LINT,L1=DISPL)
+!
+!  set explicitely that the first subset (file header) starts at position 1, ie. beginning of the file
    DISPL(1) = 1
 !
-!  Position in file with empty write statement
+!  Position process to the file - ie. invoke empty write statement at position POS
+!  If group root process, write file header!
 !
    IF(RANK == ROOT_RANK)THEN
     WRITE(IOUNIT,POS=1)
@@ -183,12 +198,11 @@ CONTAINS
      WRITE(IOUNIT,POS=DISPL(RANK+2))
    END IF
 !
-!  Write linked list
+!  Write data set
 ! 
    CALL FLL_WRITE_LIST(PNODE,IOUNIT,'B',FPAR)
 !
-!  MPI_Barrier does not need to be here, 
-!  just for testing purposes 
+!  close file and sync with barrier
 !
    CLOSE(IOUNIT)
    IF(.NOT.ASSOCIATED(PNODE))THEN
@@ -199,6 +213,10 @@ CONTAINS
      RETURN
    END IF
 
+   CALL MPI_BARRIER(COMMUNICATOR, IERR)
+!
+! free memory
+!
    DEALLOCATE(POS, DISPL, STAT = ISTAT)
     IF(ISTAT /= 0)STOP'ERROR ALLOCATING MEMORY ==> fll_mpi_write ERR:203 '
     
@@ -210,7 +228,7 @@ CONTAINS
 
   FUNCTION FLL_PART_FILE_HEADER(IOUNIT, NPROC, DISPL, FPAR) RESULT(POS)
 !
-! Description: contains subroutine writing file in paralell mode
+! Description: write header for partitioned file
 !
 ! 
 ! History:
@@ -243,19 +261,31 @@ CONTAINS
 ! Local declarations
 !
    TYPE(DNODE), POINTER :: PTMP
-
+!
+!  make a head node and say it contains number of partitions + one subsets
+!
    PTMP => FLL_MKDIR('partitioned_file', FPAR)
    PTMP%NDIM = NPROC + 1   ! Number of partitioned solutions and displacement vector
+!
+!  save it 
+!
    CALL FLL_SAVE_NODE_B(PTMP, IOUNIT, 0_LINT, FPAR)
+!
+!  get length of saved data set and remove it
+!
    POS = FLL_GETNBYTES(PTMP,FPAR)
    CALL FLL_RM(PTMP,FPAR)
-
+!
+!  make subset displacement containing positions of each record in the file
+!
    PTMP  => FLL_MK('displacements','L', NPROC+1_LINT, 1_LINT, FPAR)
 !
 ! THE DATA CAN BE ACCESSE DIRECTLY THROUGH PTMP%D(:)
 !
    POS = POS + FLL_GETNBYTES(PTMP,FPAR)
-
+!
+!  save it and remove from memory
+!
    PTMP%L1 = DISPL
    CALL FLL_SAVE_NODE_B(PTMP, IOUNIT, 0_LINT, FPAR)
    CALL FLL_RM(PTMP,FPAR)

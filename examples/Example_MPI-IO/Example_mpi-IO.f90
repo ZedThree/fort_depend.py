@@ -48,7 +48,6 @@ PROGRAM  EXAMPLE_MPI_IO
     USE MPI
     USE FLL_MODS_M
     USE FLL_MPI_MODS_M
-    USE CREATE_MPI_STRUCT_M
     USE READ_INPUT_M
     USE CREATE_DATA_SET_M
 
@@ -58,38 +57,83 @@ PROGRAM  EXAMPLE_MPI_IO
 !
    TYPE(DNODE), POINTER  :: FLL_MPI_STRUCT, PDATA_SET, PNEW,PTMP,PMPI
    TYPE(FUNC_DATA_SET) :: FPAR
-   INTEGER :: I,IERR,WORLD_RANK,world_group_id,NPROC,ISTAT
+   INTEGER :: IERR,WORLD_RANK,world_group_id,NPROC,ISTAT
 
-  INTEGER(LINT) :: NFILES,BYTESN,NSIZE
+  INTEGER(LINT) :: NFILES,BYTESN,NSIZE,I
   integer :: EVEN_COMM_ID,EVEN_P,EVEN_GROUP_ID,ODD_GROUP_ID,ODD_COMM_ID
   CHARACTER(LEN=FILE_NAME_LENGTH) :: NAME_OF_FILE
   LOGICAL :: OK
 
   INTEGER, ALLOCATABLE :: EVEN_RANK(:),ODD_RANK(:)
-  INTEGER :: E_RANK
+  INTEGER :: E_RANK,O_RANK,COMM
   REAL :: START, FINISH
+
+  TYPE(DNODE), POINTER ::PIOSTR,PSUBPROC,PIO
 !
 !  Initialize MPI
 !
-   CALL MPI_INIT(IERR)
-   
-   FLL_MPI_STRUCT => NULL()
-
-   PMPI => FLL_MPI_PROC_STRUCT(FPAR)
-   
+   CALL MPI_INIT(IERR)   
    CALL MPI_Comm_rank ( MPI_COMM_WORLD, WORLD_RANK, IERR )
-
    CALL  MPI_Comm_size ( MPI_COMM_WORLD, NPROC, ierr )
+
+   FLL_MPI_STRUCT => NULL()
+!
+! initiate MPI structure with all info
+!
+   PMPI => FLL_MPI_PROC_STRUCT(FPAR)
+!
+!  define how to save files for N-M saving model
+!
+   CALL  FLL_IO_STRUCT(PMPI,'ada','bmpi',2_LINT, FPAR)
+!
+!  print the strucute on the screen and save into ASCII file
+!
+   IF(WORLD_RANK == 0)THEN
+    CALL FLL_CAT(PMPI,6,.FALSE., FPAR)
+    IF(.NOT.FLL_WRITE(PMPI,"io.str", 9, 'A', FPAR))STOP'Error writing file'
+   END IF
+!
+!   create sample data se
+!
+   NSIZE = 100000 + 100*WORLD_RANK
+
+   CALL CREATE_DATA_SET(PDATA_SET,NSIZE, WORLD_RANK)
+   BYTESN = FLL_GETNBYTES(PDATA_SET,FPAR)
+   WRITE(*,*)' Partition created data set size of ', WORLD_RANK,BYTESN
+!
+!  save to one file, all partitions at the same time
+!
+   CALL MPI_BARRIER(MPI_COMM_WORLD,ierr)
+   IF(WORLD_RANK == 0)CALL CPU_TIME(START)
+   
+   OK = FLL_MPI_WRITE(PDATA_SET,'PartitionedFile',10,0, world_rank, MPI_COMM_WORLD, 'A', FPAR)
+   
+   IF(WORLD_RANK == 0)THEN 
+     CALL CPU_TIME(FINISH)
+     WRITE(*,*)' SAVING TIME IS ', FINISH-START
+   END IF
+   CALL MPI_BARRIER(MPI_COMM_WORLD,ierr)
+!
+!  save to several separate files
+!  all partitions at the same time
+!
+   IF(WORLD_RANK == 0)CALL CPU_TIME(START)
+
+   OK = FLL_MPI_WRITE_NM(PDATA_SET,PMPI,FPAR)
+
+   IF(WORLD_RANK == 0)THEN 
+     CALL CPU_TIME(FINISH)
+     WRITE(*,*)' SAVING TIME IS ', FINISH-START
+   END IF
+   CALL MPI_BARRIER(MPI_COMM_WORLD,ierr)
 
    IF(WORLD_RANK == 0) THEN 
      CALL READ_INPUT(NAME_OF_FILE,NFILES,1_LINT*NPROC)
-!
-!  initialize MPI
-!
-     FLL_MPI_STRUCT => NULL()
-     CALL CREATE_MPI_STRUCT(FLL_MPI_STRUCT,NAME_OF_FILE,NFILES,1_LINT*NPROC)
-
    END IF
+
+
+
+
 !
 !  Copy FLL_MPI_STRUCT date set which now exists on root partition onlyc
 !  to all other partitions
@@ -97,105 +141,24 @@ PROGRAM  EXAMPLE_MPI_IO
 !  for all other partition then root partition
 !  On root partition, the PNEW pointer is pointing on FLL_MPI_STRUCT
 !
-   PNEW => FLL_MPI_CP_ALL(FLL_MPI_STRUCT,MPI_COMM_WORLD,0,FPAR)
-   IF(WORLD_RANK /= 0)THEN
+!   PNEW => FLL_MPI_CP_ALL(FLL_MPI_STRUCT,MPI_COMM_WORLD,0,FPAR)
+!   IF(WORLD_RANK /= 0)THEN
 !
 !  make FLL_MPI_STRUCT point to PNEW so that we cane use the same names for all partitions
 !  
-     FLL_MPI_STRUCT => PNEW
-   END IF
-!
-!  make some data set similar to solution
-  NSIZE = 100000 + 100*WORLD_RANK
-
-  CALL CREATE_DATA_SET(PDATA_SET,NSIZE, WORLD_RANK)
-  BYTESN = FLL_GETNBYTES(PDATA_SET,FPAR)
-  WRITE(*,*)' Partition created data set size of ', WORLD_RANK,BYTESN
-!
-! Write - each partition to one common file
-!
-  CALL MPI_BARRIER(MPI_COMM_WORLD,ierr)
-  IF(WORLD_RANK == 0)CALL CPU_TIME(START)
-
-  OK = FLL_MPI_WRITE(PDATA_SET,'PartitionedFile',10,0, world_rank, MPI_COMM_WORLD, 'A', FPAR)
-
-  IF(WORLD_RANK == 0)THEN 
-     CALL CPU_TIME(FINISH)
-     WRITE(*,*)' SAVING TIME IS ', FINISH-START
-  END IF
-  CALL MPI_BARRIER(MPI_COMM_WORLD,ierr)
+!     FLL_MPI_STRUCT => PNEW
+!   END IF
   
-  PTMP => FLL_MPI_READ('PartitionedFile',10,0, world_rank, MPI_COMM_WORLD, 'A', FPAR)
-  BYTESN = FLL_GETNBYTES(PTMP,FPAR)
-  WRITE(*,*)' Partition all-reads data set size of ', WORLD_RANK,BYTESN
-  CALL FLL_RM(PTMP,FPAR)
-!
-!  make a group and save to a separate file 
-!
-!
-!  Get a group identifier for MPI_COMM_WORLD.
-!
-  CALL MPI_Comm_group ( MPI_COMM_WORLD, WORLD_GROUP_ID, IERR )
-!
-  EVEN_P = ( NPROC + 1 ) / 2
-  ALLOCATE ( EVEN_RANK(1:EVEN_P), ODD_RANK(1:EVEN_P), STAT = ISTAT )
-   IF(ISTAT /= 0)STOP'ERROR ALLOCATING MEMORY'
-
-  ISTAT = 0
-  DO I = 0, NPROC - 1, 2
-    ISTAT = ISTAT + 1
-    EVEN_RANK(ISTAT) = I+1
-    ODD_RANK(ISTAT) = I
-  END DO
-!
-!  create group in parent group:  world_group_id, number of processes 
-!  in that group is: even_p
-!  the processesare: even_rank(:)
-!  the group ID is then 
-!
-  CALL MPI_Group_incl(WORLD_GROUP_ID, EVEN_P, EVEN_RANK, EVEN_GROUP_ID, IERR )
-  CALL MPI_BARRIER(MPI_COMM_WORLD,ierr)
-  CALL MPI_Comm_create(MPI_COMM_WORLD, EVEN_GROUP_ID, EVEN_COMM_ID, IERR )
-
-  IF(EVEN_COMM_ID /= MPI_COMM_NULL)THEN
-   CALL MPI_Comm_rank(EVEN_COMM_ID, E_RANK, IERR )
-  END IF
-
-  CALL MPI_Group_incl(WORLD_GROUP_ID, EVEN_P, ODD_RANK, ODD_GROUP_ID, IERR )
-  CALL MPI_BARRIER(MPI_COMM_WORLD,ierr)
-  CALL MPI_Comm_create(MPI_COMM_WORLD, ODD_GROUP_ID, ODD_COMM_ID, IERR )
-
-  IF(EVEN_COMM_ID /= MPI_COMM_NULL)THEN
-   CALL MPI_Comm_rank(EVEN_COMM_ID, E_RANK, IERR )
-  END IF
-
-  IF(ODD_COMM_ID /= MPI_COMM_NULL)THEN
-   CALL MPI_Comm_rank(ODD_COMM_ID, E_RANK, IERR )
-  END IF
-
-
-  CALL MPI_BARRIER(MPI_COMM_WORLD,ierr)
-  CALL CPU_TIME(START)
-  OK = FLL_MPI_WRITE(PDATA_SET,'PartitionedFile_group_1',10,0, E_RANK, EVEN_COMM_ID, 'A', FPAR)
-  OK = FLL_MPI_WRITE(PDATA_SET,'PartitionedFile_group_2',12,0, E_RANK, ODD_COMM_ID, 'A', FPAR)
-  IF(WORLD_RANK == 0)THEN 
-     CALL CPU_TIME(FINISH)
-     WRITE(*,*)' SAVING PART FILES TIME IS ', FINISH-START
-  END IF
-  CALL MPI_BARRIER(MPI_COMM_WORLD,ierr)
-
-  PTMP => NULL()
-  PTMP => FLL_MPI_READ('PartitionedFile',10,0, E_RANK, EVEN_COMM_ID, 'A', FPAR)
-  BYTESN = FLL_GETNBYTES(PTMP,FPAR)
-  WRITE(*,*)' Partition reads data set size of ', WORLD_RANK,BYTESN
-  CALL FLL_RM(PTMP,FPAR)
-
+!   PTMP => FLL_MPI_READ('PartitionedFile',10,0, world_rank, MPI_COMM_WORLD, 'A', FPAR)
+!   BYTESN = FLL_GETNBYTES(PTMP,FPAR)
+!   WRITE(*,*)' Partition all-reads data set size of ', WORLD_RANK,BYTESN
+!   CALL FLL_RM(PTMP,FPAR)
 !
 !  CLEAN MEMORY
 !
-  IF(WORLD_RANK==0)write(*,*)' Releasing memory'
-  CALL FLL_RM(FLL_MPI_STRUCT,FPAR)
-  CALL FLL_RM(PDATA_SET,FPAR)
+   IF(WORLD_RANK==0)write(*,*)' Releasing memory'
+   CALL FLL_RM(FLL_MPI_STRUCT,FPAR)
+   CALL FLL_RM(PDATA_SET,FPAR)
 
   
    CALL MPI_FINALIZE(IERR)

@@ -93,10 +93,13 @@ CONTAINS
   LOGICAL :: OK
 
 !
-!  MAKE STRUCTURE
+!  Main pointer
 !
   PNODE => FLL_MKDIR('MPI_prc_str',FPAR)
-
+!
+!  find world communicator, world group and number of processes and 
+!  save to file
+!
   CALL MPI_Comm_group ( MPI_COMM_WORLD, WORLD_GROUP_ID, IERR )
   CALL  MPI_Comm_size ( MPI_COMM_WORLD, NPROC, IERR )
 
@@ -111,8 +114,9 @@ CONTAINS
   PTMP => FLL_MK('Nproc', 'I', 1_LINT, 1_LINT, FPAR)
   PTMP%I0 = NPROC
   OK = FLL_MV(PTMP, PNODE, FPAR)
-
-
+!
+!  define structure Subprocs
+!
   PSUBPROC  => FLL_MKDIR('Subprocs',FPAR)
   IF(.NOT.FLL_MV(PSUBPROC, PNODE, FPAR))THEN
     WRITE(FPAR%MESG,'(A)')' FLL_MPI_PROC_STRUCT: Error moving Subprocs'
@@ -120,8 +124,9 @@ CONTAINS
     FPAR%SUCCESS = .FALSE.
     RETURN
    END IF
-
-
+!
+!  add to is IO_struct
+!
   PTMP  => FLL_MKDIR('IO_struct',FPAR)
   IF(.NOT.FLL_MV(PTMP, PSUBPROC, FPAR))THEN
     WRITE(FPAR%MESG,'(A)')' FLL_MPI_PROC_STRUCT: Error moving IO_struct'
@@ -173,16 +178,18 @@ CONTAINS
 !
     TYPE(DNODE), POINTER  :: PTMP,PSUBPROC,PIOSTR,PDIR
     INTEGER(LINT) :: I,J, COUNT,NSTEP
-    INTEGER :: IERR,NPROC,WORLD_GROUP_ID,GROUP_ID, COMM_ID
+    INTEGER :: IERR,NPROC,WORLD_GROUP_ID,GROUP_ID, COMM_ID,IOUNIT,LOC_RANK
     CHARACTER(LEN=NAME_LENGTH) :: FILENAME
     CHARACTER(LEN=5) :: STR
     INTEGER, ALLOCATABLE :: EVEN_RANK(:)
 !
-!  MAKE STRUCTURE
+!  In MPI_prc_str find MPI_prc_str -> Subprocs -> IO_struct
 !
     PSUBPROC => FLL_LOCATE(PNODE,'Subprocs','*',-1_LINT,1_LINT,.FALSE.,FPAR)
     PIOSTR   => FLL_LOCATE(PSUBPROC,'IO_struct','*',-1_LINT,1_LINT,.FALSE.,FPAR)
-
+!
+! get number of processors and world group
+!
     CALL MPI_Comm_size(  MPI_COMM_WORLD, NPROC, IERR )
     CALL MPI_Comm_group( MPI_COMM_WORLD, WORLD_GROUP_ID, IERR )
 !
@@ -197,20 +204,38 @@ CONTAINS
 
     ALLOCATE(EVEN_RANK(NSTEP), STAT = IERR)
      IF(IERR /= 0)STOP' ERROR ALLOCATING MEMORY'
-
+!
+!  loop over number of separate files, define which partition is going to be
+!  saving in what file (defined by EVEN_RANK array
+!
     DO J=1,NFILES
+!
+!  define IOunit - so that user does not have to do it and they 
+!  do not collide
+!
+      IOUNIT = 10+J
 !
 !  create node for name of the I/O file and add it to the main structure
 !
       PDIR => FLL_MKDIR('IO', FPAR)
       IF(.NOT.FLL_MV(PDIR, PIOSTR, FPAR))STOP' ERROR MOVING NODE'
-
+!
+!  create name of the file from the stem, number of file, and suffix
+!
       WRITE(STR,'(I5)')J
       WRITE(FILENAME,*)ADJUSTL(TRIM(NAME_OF_FILE))//"_",TRIM(ADJUSTL(STR))//".",ADJUSTL(TRIM(EXTENSION))
-
+!
+!  save it to the IO structure
+!
       PTMP  => FLL_MK('name-of-file','S', 1_LINT, 1_LINT, FPAR)
-      PTMP%S0 = TRIM(FILENAME)
-      IF(.NOT.FLL_MV(PTMP, PDIR, FPAR))STOP' ERROR MOVIN NODE'
+      PTMP%S0 = ADJUSTL(TRIM(FILENAME))
+      IF(.NOT.FLL_MV(PTMP, PDIR, FPAR))STOP' ERROR MOVING NODE'
+!
+!  save number of IO desrciptor
+!
+      PTMP    => FLL_MK('io-descrpt','I', 1_LINT, 1_LINT, FPAR)
+      PTMP%I0 = IOUNIT
+      IF(.NOT.FLL_MV(PTMP, PDIR, FPAR))STOP' ERROR MOVING NODE'
 !
 !  create node with number processors the job will run at
 !
@@ -237,20 +262,42 @@ CONTAINS
          COUNT = COUNT + 1
 
       END DO
-
+!
+!  create group and communicator
+!  group will contain processes in EVEN_RANK array
+!
       CALL MPI_Group_incl(WORLD_GROUP_ID, INT(NSTEP, KIND = SINT), EVEN_RANK, GROUP_ID, IERR )
       CALL MPI_Comm_create(MPI_COMM_WORLD, GROUP_ID, COMM_ID, IERR )
-
+!
+!  save comminicator
+!
       PTMP    => FLL_MK('communicator','I', 1_LINT, 1_LINT, FPAR)
       PTMP%I0 = COMM_ID
       IF(.NOT.FLL_MV(PTMP, PDIR, FPAR))STOP' ERROR MOVING NODE'
+!
+!  if in the group, get local rank of the process and save it
+!  if not in the group, set process local rank to -1
+!
+      IF(COMM_ID /= MPI_COMM_NULL)THEN
+        CALL MPI_Comm_rank(COMM_ID, LOC_RANK, IERR )
+      ELSE
+        LOC_RANK = -1
+      END IF
 
+      PTMP    => FLL_MK('loc_prc_rank','I', 1_LINT, 1_LINT, FPAR)
+      PTMP%I0 = LOC_RANK
+      IF(.NOT.FLL_MV(PTMP, PDIR, FPAR))STOP' ERROR MOVING NODE'
+!
+!  free group, will not be needed
+!
       CALL MPI_GROUP_FREE(GROUP_ID, IERR)
 !
 !  print node on the screen and save to files
 !
     END DO
-
+!
+!  free memory
+!
     DEALLOCATE(EVEN_RANK, STAT = IERR)
      IF(IERR /= 0)STOP' ERROR ALLOCATING MEMORY'
 

@@ -130,28 +130,35 @@ CONTAINS
     FPAR%SUCCESS = .FALSE.
     RETURN
    END IF
+
+   CALL MPI_BARRIER(COMMUNICATOR, IERR)
 !
-!  Position in file with empty write statement
+!  If root processor, read initial set and 
+!  get positions for each subset, ie. each partition solution
 !
    IF(RANK == ROOT_RANK)THEN
-!    INQUIRE(UNIT=IOUNIT,POS=1_LINT)
     PTMP => FLL_RPART_FILE_HEADER(IOUNIT, FPAR) 
    END IF
-  
+!
+!  distribute that info to all partitions
+!
    PTMP1 => FLL_MPI_CP_ALL(PTMP,COMMUNICATOR,ROOT_RANK,FPAR)
    IF(RANK /= ROOT_RANK) PTMP => PTMP1
-   
+!
+!  get position in a file for each partition
+!  
    DISPL => PTMP%L1
 !
 !  Read linked list
 ! 
    POS = DISPL(RANK+2)
-   PNODE => READ_NODE(IOUNIT,'B',POS,'N',FPAR)
-   
-   if(rank ==1)CALL FLL_CAT(PNODE,6,.false., FPAR)
 !
-!  MPI_Barrier does not need to be here, 
-!  just for testing purposes 
+!  use read node, so that you read just 
+!  what is in the subdir (subset)
+!
+   PNODE => READ_NODE(IOUNIT,'B',POS,'N',FPAR)
+!
+!  close and use MPI barier to sync
 !
    CLOSE(IOUNIT)
    IF(.NOT.ASSOCIATED(PNODE))THEN
@@ -160,10 +167,12 @@ CONTAINS
      FPAR%SUCCESS = .FALSE.
      RETURN
    END IF
-
-  CALL FLL_RM(PTMP, FPAR)
-    
-    
+   CALL MPI_BARRIER(COMMUNICATOR, IERR)
+!
+! release memory
+!
+   CALL FLL_RM(PTMP, FPAR)
+   
    FPAR%SUCCESS = .TRUE.
    RETURN
   
@@ -172,7 +181,8 @@ CONTAINS
 
   FUNCTION FLL_RPART_FILE_HEADER(IOUNIT, FPAR) RESULT(PNEW)
 !
-! Description: contains subroutine reading file header
+! Description: Reads header of partitione file containing
+!              positions of each record in the file
 !
 ! 
 ! History:
@@ -205,7 +215,10 @@ CONTAINS
    CHARACTER(LEN=NAME_LENGTH) :: NAME
    CHARACTER(LEN=TYPE_LENGTH) :: TYPE
    INTEGER(LINT) :: NDIM,NSIZE,I
-
+!
+!  read name, type, ndim, nsize 
+!  create node, read valus of record positions and return
+!
    READ(IOUNIT)NAME,TYPE,NDIM,NSIZE
    READ(IOUNIT)NAME,TYPE,NDIM,NSIZE
    PNEW => FLL_MK(NAME,TYPE,NDIM,NSIZE,FPAR)
