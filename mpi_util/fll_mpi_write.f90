@@ -121,7 +121,7 @@ CONTAINS
 !  use always binary fomat
 !
    OPEN(UNIT=IOUNIT,STATUS='UNKNOWN',FILE=TRIM(FILE),FORM='UNFORMATTED',&
-      ACCESS='STREAM',IOSTAT=ISTAT)
+      ACCESS='STREAM',ACTION='WRITE', IOSTAT=ISTAT)
 !
 !  use barrier, without barrier there were problems on cluster
 !
