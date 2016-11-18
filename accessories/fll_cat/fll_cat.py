@@ -6,6 +6,8 @@
 import os
 import sys
 from subprocess import Popen, PIPE
+import unicodedata
+import ast
 
 #Definitions
 
@@ -39,9 +41,13 @@ def run(file,fmt,scan):
         print(" ")
         print("\033[035m ... running in scan only mode ... \033[039m")  
     print(" ")  
-
-    p = Popen([executable], stdin=PIPE) #NOTE: no shell=True here
-    p.communicate(os.linesep.join([file, fmt, scan]))
+    
+    if sys.version_info < (3,0):
+      p = Popen([executable], stdin=PIPE) #NOTE: no shell=True here
+      p.communicate(os.linesep.join([file, fmt, scan]))
+    else:
+      p = Popen([executable], stdin=PIPE,universal_newlines=True) #NOTE: no shell=True here
+      p.communicate(os.linesep.join( [file, fmt, scan]))
 
 def print_header():
      print("  ")
