@@ -29,48 +29,31 @@
 #
 #
 include src_dir_path.mk
--include config.mk
+include ../config.mk
 
+DEP_FILE=project.dep
+
+#FMODDIRS= ../../data_util
+
+#SUBDIRS= $(dir $(wildcard $(srcdir)/*))
 SUBDIRS= \
-data_util\
-mpi_util \
-accessories\
-examples\
+	fll_cat
+
+
 
 ###########################################################################
 
 all: $(SUBDIRS:%=%.all)
-	@echo '************************************************'
-	@echo '*'
-	@echo '* FLL built successfully!'
-	@echo '*'
-	@echo '************************************************'
 
-include rules.mk
-
-
-init:
-	echo PROJ_ROOT_PATH=$(PWD) > config.mk
-	echo MAKEDEPEND=$(PWD)/python_dep/fort_depend.py >> config.mk
-	echo MPI_FC=YES >> config.mk
-
-data_util.all: 
-test.all: data_util.all
+include ../rules.mk
 
 clean: $(SUBDIRS:%=%.clean)
+	rm -f *.x *.o *.mod
 
 depend: $(SUBDIRS:%=%.depend)
 
-install: $(SUBDIRS:%=%.all) $(SUBDIRS:%=%.install)
+install: $(SUBDIRS:%=%.install)
 
 test: $(SUBDIRS:%=%.test)
 
-#
-# The following target checks all .f90 files against
-# some of the sourcecode standard rules.
-#
-CHK_SUBDIRS:=$(filter-out adaption lapack,$(SUBDIRS))
-chk: $(CHK_SUBDIRS:%=%.chk)
-#
-#
-.PHONY: path
+chk: $(SUBDIRS:%=%.chk)

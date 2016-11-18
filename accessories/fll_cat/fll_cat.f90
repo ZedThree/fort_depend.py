@@ -15,32 +15,59 @@
 !     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 !     
 !     contact: libm3l@gmail.com
-!
-!
-!
-MODULE FLL_MPI_MODS_M
-!
-! Description: Contains list of modules of mpi_util fll library
-!              each function/subroutine using fll data utilities
-!              should then use statement 
-!              USE FLL_MPI_MODS_M
-!
 ! 
-! History:
-! Version   Date       Patch number  CLA     Comment
-! -------   --------   --------      ---     -------
-! 1.1       10/10/16                         Initial implementation
 !
-!
-! External Modules used
-!
-    USE FLL_MPI_CP_ALL_M
-    USE FLL_MPI_CP_M
-    USE FLL_MPI_MV_M
-    USE FLL_MPI_SUM_M
-    USE FLL_MPI_WRITE_M
-    USE FLL_MPI_WRITE_NM_M
-    USE FLL_MPI_READ_M
-    USE FLL_MPI_PROC_STRUCT_M
 
-END MODULE FLL_MPI_MODS_M
+!
+!     Sample program
+!
+!     Date: 2016-10-10
+! 
+! 
+!
+!
+!     Description: prints file on screen
+!
+!
+!     Input parameters:
+! 
+!
+!     Return value:
+! 
+! 
+!
+!     Modifications:
+!     Date		Version		Patch number		CLA 
+!
+!
+!     Description
+!
+!
+ PROGRAM  FLL_CATU
+
+    USE FLL_MODS_M
+    IMPLICIT NONE
+!
+!   SUBROUTINE MOVES NODE
+!
+   CHARACTER(LEN=FILE_NAME_LENGTH) FILE
+   TYPE(DNODE), POINTER  :: PNODE
+   TYPE(FUNC_DATA_SET) :: FPAR
+   CHARACTER :: FMT, SCAN
+!
+!  read a file and print on screen
+!
+    READ(*,*)FILE
+    READ(*,*)FMT 
+    READ(*,*)SCAN 
+  
+    PNODE => FLL_READ(FILE,8,FMT,FPAR,SCAN = SCAN)
+!
+!  print node on the screen
+!
+   CALL FLL_CAT(PNODE, 6, .TRUE.,FPAR,SCAN = SCAN)
+   WRITE(*,*)
+   CALL FLL_RM(PNODE,FPAR)
+
+  
+END PROGRAM 
