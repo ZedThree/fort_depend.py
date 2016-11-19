@@ -32,7 +32,7 @@ MODULE FLL_MPI_WRITE_NM_M
 !
 CONTAINS
 
-  FUNCTION FLL_MPI_WRITE_NM(PNODE,FILE,IOUNIT,FILE_TAB,FPAR) RESULT(OK)
+  FUNCTION FLL_MPI_WRITE_NM(PNODE,PMPI,FPAR) RESULT(OK)
 !
 ! Description: contains subroutine writing file in paralell mode from N processors to M files
 !
@@ -55,7 +55,7 @@ CONTAINS
 ! Arguments description
 ! Name         In/Out     Function
 ! FILE         In         Name of file
-! PNODE        Out        Node to a first node in list from a file
+! PNODE        In         Node to be written
 ! IOUNIT       In         Number of unit
 ! FILE_TAB     In         Specifies which partition saves to which file
 ! FPAR         In/Out     structure containing function specific data
@@ -63,14 +63,53 @@ CONTAINS
 !
 ! Arguments declaration
 !
-   CHARACTER(*) :: FILE
-   TYPE(DNODE), POINTER  :: PNODE, FILE_TAB
+   TYPE(DNODE), POINTER  :: PNODE,PMPI
    TYPE(FUNC_DATA_SET) :: FPAR
-   INTEGER :: IOUNIT
    LOGICAL OK
 !
-! local declarations
+! Local declarations
 !
+   TYPE(DNODE), POINTER  :: PSUBPROC,PIOSTR,PIO
+   INTEGER :: COMM,IOUNIT,WORLD_RANK,IERR,LOC_RANK
+   INTEGER(LINT) :: I
+   CHARACTER(LEN=NAME_LENGTH) :: NAME_OF_FILE
+
+   OK = .FALSE.
+!
+!  get processor rank in world group
+!
+   CALL MPI_Comm_rank ( MPI_COMM_WORLD, WORLD_RANK, IERR )
+!
+!  find MPI_prc_str -> Subprocs -> IO_struct
+!
+   PSUBPROC => FLL_LOCATE(PMPI,'Subprocs','*',-1_LINT,1_LINT,.FALSE.,FPAR)
+   PIOSTR   => FLL_LOCATE(PSUBPROC,'IO_struct','*',-1_LINT,1_LINT,.FALSE.,FPAR)
+!
+!  loop over IO subsets
+!
+   DO I=1,PIOSTR%NDIM
+
+        PIO   => FLL_LOCATE(PIOSTR,'IO','*',-1_LINT,I,.FALSE.,FPAR)
+!
+!  find: communicator
+!        name of file to save into
+!        desrcriptor for the file
+!        local process rank, for each group of processes it will start with 0
+!
+        COMM = FLL_GETNDATA_I0(PIO,'communicator',1_LINT,FPAR)
+        NAME_OF_FILE = FLL_GETNDATA_S0(PIO,'name-of-file',1_LINT,FPAR)
+        IOUNIT = FLL_GETNDATA_I0(PIO,'io-descrpt', 1_LINT, FPAR)
+        LOC_RANK = FLL_GETNDATA_I0(PIO,'loc_prc_rank', 1_LINT, FPAR)
+!
+!  Print some info
+!
+        IF(COMM /= MPI_COMM_NULL)write(*,*)' Partition ',WORLD_RANK,' saving to :',trim(NAME_OF_FILE)
+!
+!  save file, ROOT_RANK is always 0, use local rank
+! 
+        OK = FLL_MPI_WRITE(PNODE,NAME_OF_FILE,IOUNIT,0, LOC_RANK, COMM, 'A', FPAR)
+
+   END DO
   
   END FUNCTION FLL_MPI_WRITE_NM
 

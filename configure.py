@@ -20,7 +20,7 @@ def run(comp,files=None,verbose=True,overwrite=None,output=None,macros={},build=
 #  definition of parameters
 #
     print_header()
-    linkfiles =(['src_dir_path.mk', 'Makefile', 'project.dep', '*.py'])
+    linkfiles =(['src_dir_path.mk', 'Makefile', 'project.dep'])
     exclude =(['python_dep', 'config', '.git'])     
 #
 #  
