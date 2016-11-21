@@ -230,7 +230,7 @@ CONTAINS
 !  create name of the file from the stem, number of file, and suffix
 !
       WRITE(STR,'(I5)')J
-      WRITE(FILENAME,*)ADJUSTL(TRIM(NAME_OF_FILE))//"_",TRIM(ADJUSTL(STR))//".",ADJUSTL(TRIM(EXTENSION))
+      WRITE(FILENAME,*)ADJUSTL(TRIM(NAME_OF_FILE))//"_"//TRIM(ADJUSTL(STR))//".",ADJUSTL(TRIM(EXTENSION))
 !
 !  save it to the IO structure
 !
