@@ -37,6 +37,8 @@ mpi_util \
 accessories\
 examples\
 
+SUBCLEAN=$(SUBDIRS)
+
 ###########################################################################
 
 all: $(SUBDIRS:%=%.all)
@@ -57,7 +59,7 @@ init:
 data_util.all: 
 test.all: data_util.all
 
-clean: $(SUBDIRS:%=%.clean)
+clean: $(SUBCLEAN:%=%.clean)
 
 depend: $(SUBDIRS:%=%.depend)
 

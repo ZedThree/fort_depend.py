@@ -52,7 +52,17 @@ def run(comp,files=None,verbose=True,overwrite=None,output=None,macros={},build=
     print("  ")
     print("\033[031mDIAG:\033[039m creating configure file \033[032m \033[039m")  	
     print("  ")
-    ok = mkconfigfile(path=path, cwd=cwd,version=comp, bin_dir=cwd)
+
+    if build == '':
+      print("  ")
+      print("\033[031mDIAG:\033[039m Bild directory not specified, setting it to \033[032m "+cwd+platform.machine()+"/bin\033[039m")  	
+      print("  ")
+      bin_dir=cwd+platform.machine()+'/bin'
+    else:
+      bin_dir=build
+
+
+    ok = mkconfigfile(path=path, cwd=cwd,version=comp, bin_dir=bin_dir)
 #
 #   create structure and link necessary files
 #
@@ -63,6 +73,11 @@ def run(comp,files=None,verbose=True,overwrite=None,output=None,macros={},build=
     print("  ")
     print("\033[031mDIAG:\033[039m Subdirectories .... \033[032m \033[039m")  	
     ok=mkdir_structure(root_path=path, cwd=cwd, exclude=exclude, linkfiles=linkfiles)
+
+    print("  ")
+    print("\033[031mNOTE:\033[039m Bild directory is set to \033[032m "+bin_dir+"\033[039m")  	
+    print("\033[031m------------------------------------------------------------------------\033[039m")  	
+    print("  ")
 
     print("  ")
     print("\033[031mSUCCESS:\033[039m Setup was succesful \033[032m \033[039m")  	
@@ -208,7 +223,7 @@ def mkconfigfile(path, cwd,version, bin_dir):
         sys.exit()
         
 
-    exec_dir=bin_dir+"/bin/"
+    exec_dir=bin_dir
     
     confname =  'config.mk'
     
@@ -237,7 +252,7 @@ def mkconfigfile(path, cwd,version, bin_dir):
     fconfig.write("#\n")  
     fconfig.write("#  bin_dir is the base directory where executables will be installed\n")
     fconfig.write("#\n")
-    fconfig.write('bin_dir='+exec_dir)
+    fconfig.write('bin_dir='+exec_dir+"\n")
     fconfig.write("#\n")
     fconfig.write("#\n")
     fconfig.write("#  MACHINE identifies the host machine type")
@@ -253,6 +268,15 @@ def mkconfigfile(path, cwd,version, bin_dir):
                 
     f.close()
     fconfig.close()
+#
+#  make exec directory
+#
+    if not os.path.isdir(exec_dir):
+      print("  ")
+      print("\033[031mERROR:\033[039m Creating exec directory \033[032m"+exec_dir+"\033[039m .... ")
+      os.makedirs(exec_dir) 
+
+    cwd = check_path(path=cwd)
 
 class file_obj:
     def __init__(self):

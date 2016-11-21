@@ -65,8 +65,4 @@ depend: $(FFILES)
 	@echo "Making dependencies!"
 	cd $(srcdir) && $(MAKEDEPEND) -r $(PROJ_ROOT_PATH) -w -o $(srcdir)/$(DEP_FILE) -f $(FFILES)
 
-install: $(EXE).x $(EXE)
-	$(INSTALL) $(EXE) $(bindir)/bin/$(EXE)$(POSTFIX)
-	$(INSTALL) $(EXE).x $(bindir)/bin/$(EXE)$(POSTFIX).x
-
 -include $(srcdir)/project.dep

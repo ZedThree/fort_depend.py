@@ -61,8 +61,8 @@ depend: $(FFILES)
 	cd $(srcdir) && $(MAKEDEPEND) -r  $(PROJ_ROOT_PATH) -d $(FMODDIRS)  -w -o $(srcdir)/$(DEP_FILE) -f $(FFILES)
 
 
-install: $(EXE).x $(EXE)
-	$(INSTALL) $(EXE) $(bindir)/bin/$(EXE)$(POSTFIX)
-	$(INSTALL) $(EXE).x $(bindir)/bin/$(EXE)$(POSTFIX).x
+install: $(EXE).x $(EXE).py
+	$(INSTALL) $(EXE).x $(bin_dir)/$(EXE)$(POSTFIX).x
+	$(INSTALL) $(EXE).py $(bin_dir)/$(EXE)$(POSTFIX).py
 
 -include $(srcdir)/project.dep
