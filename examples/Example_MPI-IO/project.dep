@@ -3,15 +3,15 @@
 create_data_set.o :  \
 	../../data_util/fll_mods.o
 
-Save_inivid_files.o :  \
-	../../data_util/fll_mods.o
-
 read_input.o :  \
 	../../data_util/fll_mods.o
 
+Save_inivid_files.o :  \
+	../../data_util/fll_mods.o
+
 Example_mpi-IO.o :  \
-	create_data_set.o \
 	read_input.o \
 	Save_inivid_files.o \
+	create_data_set.o \
 	../../data_util/fll_mods.o \
 	../../mpi_util/fll_mpi_mods.o
