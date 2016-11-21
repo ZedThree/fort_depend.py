@@ -67,7 +67,7 @@
      CASE('fll')
       PNODE => FLL_READ(FILE,8,FMT,FPAR,SCAN = SCAN)
      CASE('ffa')
-      PNODE => FLL_READ_FFA(FILE,8,FMT,FPAR)
+      PNODE => FLL_READ_FFA(FILE,8,FMT,FPAR,SCAN = SCAN)
     END SELECT
 !
 !  print node on the screen
