@@ -107,9 +107,8 @@ PROGRAM  EXAMPLE_MPI_IO
    PDATA_SET => FLL_READ_FFA('test.bcase',8,'B',FPAR)
    CALL MPI_BARRIER(MPI_COMM_WORLD,ierr)
 
-!    PDATA_SET => FLL_READ_FFA('BSCW_Mesh.bmsh',8,'B',FPAR)
-!   BYTESN = FLL_GETNBYTES(PDATA_SET,FPAR)
-!   WRITE(*,*)' Partition created data set size of ', WORLD_RANK,BYTESN
+   BYTESN = FLL_GETNBYTES(PDATA_SET,FPAR)
+   WRITE(*,*)' Partition created data set size of ', WORLD_RANK,BYTESN
 !
 !  save to one file, all partitions at the same time
 !
