@@ -11,7 +11,7 @@ import ast
 
 #Definitions
 
-def run(file,fmt,scan):
+def run(file,fmt,efmt,scan):
 #
 #  execute 
 #
@@ -44,10 +44,10 @@ def run(file,fmt,scan):
     
     if sys.version_info < (3,0):
       p = Popen([executable], stdin=PIPE) #NOTE: no shell=True here
-      p.communicate(os.linesep.join([file, fmt, scan]))
+      p.communicate(os.linesep.join([file, fmt, efmt, scan]))
     else:
       p = Popen([executable], stdin=PIPE,universal_newlines=True) #NOTE: no shell=True here
-      p.communicate(os.linesep.join( [file, fmt, scan]))
+      p.communicate(os.linesep.join( [file, fmt, efmt, scan]))
 
 def print_header():
      print("  ")
@@ -77,12 +77,14 @@ if __name__ == "__main__":
     parser.add_argument('-i','--file',nargs=1,help='Files to process')
     parser.add_argument('-f','--format',nargs=1,help='Format of the file')
     parser.add_argument('-s','--scan',action='store_true',help='Scan file only',required=False)
+    parser.add_argument('-e','--external_format',nargs=1,help='External format of the file')
 
     # Parse the command line arguments
     args = parser.parse_args()
 
     file = args.file[0]   if args.file else None
     format = args.format[0] if args.format else None
+    eformat = args.external_format[0] if args.external_format else None
     scan = args.scan
  
     if not scan:
@@ -97,11 +99,16 @@ if __name__ == "__main__":
     if not format:
         print ("\033[031mError: \033[039m missing file format\033[031m-c \033[032m")
         print ("\033[031m       \033[039m available options are: \033[032m a - ASCII\033[039m")
-        print ("\033[031m       \033[039m                        \033[032m b - binary\033[039m")
-        sys.exit()
-    else:
-     if not('a') or not('A') or not('b') or not('B'):
-        print ("\033[031mError: \033[039m wrong specified file format\033[031m-c \033[032m")
+        print ("\033[031m       \033[039m                        \033[032m b - binary format\033[039m")
         sys.exit()
 
-    run(file=file,fmt=format, scan=scan)
+    if not eformat:
+        eformat = 'fll'
+    else:
+     if not('fll') or not('ffa'):
+        print ("\033[031mError: \033[039m wrong file format\033[031m-e \033[032m")
+        print ("\033[031m       \033[039m available options are: \033[032m fll - fll native format\033[039m")
+        print ("\033[031m       \033[039m                        \033[032m ffa - ffa format\033[039m")
+        sys.exit()
+
+    run(file=file,fmt=format, efmt = eformat, scan=scan)

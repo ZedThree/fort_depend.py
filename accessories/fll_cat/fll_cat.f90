@@ -54,14 +54,21 @@
    TYPE(DNODE), POINTER  :: PNODE
    TYPE(FUNC_DATA_SET) :: FPAR
    CHARACTER :: FMT, SCAN
+   CHARACTER(LEN=3) :: EFMT
 !
 !  read a file and print on screen
 !
     READ(*,*)FILE
     READ(*,*)FMT 
+    READ(*,'(A3)')EFMT 
     READ(*,*)SCAN 
-  
-    PNODE => FLL_READ(FILE,8,FMT,FPAR,SCAN = SCAN)
+
+    SELECT CASE(EFMT)
+     CASE('fll')
+      PNODE => FLL_READ(FILE,8,FMT,FPAR,SCAN = SCAN)
+     CASE('ffa')
+      PNODE => FLL_READ_FFA(FILE,8,FMT,FPAR)
+    END SELECT
 !
 !  print node on the screen
 !
