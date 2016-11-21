@@ -316,10 +316,10 @@ CONTAINS
      LTYPE = PNODE%LTYPE
      IF(TRIM(PNODE%LTYPE) == 'DIR' .OR.TRIM(PNODE%LTYPE) == 'N')THEN
         IF(PNODE%NLINK > 0)THEN 
-          WRITE(IOUNIT, *)TRIM(PNODE%LNAME),",",TRIM(PNODE%FTYPE),' ,1, 1,',PNODE%NDIM
+          WRITE(IOUNIT, *)TRIM(PNODE%LNAME)," ",TRIM(PNODE%FTYPE),' 1 1 ',PNODE%NDIM
            LTYPE = PNODE%FTYPE
         ELSE
-          WRITE(IOUNIT, *)TRIM(PNODE%LNAME),',N, 0, 0,',PNODE%NDIM
+          WRITE(IOUNIT, *)TRIM(PNODE%LNAME),' N  0  0 ',PNODE%NDIM
           RETURN
         END IF
      ELSE 
@@ -330,9 +330,10 @@ CONTAINS
             LTYPE ='L'
           END IF
         ELSE IF(TRIM(LTYPE) == 'L') THEN
-          LTYPE ='J'
+          LTYPE ='I'
         END IF
-        LTYPE = PNODE%FTYPE
+
+        IF(PNODE%FTYPE /= '') LTYPE = PNODE%FTYPE
         
         IF( (PNODE%NSIZE * PNODE%NDIM > 1) )THEN
           SELECT CASE(LTYPE)
@@ -341,7 +342,8 @@ CONTAINS
           END SELECT
         END IF
 
-        WRITE(IOUNIT, *)TRIM(PNODE%LNAME),',', TRIM(LTYPE),',', PNODE%NSIZE, ',',PNODE%NDIM,',',0
+        write(*,*)' LTYPE is ', ltype
+        WRITE(IOUNIT, *)TRIM(PNODE%LNAME),' ', TRIM(LTYPE),' ', PNODE%NSIZE, ' ',PNODE%NDIM,' ',0
      END IF
 !
 !  1 D ARRAYS
@@ -495,7 +497,7 @@ CONTAINS
       ELSE IF(TRIM(LTYPE) == 'L') THEN
         LTYPE ='J'
        END IF
-       LTYPE = PNODE%FTYPE
+       IF(PNODE%FTYPE /= '') LTYPE = PNODE%FTYPE
        
        IF( (PNODE%NSIZE * PNODE%NDIM > 1) )THEN
           SELECT CASE(LTYPE)
