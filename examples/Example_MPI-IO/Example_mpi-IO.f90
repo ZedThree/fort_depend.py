@@ -89,7 +89,7 @@ PROGRAM  EXAMPLE_MPI_IO
 !
 !  define how to save files for N-M saving model
 !
-   CALL  FLL_IO_STRUCT(PMPI,'ada','bmpi',2_LINT, FPAR)
+   CALL  FLL_NMIO_STRUCT(PMPI,'ada','bmpi',2_LINT, FPAR)
 !
 !  print the strucute on the screen and save into ASCII file
 !
@@ -113,7 +113,7 @@ PROGRAM  EXAMPLE_MPI_IO
 !  save to one file, all partitions at the same time
 !
    CALL MPI_BARRIER(MPI_COMM_WORLD,ierr)
-!   IF(WORLD_RANK == 0)CALL CPU_TIME(START)
+
    IF(WORLD_RANK == 0)THEN
     CALL DATE_AND_TIME(VALUES=VALS)
     CPUS = REAL(VALS(5)*3600+VALS(6)*60+VALS(7))+REAL(VALS(8))*0.001
@@ -157,7 +157,7 @@ PROGRAM  EXAMPLE_MPI_IO
 
    CALL FLL_RM(PMPI,FPAR)
    PMPI => FLL_MPI_PROC_STRUCT(FPAR)
-   CALL  FLL_IO_STRUCT(PMPI,'beda','bmpi',4_LINT, FPAR)
+   CALL FLL_NMIO_STRUCT(PMPI,'beda','bmpi',4_LINT, FPAR)
 
    IF(WORLD_RANK == 0)THEN
     CALL CPU_TIME(START)
