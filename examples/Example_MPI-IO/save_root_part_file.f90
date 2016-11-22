@@ -88,7 +88,7 @@ CONTAINS
 !     WRITE(*,*)' SAVING INDIVIDUAL FILES TIME IS ', FINISH-START
      CALL DATE_AND_TIME(VALUES=VALS)
      CPUE = REAL(VALS(5)*3600+VALS(6)*60+VALS(7))+REAL(VALS(8))*0.001
-     WRITE(*,*)'Time writing parallel to single file :',CPUE-CPUS
+     WRITE(*,*)'Time writing single to single file :',CPUE-CPUS
    END IF
 
    CALL FLL_RM(PMAIN, FPAR)
