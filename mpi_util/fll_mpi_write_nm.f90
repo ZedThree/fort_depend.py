@@ -80,10 +80,10 @@ CONTAINS
 !
    CALL MPI_Comm_rank ( MPI_COMM_WORLD, WORLD_RANK, IERR )
 !
-!  find MPI_prc_str -> Subprocs -> IO_struct
+!  find MPI_prc_str -> Subprocs -> IO-NM_struct
 !
    PSUBPROC => FLL_LOCATE(PMPI,'Subprocs','*',-1_LINT,1_LINT,.FALSE.,FPAR)
-   PIOSTR   => FLL_LOCATE(PSUBPROC,'IO_struct','*',-1_LINT,1_LINT,.FALSE.,FPAR)
+   PIOSTR   => FLL_LOCATE(PSUBPROC,'IO-NM_struct','*',-1_LINT,1_LINT,.FALSE.,FPAR)
 !
 !  loop over IO subsets
 !
@@ -93,17 +93,19 @@ CONTAINS
 !
 !  find: communicator
 !        name of file to save into
-!        desrcriptor for the file
+!        descriptor for the file
 !        local process rank, for each group of processes it will start with 0
 !
         COMM = FLL_GETNDATA_I0(PIO,'communicator',1_LINT,FPAR)
+        IF(COMM /= MPI_COMM_NULL)RETURN
+        
         NAME_OF_FILE = FLL_GETNDATA_S0(PIO,'name-of-file',1_LINT,FPAR)
         IOUNIT = FLL_GETNDATA_I0(PIO,'io-descrpt', 1_LINT, FPAR)
         LOC_RANK = FLL_GETNDATA_I0(PIO,'loc_prc_rank', 1_LINT, FPAR)
 !
 !  Print some info
 !
-        IF(COMM /= MPI_COMM_NULL)write(*,*)' Partition ',WORLD_RANK,' saving to :',trim(NAME_OF_FILE)
+        WRITE(*,*)' Partition ',WORLD_RANK,' saving to :',trim(NAME_OF_FILE)
 !
 !  save file, ROOT_RANK is always 0, use local rank
 ! 

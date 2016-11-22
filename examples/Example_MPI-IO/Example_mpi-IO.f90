@@ -90,6 +90,7 @@ PROGRAM  EXAMPLE_MPI_IO
 !  define how to save files for N-M saving model
 !
    CALL  FLL_NMIO_STRUCT(PMPI,'ada','bmpi',2_LINT, FPAR)
+   CALL  FLL_SNMIO_STRUCT(PMPI,'ceda','bmpi',2_LINT, 'I', FPAR)
 !
 !  print the strucute on the screen and save into ASCII file
 !
@@ -100,15 +101,15 @@ PROGRAM  EXAMPLE_MPI_IO
 !
 !   create sample data se
 !
-   NSIZE = 100000 !+ 100*WORLD_RANK
+   NSIZE = 10000 !+ 100*WORLD_RANK
 
-!   CALL CREATE_DATA_SET(PDATA_SET,NSIZE, WORLD_RANK)
+   CALL CREATE_DATA_SET(PDATA_SET,NSIZE, WORLD_RANK)
 !   IF(WORLD_RANK == 0) OK = FLL_WRITE_FFA(PDATA_SET,'test.bcs',10,'B',FPAR)
-   PDATA_SET => FLL_READ_FFA('test.bcase',8,'B',FPAR)
+!   PDATA_SET => FLL_READ_FFA('test.bcase',8,'B',FPAR)
    CALL MPI_BARRIER(MPI_COMM_WORLD,ierr)
 
    BYTESN = FLL_GETNBYTES(PDATA_SET,FPAR)
-   WRITE(*,*)' Partition created data set size of ', WORLD_RANK,BYTESN
+   IF(WORLD_RANK == 0) WRITE(*,*)' Partitions created data set size of ', WORLD_RANK,BYTESN
 !
 !  save to one file, all partitions at the same time
 !
@@ -119,46 +120,65 @@ PROGRAM  EXAMPLE_MPI_IO
     CPUS = REAL(VALS(5)*3600+VALS(6)*60+VALS(7))+REAL(VALS(8))*0.001
    END IF
    
-   OK = FLL_MPI_WRITE(PDATA_SET,'PartitionedFile',10,0, world_rank, MPI_COMM_WORLD, 'A', FPAR)
+!   OK = FLL_MPI_WRITE(PDATA_SET,'PartitionedFile',10,0, world_rank, MPI_COMM_WORLD, 'A', FPAR)
    
+   CALL MPI_BARRIER(MPI_COMM_WORLD,ierr)
    IF(WORLD_RANK == 0)THEN 
-!     CALL CPU_TIME(FINISH)
-!     WRITE(*,*)'Time writing paralell to single file  (N-1 model):', FINISH-START
       CALL DATE_AND_TIME(VALUES=VALS)
       CPUE = REAL(VALS(5)*3600+VALS(6)*60+VALS(7))+REAL(VALS(8))*0.001
       WRITE(*,*)' Time writing paralell to single file  (N-1 model):',CPUE-CPUS
    END IF
-   CALL MPI_BARRIER(MPI_COMM_WORLD,ierr)
 !
-!  save to several separate files
-!  all partitions at the same time
+!  save to 2 separate files in S-N-M mode
 !
    IF(WORLD_RANK == 0)THEN
-!    CALL CPU_TIME(START)
+    CALL DATE_AND_TIME(VALUES=VALS)
+    CPUS = REAL(VALS(5)*3600+VALS(6)*60+VALS(7))+REAL(VALS(8))*0.001
+   END IF
+
+   OK = FLL_MPI_WRITE_SNM(PDATA_SET,PMPI,FPAR)
+
+   CALL MPI_BARRIER(MPI_COMM_WORLD,ierr)
+   IF(WORLD_RANK == 0)THEN 
+      CALL DATE_AND_TIME(VALUES=VALS)
+      CPUE = REAL(VALS(5)*3600+VALS(6)*60+VALS(7))+REAL(VALS(8))*0.001
+      WRITE(*,*)"Time writing serial to 2 files (S-N-M model):",CPUE-CPUS
+   END IF
+
+   CALL MPI_BARRIER(MPI_COMM_WORLD,ierr)
+stop
+
+!
+!  save to 2 separate files all partitions at the same time
+!
+   IF(WORLD_RANK == 0)THEN
     CALL DATE_AND_TIME(VALUES=VALS)
     CPUS = REAL(VALS(5)*3600+VALS(6)*60+VALS(7))+REAL(VALS(8))*0.001
    END IF
 
    OK = FLL_MPI_WRITE_NM(PDATA_SET,PMPI,FPAR)
 
+   CALL MPI_BARRIER(MPI_COMM_WORLD,ierr)
    IF(WORLD_RANK == 0)THEN 
-!      CALL CPU_TIME(FINISH)
-!      WRITE(*,*)'Time writing paralell to a 2 file file (N-M model):', FINISH-START
       CALL DATE_AND_TIME(VALUES=VALS)
       CPUE = REAL(VALS(5)*3600+VALS(6)*60+VALS(7))+REAL(VALS(8))*0.001
-      WRITE(*,*)"Time writing paralell to a 2 file file (N-M model):",CPUE-CPUS
+      WRITE(*,*)"Time writing paralell to 2 partitions file (N-M model):",CPUE-CPUS
    END IF
 
-   CALL MPI_BARRIER(MPI_COMM_WORLD,ierr)
 
    IF(WORLD_RANK == 0) THEN 
      CALL READ_INPUT(NAME_OF_FILE,NFILES,1_LINT*NPROC)
    END IF
 
    CALL FLL_RM(PMPI,FPAR)
+!
+!  save to 4 separate files all partitions at the same time
+!
    PMPI => FLL_MPI_PROC_STRUCT(FPAR)
    CALL FLL_NMIO_STRUCT(PMPI,'beda','bmpi',4_LINT, FPAR)
 
+
+   CALL MPI_BARRIER(MPI_COMM_WORLD,ierr)
    IF(WORLD_RANK == 0)THEN
     CALL CPU_TIME(START)
     CALL DATE_AND_TIME(VALUES=VALS)
@@ -167,17 +187,20 @@ PROGRAM  EXAMPLE_MPI_IO
 
    OK = FLL_MPI_WRITE_NM(PDATA_SET,PMPI,FPAR)
 
+   CALL MPI_BARRIER(MPI_COMM_WORLD,ierr)
    IF(WORLD_RANK == 0)THEN 
 !      CALL CPU_TIME(FINISH)
 !      WRITE(*,*)'Time writing paralell to a 4 file file (N-M model)', FINISH-START
       CALL DATE_AND_TIME(VALUES=VALS)
       CPUE = REAL(VALS(5)*3600+VALS(6)*60+VALS(7))+REAL(VALS(8))*0.001
-      WRITE(*,*)' Time writing paralell to a 4 file file (N-M model):',CPUE-CPUS
+      WRITE(*,*)' Time writing paralell to 4 partitions file (N-M model):',CPUE-CPUS
    END IF
+
+
+!
+!  write to individual files
+!
    CALL MPI_BARRIER(MPI_COMM_WORLD,ierr)
-   
-   
-!   IF(WORLD_RANK == 0)CALL CPU_TIME(START)
    IF(WORLD_RANK == 0)THEN
     CALL DATE_AND_TIME(VALUES=VALS)
     CPUS = REAL(VALS(5)*3600+VALS(6)*60+VALS(7))+REAL(VALS(8))*0.001
@@ -185,16 +208,17 @@ PROGRAM  EXAMPLE_MPI_IO
 
    CALL SAVE_INDIVID_FILES(PDATA_SET,WORLD_RANK,FPAR)
 
+   CALL MPI_BARRIER(MPI_COMM_WORLD,ierr)
    IF(WORLD_RANK == 0)THEN 
-!     CALL CPU_TIME(FINISH)
-!     WRITE(*,*)'Time writing to individual files (N-N model):', FINISH-START
       CALL DATE_AND_TIME(VALUES=VALS)
       CPUE = REAL(VALS(5)*3600+VALS(6)*60+VALS(7))+REAL(VALS(8))*0.001
       WRITE(*,*)' Time writing to individual files (N-N model):',CPUE-CPUS
    END IF
    CALL MPI_BARRIER(MPI_COMM_WORLD,ierr)
 
-
+!
+!  save entire data set from too partiton: 1-1 model
+!
    IF(WORLD_RANK == 0)CALL SAVE_ROOT_PART_FILE(PDATA_SET,FPAR)
 !
 !  Copy FLL_MPI_STRUCT date set which now exists on root partition onlyc
