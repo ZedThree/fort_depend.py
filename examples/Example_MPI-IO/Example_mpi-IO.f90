@@ -101,7 +101,7 @@ PROGRAM  EXAMPLE_MPI_IO
 !
 !   create sample data se
 !
-   NSIZE = 10000 !+ 100*WORLD_RANK
+   NSIZE = 5000000 !+ 100*WORLD_RANK
 
    CALL CREATE_DATA_SET(PDATA_SET,NSIZE, WORLD_RANK)
 !   IF(WORLD_RANK == 0) OK = FLL_WRITE_FFA(PDATA_SET,'test.bcs',10,'B',FPAR)
@@ -120,7 +120,7 @@ PROGRAM  EXAMPLE_MPI_IO
     CPUS = REAL(VALS(5)*3600+VALS(6)*60+VALS(7))+REAL(VALS(8))*0.001
    END IF
    
-!   OK = FLL_MPI_WRITE(PDATA_SET,'PartitionedFile',10,0, world_rank, MPI_COMM_WORLD, 'A', FPAR)
+   OK = FLL_MPI_WRITE(PDATA_SET,'PartitionedFile',10,0, world_rank, MPI_COMM_WORLD, 'A', FPAR)
    
    CALL MPI_BARRIER(MPI_COMM_WORLD,ierr)
    IF(WORLD_RANK == 0)THEN 
@@ -146,8 +146,6 @@ PROGRAM  EXAMPLE_MPI_IO
    END IF
 
    CALL MPI_BARRIER(MPI_COMM_WORLD,ierr)
-stop
-
 !
 !  save to 2 separate files all partitions at the same time
 !
@@ -164,7 +162,6 @@ stop
       CPUE = REAL(VALS(5)*3600+VALS(6)*60+VALS(7))+REAL(VALS(8))*0.001
       WRITE(*,*)"Time writing paralell to 2 partitions file (N-M model):",CPUE-CPUS
    END IF
-
 
    IF(WORLD_RANK == 0) THEN 
      CALL READ_INPUT(NAME_OF_FILE,NFILES,1_LINT*NPROC)

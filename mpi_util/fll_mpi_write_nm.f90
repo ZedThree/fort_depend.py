@@ -97,7 +97,7 @@ CONTAINS
 !        local process rank, for each group of processes it will start with 0
 !
         COMM = FLL_GETNDATA_I0(PIO,'communicator',1_LINT,FPAR)
-        IF(COMM /= MPI_COMM_NULL)RETURN
+        IF(COMM == MPI_COMM_NULL)CYCLE
         
         NAME_OF_FILE = FLL_GETNDATA_S0(PIO,'name-of-file',1_LINT,FPAR)
         IOUNIT = FLL_GETNDATA_I0(PIO,'io-descrpt', 1_LINT, FPAR)
