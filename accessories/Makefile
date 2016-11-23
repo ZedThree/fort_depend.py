@@ -37,7 +37,8 @@ DEP_FILE=project.dep
 
 #SUBDIRS= $(dir $(wildcard $(srcdir)/*))
 SUBDIRS= \
-	fll_cat
+	fll_cat\
+	fll_convert
 
 
 
