@@ -31,12 +31,29 @@ def run(file,fmt,efmt,ofile,ofmt):
       sys.exit()
 
     print(" ")  
-    print("\033[039m Specified file  is:       \033[032m"+file+"\033[039m")
+    print("\033[039m Specified input file is:  \033[032m"+file+"\033[039m")
     if fmt == 'b'  or fmt == 'B':
-      print("\033[039m Specified file format is: \033[032mbinary\033[039m") 
+      print("\033[039m Specified input file format is: \033[032mbinary\033[039m") 
     else:
-      print("\033[039m Specified file format is: \033[032mASCII \033[039m")  
-    
+      print("\033[039m Specified input file format is: \033[032mASCII \033[039m")  
+      
+    if efmt == 'fll':
+      print("\033[039m Specified input file type  is: \033[032mFLL \033[039m")  
+    else:
+      print("\033[039m Specified input file type is: \033[032mFFA \033[039m")  
+      
+    print(" ")  
+    print("\033[039m Specified outpu file is:  \033[032m"+ofile+"\033[039m")
+    if fmt == 'b'  or fmt == 'B':
+      print("\033[039m Specified input file format is: \033[032mbinary\033[039m") 
+    else:
+      print("\033[039m Specified input file format is: \033[032mASCII \033[039m") 
+      
+    if ofmt == 'fll':
+      print("\033[039m Specified output file type  is: \033[032mFLL \033[039m")  
+    else:
+      print("\033[039m Specified output file type is: \033[032mFFA \033[039m") 
+      
     if sys.version_info < (3,0):
       p = Popen([executable], stdin=PIPE) #NOTE: no shell=True here
       p.communicate(os.linesep.join([file, fmt, efmt, ofile,ofmt]))
@@ -50,7 +67,7 @@ def print_header():
      print ("\033[031m                                                                                   \033[039m")
      print ("\033[031m               \033[039m              fll_convert   - v1.1       \033[031m                          \033[039m")
      print ("\033[031m                                                                                   \033[039m")
-     print ("\033[031m             \033[039m          prints content of file on screen  \033[031m                    \033[039m")
+     print ("\033[031m             \033[039m                 conversion utility  \033[031m                    \033[039m")
      print ("\033[031m                                                                                  \033[039m")
      print ("\033[031m************************************************************************************ \033[039m")
 
