@@ -28,33 +28,41 @@
 #
 #
 #
+
+EXE    = fll_convert
+
 include src_dir_path.mk
-include ../config.mk
+include ../../config.mk
 
 DEP_FILE=project.dep
 
-#FMODDIRS= ../../data_util
+FMODDIRS= ../../data_util
 
-#SUBDIRS= $(dir $(wildcard $(srcdir)/*))
-SUBDIRS= \
-	fll_cat\
-	fll_convert
+FFILES= $(notdir $(wildcard $(srcdir)/*.f90))
 
 
+OFILES=$(FFILES:%.f90=%.o)
+XOFILES=$(wildcard ../../data_util/*.o)
 
 ###########################################################################
 
-all: $(SUBDIRS:%=%.all)
+all: $(EXE).x 
 
-include ../rules.mk
+include ../../rules.mk
 
-clean: $(SUBDIRS:%=%.clean)
-	rm -f *.x *.o *.mod
+$(EXE).x: $(OFILES) $(XOFILES)
+	$(FC) $(LDFLAGS) -o $@ $^
 
-depend: $(SUBDIRS:%=%.depend)
+clean:
+	rm -f *.x *.o *.mod $(EXE)
 
-install: $(SUBDIRS:%=%.install)
+depend: $(FFILES)
+	@echo "Making dependencies!"
+	cd $(srcdir) && $(MAKEDEPEND) -r  $(PROJ_ROOT_PATH) -d $(FMODDIRS)  -w -o $(srcdir)/$(DEP_FILE) -f $(FFILES)
 
-test: $(SUBDIRS:%=%.test)
 
-chk: $(SUBDIRS:%=%.chk)
+install: $(EXE).x $(EXE).py
+	$(INSTALL) $(EXE).x $(bin_dir)/$(EXE)$(POSTFIX).x
+	$(INSTALL) $(EXE).py $(bin_dir)/$(EXE)$(POSTFIX).py
+
+-include $(srcdir)/project.dep

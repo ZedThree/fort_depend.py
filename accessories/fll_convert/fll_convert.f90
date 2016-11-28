@@ -43,12 +43,12 @@
 !     Description
 !
 !
- PROGRAM  FLL_CATU
+ PROGRAM  FLL_CONVERT
 
     USE FLL_MODS_M
     IMPLICIT NONE
 !
-! Description: cat file
+! Description: conversion utility
 !
 ! 
 ! History:
@@ -59,30 +59,36 @@
 !
 ! External Modules used
 !
-   CHARACTER(LEN=FILE_NAME_LENGTH) FILE
+   CHARACTER(LEN=FILE_NAME_LENGTH) FILE,OUTFILE
    TYPE(DNODE), POINTER  :: PNODE
    TYPE(FUNC_DATA_SET) :: FPAR
    CHARACTER :: FMT, SCAN
-   CHARACTER(LEN=3) :: EFMT
+   CHARACTER(LEN=3) :: EFMT,OFMT
+   LOGICAL :: OK
 !
-!  read a file and print on screen
+!  read a file and save it
 !
     READ(*,*)FILE
     READ(*,*)FMT 
     READ(*,'(A3)')EFMT 
-    READ(*,*)SCAN 
+    READ(*,*)OUTFILE
+    READ(*,'(A3)')OFMT 
 
     SELECT CASE(EFMT)
      CASE('fll')
-      PNODE => FLL_READ(FILE,8,FMT,FPAR,SCAN = SCAN)
+      PNODE => FLL_READ(FILE,8,FMT,FPAR)
      CASE('ffa')
-      PNODE => FLL_READ_FFA(FILE,8,FMT,FPAR,SCAN = SCAN)
+      PNODE => FLL_READ_FFA(FILE,8,FMT,FPAR)
     END SELECT
-!
-!  print node on the screen
-!
-   CALL FLL_CAT(PNODE, 6, .TRUE.,FPAR,SCAN = SCAN)
-   WRITE(*,*)
+
+    SELECT CASE(OFMT)
+     CASE('fll')
+      OK = FLL_WRITE(PNODE,OUTFILE,8,FMT,FPAR)
+     CASE('ffa')
+      OK = FLL_WRITE_FFA(PNODE, OUTFILE,8,FMT,FPAR)
+    END SELECT    
+    
+    
    CALL FLL_RM(PNODE,FPAR)
 
   
