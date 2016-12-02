@@ -454,7 +454,7 @@ CONTAINS
         ELSE IF(ASSOCIATED(PNODE%S1))THEN
           NDIM = SIZE(PNODE%S1, DIM =1, KIND = LINT)
           DO I = 1,NDIM
-            WRITE(IOUNIT)"'",PNODE%S1(I),"'"
+            WRITE(IOUNIT)PNODE%S1(I)
           END DO          
           SAVED = .TRUE.
 !
@@ -488,7 +488,7 @@ CONTAINS
           NDIM  = SIZE(PNODE%S2, DIM =1, KIND = LINT)
           NSIZE = SIZE(PNODE%S2, DIM =2, KIND = LINT)
           DO J=1,NSIZE
-            WRITE(IOUNIT)("'",PNODE%S2(I,J),"' ", I = 1,NDIM)
+            WRITE(IOUNIT)(PNODE%S2(I,J), I = 1,NDIM)
           END DO           
           SAVED = .TRUE.
       END IF
@@ -506,7 +506,7 @@ CONTAINS
          CASE('L')
             WRITE(IOUNIT)PNODE%L0
          CASE('S')
-            WRITE(IOUNIT)"'",PNODE%S0,"'"
+            WRITE(IOUNIT)PNODE%S0
 
          CASE DEFAULT 
          
