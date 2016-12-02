@@ -87,7 +87,7 @@ if __name__ == "__main__":
     # Add command line arguments
     parser = argparse.ArgumentParser(description='FLL configure script')
     parser.add_argument('-i','--file',nargs=1,help='Input file')
-    parser.add_argument('-f','--format',nargs=1,help='Format of the file')
+    parser.add_argument('-f','--format',nargs=1,help='Format of the file - ASCII, binary')
     parser.add_argument('-o','--output_file',nargs=1,help='Output file')
     parser.add_argument('-e','--format_input',nargs=1,help='Input file format')
     parser.add_argument('-g','--format_output',nargs=1,help='Output file format')
@@ -103,7 +103,7 @@ if __name__ == "__main__":
     output = args.output_file[0] if args.output_file else None
 
     if not file:
-        print ("\033[031mError: \033[039m missing name of file\033[031m-c \033[032m")
+        print ("\033[031mError: \033[039m missing name of file \033[031m-i \033[039m")
         sys.exit()
 
     if not format:
