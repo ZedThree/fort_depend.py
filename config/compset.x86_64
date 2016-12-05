@@ -5,8 +5,8 @@
 
 # Fortran compiler and flags
 FC='ifort'
-FFLAGS='-O2 -msse3 -ip -convert big_endian -r8 -std03 -fpp'
-LDFLAGS='-O2 -msse3 -ip -convert big_endian -r8 -std03 -i-static'
+FFLAGS='-O2 -msse3 -ip -r8 -std03 -fpp'
+LDFLAGS='-O2 -msse3 -ip -r8 -std03 -i-static'
 
 # C compiler
 CC='icc'

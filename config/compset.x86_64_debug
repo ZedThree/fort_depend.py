@@ -5,8 +5,8 @@
 
 # Fortran compiler and flags
 FC='ifort'
-FFLAGS='-msse3 -g -traceback -check -warn -convert big_endian -r8 -std03 -fpe0 -ftrapuv'
-LDFLAGS='-msse3 -g -traceback -check -warn -convert big_endian -r8 -std03 -i-static -fpe0 -ftrapuv'
+FFLAGS='-msse3 -g -traceback -check -warn -r8 -std03 -fpe0 -ftrapuv'
+LDFLAGS='-msse3 -g -traceback -check -warn -r8 -std03 -i-static -fpe0 -ftrapuv'
 
 # C compiler
 CC='icc'
