@@ -54,8 +54,8 @@ CONTAINS
 ! NUMBER       In         position of node in list
 ! LTYPE        In         type of node  - can be *
 ! DATADIM      In         dimensions of data the node should contain
-!                         can be 0 - scalar), 1 -1D array, 2 -2D array 
-!                         any other number (prefer -1) - do not care about dimensions
+!                         can be 0 - scalar, 1 -1D array, 2 -2D array 
+!                         if any other number specified (preferrable -1) - do not care about dimensions
 ! RECURSE      In         search recursively
 ! PFIND        Out        return pointer to located node
 ! FPAR         In/Out     structure containing function specific data
