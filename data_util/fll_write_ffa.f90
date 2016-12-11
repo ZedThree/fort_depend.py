@@ -86,7 +86,6 @@ CONTAINS
     CASE DEFAULT
       WRITE(FPAR%MESG,'(A,A)')' Write  - unknown format',TRIM(FMT)
       CALL FLL_OUT('ALL',FPAR)
-      CALL FLL_OUT('ALL',FPAR)
       FPAR%SUCCESS = .FALSE.
       PNODE => NULL()
       OK = .FALSE.
