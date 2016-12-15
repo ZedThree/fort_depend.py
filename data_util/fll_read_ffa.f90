@@ -464,6 +464,12 @@ CONTAINS
           REWIND(IOUNIT)
           READ(IOUNIT,IOSTAT=IOSTAT)VER
           READ(IOUNIT,IOSTAT=IOSTAT)NAME,LTYPE,NSIZE,NDIM,NLINK
+       ELSE
+    	  WRITE(FPAR%MESG,'(A)')' Read-ffa - error reading ffa file '
+    	  CALL FLL_OUT('ALL',FPAR)
+    	  FPAR%SUCCESS = .FALSE.
+    	  RETURN
+
        END IF
        INQUIRE(UNIT = IOUNIT, POS=POS)
       
