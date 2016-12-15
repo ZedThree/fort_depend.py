@@ -1,13 +1,13 @@
 
 FC                 = gfortran
 FCMODINCFLAG       = -I
-FFLAGS             = -g -ffpe-trap=invalid,zero,overflow -fdefault-real-8 -fdefault-double-8 -fconvert=big-endian -frecord-marker=4 -fbounds-check -Wall -Wextra -fopenmp -x f95-cpp-input
-FFFLAGS            = -g -ffpe-trap=invalid,zero,overflow -fdefault-real-8 -fdefault-double-8 -fconvert=big-endian -frecord-marker=4 -fbounds-check -Wall -Wextra -fopenmp -x f95-cpp-input
+FFLAGS             = -g -ffpe-trap=invalid,zero,overflow -fdefault-real-8 -fdefault-double-8  -frecord-marker=4 -fbounds-check -Wall -Wextra -fopenmp -x f95-cpp-input
+FFFLAGS            = -g -ffpe-trap=invalid,zero,overflow -fdefault-real-8 -fdefault-double-8  -frecord-marker=4 -fbounds-check -Wall -Wextra -fopenmp -x f95-cpp-input
 UPPER_MODFILE_NAME =
-LDFLAGS            = -g -ffpe-trap=invalid,zero,overflow -fdefault-real-8 -fdefault-double-8 -fconvert=big-endian -frecord-marker=4 -fbounds-check -Wall -Wextra -fopenmp
+LDFLAGS            = -g -ffpe-trap=invalid,zero,overflow -fdefault-real-8 -fdefault-double-8  -frecord-marker=4 -fbounds-check -Wall -Wextra -fopenmp
 CC                 = gcc -fopenmp
 CFLAGS             = -g -fopenmp
 C_LDFLAGS          = -g -fopenmp
 MPI_FC             = mpif90
-MPI_FFLAGS         = -g -ffpe-trap=invalid,zero,overflow -fdefault-real-8 -fdefault-double-8 -fconvert=big-endian -frecord-marker=4 -fbounds-check -Wall -Wextra -fopenmp -x f95-cpp-input
-MPI_LDFLAGS        = -g -ffpe-trap=invalid,zero,overflow -fdefault-real-8 -fdefault-double-8 -fconvert=big-endian -frecord-marker=4 -fbounds-check -Wall -Wextra -fopenmp
+MPI_FFLAGS         = -g -ffpe-trap=invalid,zero,overflow -fdefault-real-8 -fdefault-double-8  -frecord-marker=4 -fbounds-check -Wall -Wextra -fopenmp -x f95-cpp-input
+MPI_LDFLAGS        = -g -ffpe-trap=invalid,zero,overflow -fdefault-real-8 -fdefault-double-8  -frecord-marker=4 -fbounds-check -Wall -Wextra -fopenmp
