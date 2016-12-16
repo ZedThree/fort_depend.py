@@ -35,7 +35,7 @@ CONTAINS
    RECURSIVE FUNCTION FLL_LOCATE(PNODE,NAME,LTYPE,DATADIM,NUMBER,RECURSE,FPAR) RESULT(PFIND)
 !
 ! Description: function finds node identified by name, type, position in list, dimensions of data it contains
-!                       serach can be done recursively
+!                       search can be done recursively
 !
 ! External Modules used
 !   
