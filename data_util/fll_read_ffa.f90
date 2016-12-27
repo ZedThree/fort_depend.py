@@ -79,7 +79,7 @@ CONTAINS
    
    INQUIRE (FILE=TRIM(FILE), EXIST=OK)
    IF(.NOT.OK) THEN
-      WRITE(FPAR%MESG,'(A,A)')' Read  - file does not exist ',TRIM(FILE)
+      WRITE(FPAR%MESG,'(A,A)')' Read-ffa -  file does not exist ',TRIM(FILE)
       CALL FLL_OUT('ALL',FPAR)
       FPAR%SUCCESS = .FALSE.
       PNODE => NULL()
@@ -98,7 +98,7 @@ CONTAINS
     CASE('U','u','*')
       FMT_LOC = 'U'
     CASE DEFAULT
-      WRITE(FPAR%MESG,'(A,A)')' Read  - unknown format',TRIM(FMT)
+      WRITE(FPAR%MESG,'(A,A)')' Read-ffa -  unknown format',TRIM(FMT)
       CALL FLL_OUT('ALL',FPAR)
       FPAR%SUCCESS = .FALSE.
       PNODE => NULL()
@@ -123,7 +123,7 @@ CONTAINS
     END SELECT
 
     IF(ISTAT/=0) THEN
-      WRITE(FPAR%MESG,'(A,A)')' Read  - error opening file ',TRIM(FILE)
+      WRITE(FPAR%MESG,'(A,A)')' Read-ffa -  error opening file ',TRIM(FILE)
       CALL FLL_OUT('ALL',FPAR)
       FPAR%SUCCESS = .FALSE.
       PNODE => NULL()
@@ -136,7 +136,7 @@ CONTAINS
     
     CLOSE(IOUNIT)
     IF(.NOT.ASSOCIATED(PNODE))THEN
-       WRITE(FPAR%MESG,'(A,A)')' Read  - error reading file ',TRIM(FILE)
+       WRITE(FPAR%MESG,'(A,A)')' Read-ffa  - error opening file ',TRIM(FILE)
        CALL FLL_OUT('ALL',FPAR)
        FPAR%SUCCESS = .FALSE.
     END IF
@@ -202,7 +202,7 @@ CONTAINS
     CALL READ_HEADER_FFA(IOUNIT,FMT,POS,NAME,LTYPE,FTYPE,NDIM,NSIZE,NSUB,NDIMO,NSIZEO,EXTRALINE,FPAR_H)
     
     IF(.NOT.FPAR_H%SUCCESS)THEN
-      WRITE(FPAR%MESG,'(A)')' Read  - error reading header '
+      WRITE(FPAR%MESG,'(A)')' Read-ffa -  error reading header '
       CALL FLL_OUT('ALL',FPAR)
       FPAR%SUCCESS = .FALSE.
       PNODE => NULL()
@@ -216,7 +216,7 @@ CONTAINS
     END IF
 
     IF(.NOT.ASSOCIATED(PNODE))THEN
-      WRITE(FPAR%MESG,'(A)')' Read  - error allocating node '
+      WRITE(FPAR%MESG,'(A)')' Read-ffa -  error allocating node '
       CALL FLL_OUT('ALL',FPAR)
       FPAR%SUCCESS = .FALSE.
       PNODE => NULL()
@@ -456,20 +456,24 @@ CONTAINS
        NSIZE = 0
        READ(IOUNIT,IOSTAT=IOSTAT, POS=POS)NAME,LTYPE,NSIZE,NDIM,NLINK
 
-       IF(TRIM(NAME) == 'FFA-format-v2')THEN 
+       IF(POS == 1)THEN
+
+         IF(TRIM(NAME) == 'FFA-format-v2')THEN 
 !
 !  DISREGARD, THIS IS JUST INFO ABOUT VERSION
 !  CONSIDER HAVING VERSION ONLY AT THE BEGINING OF THE FILE
 !
-          REWIND(IOUNIT)
-          READ(IOUNIT,IOSTAT=IOSTAT)VER
-          READ(IOUNIT,IOSTAT=IOSTAT)NAME,LTYPE,NSIZE,NDIM,NLINK
-       ELSE
-    	  WRITE(FPAR%MESG,'(A)')' Read-ffa - error reading ffa file '
-    	  CALL FLL_OUT('ALL',FPAR)
-    	  FPAR%SUCCESS = .FALSE.
-    	  RETURN
+            REWIND(IOUNIT)
+            READ(IOUNIT,IOSTAT=IOSTAT)VER
+            READ(IOUNIT,IOSTAT=IOSTAT)NAME,LTYPE,NSIZE,NDIM,NLINK
+         ELSE
+     	    WRITE(FPAR%MESG,'(A)')' Read-ffa - error reading ffa header '
+    	    CALL FLL_OUT('ALL',FPAR)
+    	    FPAR%SUCCESS = .FALSE.
+    	    RETURN
 
+         END IF
+       
        END IF
        INQUIRE(UNIT = IOUNIT, POS=POS)
       
@@ -496,15 +500,16 @@ CONTAINS
       END IF
 
       FPAR%SUCCESS = .TRUE.
+      
       RETURN
     END SELECT
     
-    WRITE(FPAR%MESG,'(A)')' Read  - reading header error '
+    WRITE(FPAR%MESG,'(A)')' Read-ffa -  reading header error '
     CALL FLL_OUT('ALL',FPAR)
     FPAR%SUCCESS = .FALSE.
     RETURN
     
-    WRITE(FPAR%MESG,'(A)')' Read  - reading header error, reached end of file '
+    WRITE(FPAR%MESG,'(A)')' Read-ffa -  reading header error, reached end of file '
     CALL FLL_OUT('ALL',FPAR)
     FPAR%SUCCESS = .FALSE.
     RETURN
