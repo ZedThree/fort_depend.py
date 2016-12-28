@@ -33,9 +33,12 @@ include src_dir_path.mk
 
 SUBDIRS= \
 data_util\
-mpi_util \
 accessories\
 examples\
+
+ifneq ($(strip $(MPI_FC)),)
+  SUBDIRS+= mpi_util
+endif
 
 SUBCLEAN=$(SUBDIRS)
 

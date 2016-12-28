@@ -103,17 +103,17 @@ if __name__ == "__main__":
     output = args.output_file[0] if args.output_file else None
 
     if not file:
-        print ("\033[031mError: \033[039m missing name of file \033[031m-i \033[039m")
+        print ("\033[031mError: \033[039m missing name of file, option \033[031m -i \033[039m")
         sys.exit()
 
     if not format:
-        print ("\033[031mError: \033[039m missing file format\033[031m-c \033[032m")
+        print ("\033[031mError: \033[039m missing file format, option\033[031m -c \033[039m")
         print ("\033[031m       \033[039m available options are: \033[032m a - ASCII\033[039m")
         print ("\033[031m       \033[039m                        \033[032m b - binary format\033[039m")
         sys.exit()
     
     if not output:
-        print ("\033[031mError: \033[039m missing output file \033[031m-o \033[032m")
+        print ("\033[031mError: \033[039m missing output file, option \033[031m -o \033[039m")
         sys.exit()
 
     if not eformat:
@@ -121,7 +121,7 @@ if __name__ == "__main__":
     else:
         
      if not('fll') or not('ffa'):
-        print ("\033[031mError: \033[039m wrong file format\033[031m-e \033[032m")
+        print ("\033[031mError: \033[039m wrong input file format, option \033[031m -e \033[039m")
         print ("\033[031m       \033[039m available options are: \033[032m fll - fll native format\033[039m")
         print ("\033[031m       \033[039m                        \033[032m ffa - ffa format\033[039m")
         sys.exit()
@@ -132,7 +132,7 @@ if __name__ == "__main__":
     else:
         
      if not('fll') or not('ffa'):
-        print ("\033[031mError: \033[039m wrong file format\033[031m-e \033[032m")
+        print ("\033[031mError: \033[039m wrong output file format, option\033[031m -g \033[032m")
         print ("\033[031m       \033[039m available options are: \033[032m fll - fll native format\033[039m")
         print ("\033[031m       \033[039m                        \033[032m ffa - ffa format\033[039m")
         sys.exit()
