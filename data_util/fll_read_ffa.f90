@@ -208,7 +208,7 @@ CONTAINS
       PNODE => NULL()
       RETURN
     END IF
-    
+
     IF(TRIM(LTYPE) == 'DIR' .OR. TRIM(LTYPE) == 'N')THEN
       PNODE => FLL_MK(NAME,LTYPE,0_LINT,0_LINT,FPAR_H)
     ELSE
@@ -433,11 +433,12 @@ CONTAINS
       IF(TRIM(LTYPE) == 'DIR' .OR. TRIM(LTYPE) == 'N')THEN
         NDIM   = NLINK
       ELSE
-      
          IF(TRIM(LTYPE) == 'L')THEN 
             LTYPE ='S'
          ELSE IF(TRIM(LTYPE) == 'J')THEN 
             LTYPE ='L'
+         ELSE IF(TRIM(LTYPE) == 'A')THEN 
+            LTYPE ='S'
          END IF
       
          IF(NLINK > 0  )THEN
@@ -490,6 +491,8 @@ CONTAINS
            LTYPE ='S'
          ELSE IF(TRIM(LTYPE(1:1)) == 'J')THEN 
            LTYPE ='L'
+         ELSE IF(TRIM(LTYPE) == 'A')THEN 
+            LTYPE ='S'
          END IF
       
          IF(NLINK > 0  )THEN
@@ -644,7 +647,20 @@ CONTAINS
          END IF
        END IF
 
-      CASE('C')
+      CASE('A')
+       IF(NDIM == 1)THEN
+         IF(NSIZE > 1)THEN
+           READ(IOUNIT,*,IOSTAT=IOSTAT)(PNODE%C,I=1,NSIZE)
+         ELSE
+           READ(IOUNIT,*,IOSTAT=IOSTAT)PNODE%C
+         END IF
+       ELSE
+         IF(NSIZE == 1)THEN
+           READ(IOUNIT,*,IOSTAT=IOSTAT)(PNODE%C,I=1,NDIM)
+         ELSE
+           READ(IOUNIT,*,IOSTAT=IOSTAT)((PNODE%C,I=1,NDIM),J=1,NSIZE)
+         END IF
+       END IF
 
       CASE('N','DIR')
          RETURN
@@ -703,6 +719,7 @@ CONTAINS
 !  Local declarations
 !
     CHARACTER(LEN=SSTRING_LENGTH) :: T
+    CHARACTER :: ST
     INTEGER(LINT) :: I,J
     INTEGER :: IOSTAT
     LOGICAL :: OK
@@ -826,6 +843,44 @@ CONTAINS
          END IF
        END IF
 
+
+      CASE('A')
+       IF(NDIM == 1)THEN
+         IF(NSIZE > 1)THEN
+           READ(IOUNIT,IOSTAT=IOSTAT,POS=POS)NINTEG
+           DO I=1,NSIZE
+             READ(IOUNIT,IOSTAT=IOSTAT)ST
+             PNODE%S1(I) = ' '
+             PNODE%S1(I) = ST
+           END DO
+           INQUIRE(UNIT = IOUNIT, POS=POS)
+         ELSE
+           READ(IOUNIT,IOSTAT=IOSTAT,POS=POS)NINTEG,ST
+           INQUIRE(UNIT = IOUNIT, POS=POS)
+           PNODE%S0 = ST
+         END IF
+       ELSE
+         IF(NSIZE == 1)THEN
+           READ(IOUNIT,IOSTAT=IOSTAT,POS=POS)NINTEG
+           DO I=1,NDIM
+             READ(IOUNIT,IOSTAT=IOSTAT)T
+             PNODE%S1(I) = ' '
+             PNODE%S1(I) = ST
+           END DO
+           INQUIRE(UNIT = IOUNIT, POS=POS)
+         ELSE
+           READ(IOUNIT,IOSTAT=IOSTAT,POS=POS)NINTEG
+           DO J=1,NSIZE
+             DO I=1,NDIM
+              READ(IOUNIT,IOSTAT=IOSTAT)ST
+              PNODE%S2(I,J) = ' '
+              PNODE%S2(I,J) = ST
+             END DO
+           END DO
+           INQUIRE(UNIT = IOUNIT, POS=POS)
+         END IF
+       END IF
+
       CASE('L')
        IF(NDIM == 1)THEN
          IF(NSIZE > 1)THEN
@@ -845,7 +900,6 @@ CONTAINS
          END IF
        END IF
 
-      CASE('C')
 
       CASE('N','DIR')
          RETURN
@@ -916,7 +970,8 @@ CONTAINS
       CASE('S')
        LENGTH = LSTRING_LENGTH
 
-      CASE('C')
+      CASE('A')
+       LENGTH = 1
 
       CASE('N','DIR')
          RETURN
