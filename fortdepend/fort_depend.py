@@ -112,8 +112,12 @@ class FortranProject(object):
         for source_file in self.files.values():
             graph = []
             for mod in source_file.uses:
+                mod_file = self.modules[mod].source_file
+                # Don't add self as a dependency
+                if mod_file.filename.lower() == source_file.filename.lower():
+                    continue
                 try:
-                    graph.append(self.modules[mod].source_file)
+                    graph.append(mod_file)
                 except KeyError:
                     print(Fore.RED + "Error" + Fore.RESET + " module " + Fore.GREEN +
                           mod + Fore.RESET + " not defined in any files. Skipping...",
