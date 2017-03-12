@@ -75,6 +75,11 @@ class FortranFile(object):
         return contains
 
     def get_uses(self):
+        """Return a sorted list of the modules this file USEs
+        """
+
+        if self.modules is None:
+            return []
 
         # flatten list of lists
         return sorted(set([mod for module in self.modules.values()
