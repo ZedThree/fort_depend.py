@@ -44,7 +44,11 @@ def write_depend(outfile="makefile.dep",dep=[],overwrite=False,build=''):
         stri="\n"+os.path.join(build, fil.split(".")[0]+".o"+" : ")
         for j in dep[i]:
             tmp,fil=os.path.split(j)
-            stri=stri+" \\\n\t"+os.path.join(build, fil.split(".")[0]+".o")
+            ext=fil.split(".")[1]
+            if (ext == "inc"):
+                stri=stri+" \\\n\t"+os.path.join(build, fil)
+            else:
+                stri=stri+" \\\n\t"+os.path.join(build, fil.split(".")[0]+".o")
         stri=stri+"\n"
         f.write(stri)
     f.close()
@@ -69,6 +73,7 @@ def create_file_objs(files=None, macros={}):
 
         source_file.file_name = i
         source_file.uses = get_uses(i,macros)
+        source_file.includes = get_includes(i,macros)
         source_file.contains = get_contains(i)
 
         l.append(source_file)
@@ -99,6 +104,30 @@ def get_uses(infile=None, macros={}):
 
     return uniq_mods
 
+def get_includes(infile=None, macros={}):
+    "Return which modules are included in infile after expanding macros"
+    p=re.compile("\#include\s*\"(?P<incfile>\w*).inc\"$",re.IGNORECASE).match
+
+    includes=[]
+
+    with open(infile,'r') as f:
+        t=f.readlines()
+
+    for i in t:
+        tmp=p(i)
+        if tmp:
+            includes.append(tmp.group('incfile').strip()+".inc")
+
+    # Remove duplicates
+    uniq_includes = list(set(includes))
+
+    for i, mod in enumerate(uniq_includes):
+        for k, v in macros.items():
+            if re.match(k, mod, re.IGNORECASE):
+                uniq_includes[i] = mod.replace(k,v)
+
+    return uniq_includes
+
 def get_contains(infile=None):
     "Return all the modules that are in infile"
     p=re.compile("^\s*module\s*(?P<modname>\w*)",re.IGNORECASE).match
@@ -125,6 +154,7 @@ def file_objs_to_mod_dict(file_objs=[]):
     return dic
 
 def get_depends(fob=[],m2f=[],ignore=[]):
+    import os.path
     deps={}
     for i in fob:
         tmp=[]
@@ -134,6 +164,12 @@ def get_depends(fob=[],m2f=[],ignore=[]):
                 tmp.append(m2f[j.lower()])
             except:
                 print "\033[031mError\033[039m module \033[032m"+j+"\033[039m not defined in any files. Skipping..."
+        for j in i.includes:
+            try:
+                os.path.isfile(j)
+                tmp.append(j)
+            except:
+                print "\033[031mError\033[039m include file \033[032m"+j+"\033[039m does not exist. Skipping..."
 
         deps[i.file_name]=tmp
 
@@ -143,6 +179,7 @@ class file_obj:
     def __init__(self):
         self.file_name=None
         self.uses=None
+        self.includes=None
         self.contains=None
         self.depends_on=None
 
