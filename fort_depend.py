@@ -3,11 +3,11 @@ import os
 import re
 
 #Definitions
-def run(files=None,verbose=True,overwrite=None,output=None,macros={},build=''):
+def run(files=None,ignore=None,verbose=True,overwrite=None,output=None,macros={},build=''):
 
     l=create_file_objs(files,macros)
     mod2fil=file_objs_to_mod_dict(file_objs=l)
-    depends=get_depends(fob=l,m2f=mod2fil)
+    depends=get_depends(fob=l,m2f=mod2fil,ignore=ignore)
 
     if verbose:
         for i in depends.keys():
@@ -124,11 +124,12 @@ def file_objs_to_mod_dict(file_objs=[]):
             dic[j.lower()]=i.file_name
     return dic
 
-def get_depends(fob=[],m2f=[]):
+def get_depends(fob=[],m2f=[],ignore=[]):
     deps={}
     for i in fob:
         tmp=[]
         for j in i.uses:
+            if ignore and (j in ignore): continue
             try:
                 tmp.append(m2f[j.lower()])
             except:
@@ -153,6 +154,7 @@ if __name__ == "__main__":
     # Add command line arguments
     parser = argparse.ArgumentParser(description='Generate Fortran dependencies')
     parser.add_argument('-f','--files',nargs='+',help='Files to process')
+    parser.add_argument('-i','--ignore',nargs='+',help='Modules to ignore')
     parser.add_argument('-D',nargs='+',action='append',metavar='NAME=DESCRIPTION',
                         help="""The macro NAME is replaced by DEFINITION in 'use' statements""")
     parser.add_argument('-b','--build',nargs=1,help='Build Directory (prepended to all files in output',
@@ -175,4 +177,4 @@ if __name__ == "__main__":
     output = args.output[0] if args.output else None
     build = args.build[0] if args.build else ''
 
-    run(files=args.files, verbose=args.verbose, overwrite=args.overwrite, macros=macros, output=output, build=build)
+    run(files=args.files, ignore=args.ignore, verbose=args.verbose, overwrite=args.overwrite, macros=macros, output=output, build=build)
