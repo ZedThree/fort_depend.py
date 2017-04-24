@@ -136,7 +136,7 @@ CONTAINS
     
     CLOSE(IOUNIT)
     IF(.NOT.ASSOCIATED(PNODE))THEN
-       WRITE(FPAR%MESG,'(A,A)')' Read-ffa  - error opening file ',TRIM(FILE)
+       WRITE(FPAR%MESG,'(A,A)')' Read-ffa  - error reading file ',TRIM(FILE)
        CALL FLL_OUT('ALL',FPAR)
        FPAR%SUCCESS = .FALSE.
     END IF
