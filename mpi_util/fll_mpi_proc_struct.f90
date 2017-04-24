@@ -124,24 +124,6 @@ CONTAINS
     FPAR%SUCCESS = .FALSE.
     RETURN
    END IF
-!
-!  add to IO_struct structs
-!
-!  PTMP  => FLL_MKDIR('IO-NM_struct',FPAR)
-!  IF(.NOT.FLL_MV(PTMP, PSUBPROC, FPAR))THEN
-!    WRITE(FPAR%MESG,'(A)')' FLL_MPI_PROC_STRUCT: Error moving IO-NM_struct'
-!    CALL FLL_OUT('ALL',FPAR)
-!    FPAR%SUCCESS = .FALSE.
-!    RETURN
-!   END IF
-
-!  PTMP  => FLL_MKDIR('IO-SNM_struct',FPAR)
-!  IF(.NOT.FLL_MV(PTMP, PSUBPROC, FPAR))THEN
-!    WRITE(FPAR%MESG,'(A)')' FLL_MPI_PROC_STRUCT: Error moving IO-NM_struct'
-!    CALL FLL_OUT('ALL',FPAR)
-!    FPAR%SUCCESS = .FALSE.
-!    RETURN
-!   END IF
 
   FPAR%SUCCESS = .TRUE.
   RETURN
