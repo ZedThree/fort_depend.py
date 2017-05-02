@@ -72,7 +72,7 @@ CONTAINS
 !
    LOGICAL :: OK
    CHARACTER :: FMT_LOC
-   INTEGER :: ISTAT
+   INTEGER :: ISTAT,FMTS
    INTEGER(LINT) :: POS
    CHARACTER :: SCAN_LOC
 
@@ -132,9 +132,21 @@ CONTAINS
 !
 !   READ INITIAL NODE
 !
-    PNODE => READ_NODE_FFA(IOUNIT,FMT_LOC,POS,SCAN_LOC,FPAR)
-    
-    CLOSE(IOUNIT)
+    FMTS = 0
+    PNODE => READ_NODE_FFA(IOUNIT,FMT_LOC,POS,SCAN_LOC,FMTS,FPAR)
+
+    IF(FMTS == 1)THEN
+      WRITE(*,*)' Reopening as old format'
+      FMTS = 2
+      CLOSE(IOUNIT)
+      OPEN(UNIT=IOUNIT,STATUS='UNKNOWN',FILE=TRIM(FILE),FORM='UNFORMATTED',&
+           CONVERT='big_endian',IOSTAT=ISTAT)
+      PNODE => READ_NODE_FFA(IOUNIT,FMT_LOC,POS,SCAN_LOC,FMTS,FPAR)
+      CLOSE(IOUNIT)
+    ELSE
+     CLOSE(IOUNIT)
+    END IF
+
     IF(.NOT.ASSOCIATED(PNODE))THEN
        WRITE(FPAR%MESG,'(A,A)')' Read-ffa  - error reading file ',TRIM(FILE)
        CALL FLL_OUT('ALL',FPAR)
@@ -147,7 +159,7 @@ CONTAINS
 !
 !  READS NODE
 !
-  RECURSIVE FUNCTION READ_NODE_FFA(IOUNIT,FMT,POS,SCAN,FPAR) RESULT(PNODE)
+  RECURSIVE FUNCTION READ_NODE_FFA(IOUNIT,FMT,POS,SCAN,FMTS,FPAR) RESULT(PNODE)
 !
 ! Description: Function reads a node
 !
@@ -184,7 +196,7 @@ CONTAINS
     TYPE(DNODE), POINTER :: PNODE
     CHARACTER :: FMT
     TYPE(FUNC_DATA_SET) :: FPAR
-    INTEGER :: IOUNIT
+    INTEGER :: IOUNIT,FMTS
     CHARACTER :: SCAN
 !
 ! Local declarations
@@ -199,7 +211,8 @@ CONTAINS
 !
 !  READ HEADER
 !
-    CALL READ_HEADER_FFA(IOUNIT,FMT,POS,NAME,LTYPE,FTYPE,NDIM,NSIZE,NSUB,NDIMO,NSIZEO,EXTRALINE,FPAR_H)
+    CALL READ_HEADER_FFA(IOUNIT,FMT,POS,NAME,LTYPE,FTYPE,NDIM,NSIZE,NSUB,NDIMO,NSIZEO,&
+          EXTRALINE,FMTS,FPAR_H)
     
     IF(.NOT.FPAR_H%SUCCESS)THEN
       WRITE(FPAR%MESG,'(A)')' Read-ffa -  error reading header '
@@ -234,12 +247,16 @@ CONTAINS
          CASE('A')
            CALL READ_DATA_FFA_ASCII(IOUNIT,PNODE,PNODE%FTYPE,NDIMO,NSIZEO,FPAR_H)
          CASE('B')
-           CALL READ_DATA_FFA_BIN(IOUNIT,PNODE,PNODE%FTYPE,NDIMO,NSIZEO,POS,FPAR_H)
+           IF(FMTS == 0)THEN
+             CALL READ_DATA_FFA_BIN(IOUNIT,PNODE,PNODE%FTYPE,NDIMO,NSIZEO,POS,FPAR_H)
+           ELSE
+             CALL READ_DATA_FFA_BIN_OLD(IOUNIT,PNODE,PNODE%FTYPE,NDIMO,NSIZEO,FPAR_H)
+           END IF 
         END SELECT
       END IF
 
       DO NNODES = 1,NDIM
-        PNEW => READ_NODE_FFA(IOUNIT,FMT,POS,SCAN,FPAR)
+        PNEW => READ_NODE_FFA(IOUNIT,FMT,POS,SCAN,FMTS,FPAR)
         IF(.NOT.ASSOCIATED(PNEW))STOP ' ERROR READING NODE'
 !
 !   ATTACH TO PNODE
@@ -257,9 +274,14 @@ CONTAINS
          CALL READ_DATA_FFA_ASCII(IOUNIT,PNODE,PNODE%FTYPE,PNODE%NDIM,PNODE%NSIZE,FPAR_H)
       CASE('B')
         IF(SCAN /= 'Y')THEN
-        CALL READ_DATA_FFA_BIN(IOUNIT,PNODE,PNODE%FTYPE,PNODE%NDIM,PNODE%NSIZE,POS,FPAR_H)
+           IF(FMTS == 0)THEN
+             CALL READ_DATA_FFA_BIN(IOUNIT,PNODE,PNODE%FTYPE,PNODE%NDIM,PNODE%NSIZE,POS,FPAR_H)
+           ELSE
+             CALL READ_DATA_FFA_BIN_OLD(IOUNIT,PNODE,PNODE%FTYPE,PNODE%NDIM,PNODE%NSIZE,FPAR_H)
+           END IF
         ELSE
           IF(PNODE%NSIZE * PNODE%NDIM == 1)THEN
+            IF(FMTS /= 0)STOP' Cannot use scan == y with old format'
             CALL READ_DATA_FFA_BIN(IOUNIT,PNODE,PNODE%FTYPE,PNODE%NDIM,PNODE%NSIZE,POS,FPAR_H)         
           ELSE
             POS = POS + GET_NEW_FFA_POS(PNODE,PNODE%LTYPE,PNODE%NDIM,PNODE%NSIZE,FPAR_H)
@@ -276,7 +298,7 @@ CONTAINS
 !
 !  READ HEADER OR EACH NODE
 !
-   SUBROUTINE READ_HEADER_FFA(IOUNIT,FMT,POS,NAME,LTYPE,FTYPE,NDIM,NSIZE,NLINK,NDIMO,NSIZEO,EXTRALINE,FPAR)
+   SUBROUTINE READ_HEADER_FFA(IOUNIT,FMT,POS,NAME,LTYPE,FTYPE,NDIM,NSIZE,NLINK,NDIMO,NSIZEO,EXTRALINE,FMTS,FPAR)
 !
 ! Description: Reads header of each node
 !
@@ -312,12 +334,13 @@ CONTAINS
 ! EXTRALINE    In/Out     If node node N but has NSUB > 0 read extra line
 ! FPAR         In/Out     structure containing function specific data
 ! POS          In         position in file
+! FMTPS        In         format specification
 !
 ! Arguments declaration
 !     
     CHARACTER :: FMT
     TYPE(FUNC_DATA_SET) :: FPAR
-    INTEGER :: IOUNIT
+    INTEGER :: IOUNIT,FMTS
     LOGICAL :: EXTRALINE
     INTEGER(LINT) :: NDIM, NSIZE,NLINK,NDIMO,NSIZEO,POS
     CHARACTER(*)  :: LTYPE
@@ -331,6 +354,7 @@ CONTAINS
     CHARACTER*32  :: VER
     INTEGER :: IOSTAT
     LOGICAL :: OK
+    INTEGER(SINT) :: NDIM_S, NSIZE_S,NLINK_S
 
     EXTRALINE = .FALSE.
     
@@ -455,9 +479,16 @@ CONTAINS
 !
     CASE('B')
        NSIZE = 0
-       READ(IOUNIT,IOSTAT=IOSTAT, POS=POS)NAME,LTYPE,NSIZE,NDIM,NLINK
+       IF(FMTS == 0)THEN
+         READ(IOUNIT,IOSTAT=IOSTAT, POS=POS)NAME,LTYPE,NSIZE,NDIM,NLINK
+       ELSE
+         READ(IOUNIT,IOSTAT=IOSTAT)NAME,LTYPE,NSIZE_S,NDIM_S,NLINK_S
+         NDIM  = NDIM_S
+         NSIZE = NSIZE_S
+         NLINK = NLINK_S
+       END IF
 
-       IF(POS == 1)THEN
+       IF(POS == 1 .AND. FMTS == 0)THEN
 
          IF(TRIM(NAME) == 'FFA-format-v2')THEN 
 !
@@ -471,6 +502,7 @@ CONTAINS
      	    WRITE(FPAR%MESG,'(A)')' Read-ffa - error reading ffa header '
     	    CALL FLL_OUT('ALL',FPAR)
     	    FPAR%SUCCESS = .FALSE.
+            FMTS = 1
     	    RETURN
 
          END IF
@@ -914,6 +946,210 @@ CONTAINS
    RETURN
 
    END SUBROUTINE READ_DATA_FFA_BIN
+
+
+
+    SUBROUTINE READ_DATA_FFA_BIN_OLD(IOUNIT,PNODE,LTYPE,NDIM,NSIZE,FPAR)
+!
+! Description: Function reads data contained in Pnode, binary file
+!
+! 
+! History:
+! Version   Date       Patch number  CLA     Comment
+! -------   --------   --------      ---     -------
+! 1.1       10/10/16                         Initial implementation
+!
+!
+! External Modules used
+!      
+    USE FLL_TYPE_M
+    USE FLL_FUNC_PRT_M
+   
+    IMPLICIT NONE
+!
+! Declarations
+!
+! Arguments description
+! Name         In/Out     Function
+! PNODE        In         Pointer to node
+! IOUNIT       In         Number of unit
+! LTYPE        In         type of node
+! NDIM         In         1st dimension of array in the node
+! NSIZE        In         2nd dimension of array in the node
+! FPAR         In/Out     structure containing function specific data
+!
+! Arguments declaration
+!    
+    TYPE(DNODE), POINTER :: PNODE
+    INTEGER :: IOUNIT
+    INTEGER(LINT) :: NDIM,NSIZE
+    CHARACTER(*) :: LTYPE
+    TYPE(FUNC_DATA_SET) :: FPAR
+!
+!  Local declarations
+!
+    CHARACTER(LEN=SSTRING_LENGTH) :: T
+    CHARACTER :: ST
+    INTEGER(LINT) :: I,J
+    INTEGER :: IOSTAT
+    LOGICAL :: OK
+!
+!  BODY
+!
+    IF(NDIM*NSIZE == 0)RETURN
+    SELECT CASE(LTYPE(1:1))
+     CASE('R')
+       IF(NDIM == 1)THEN
+         IF(NSIZE > 1)THEN
+           READ(IOUNIT,IOSTAT=IOSTAT)(PNODE%R1(I),I=1,NSIZE)
+         ELSE
+           READ(IOUNIT,IOSTAT=IOSTAT)PNODE%R0
+         END IF
+       ELSE
+         IF(NSIZE == 1)THEN
+           READ(IOUNIT,IOSTAT=IOSTAT)(PNODE%R1(I),I=1,NDIM)
+         ELSE
+           READ(IOUNIT,IOSTAT=IOSTAT)((PNODE%R2(I,J),I=1,NDIM),J=1,NSIZE)
+         END IF
+       END IF
+
+     CASE('D')
+       IF(NDIM == 1)THEN
+         IF(NSIZE > 1)THEN
+           READ(IOUNIT,IOSTAT=IOSTAT)(PNODE%D1(I),I=1,NSIZE)
+         ELSE
+           READ(IOUNIT,IOSTAT=IOSTAT)PNODE%D0
+         END IF
+       ELSE
+         IF(NSIZE == 1)THEN
+           READ(IOUNIT,IOSTAT=IOSTAT)(PNODE%D1(I),I=1,NDIM)
+         ELSE
+           READ(IOUNIT,IOSTAT=IOSTAT)((PNODE%D2(I,J),I=1,NDIM),J=1,NSIZE)
+         END IF
+       END IF
+       
+       
+     CASE('I')
+       IF(NDIM == 1)THEN
+         IF(NSIZE > 1)THEN
+           READ(IOUNIT,IOSTAT=IOSTAT)(PNODE%I1(I),I=1,NSIZE)
+         ELSE
+           READ(IOUNIT,IOSTAT=IOSTAT)PNODE%I0
+         END IF
+       ELSE
+         IF(NSIZE == 1)THEN
+           READ(IOUNIT,IOSTAT=IOSTAT)(PNODE%I1(I),I=1,NDIM)
+         ELSE
+           READ(IOUNIT,IOSTAT=IOSTAT)((PNODE%I2(I,J),I=1,NDIM),J=1,NSIZE)
+         END IF
+       END IF
+       
+       
+     CASE('J')
+       IF(NDIM == 1)THEN
+         IF(NSIZE > 1)THEN
+           READ(IOUNIT,IOSTAT=IOSTAT)(PNODE%L1(I),I=1,NSIZE)
+         ELSE
+           READ(IOUNIT,IOSTAT=IOSTAT)PNODE%L0
+         END IF
+       ELSE
+         IF(NSIZE == 1)THEN
+           READ(IOUNIT,IOSTAT=IOSTAT)(PNODE%L1(I),I=1,NDIM)
+         ELSE
+           READ(IOUNIT,IOSTAT=IOSTAT)((PNODE%L2(I,J),I=1,NDIM),J=1,NSIZE)
+         END IF
+       END IF
+       
+      CASE('S')
+       IF(NDIM == 1)THEN
+         IF(NSIZE > 1)THEN
+           DO I=1,NSIZE
+             READ(IOUNIT,IOSTAT=IOSTAT)T
+             PNODE%S1(I) = ' '
+             PNODE%S1(I) = T
+           END DO
+         ELSE
+           READ(IOUNIT,IOSTAT=IOSTAT)T
+           PNODE%S0 = T
+         END IF
+       ELSE
+         IF(NSIZE == 1)THEN
+           DO I=1,NDIM
+             READ(IOUNIT,IOSTAT=IOSTAT)T
+             PNODE%S1(I) = ' '
+             PNODE%S1(I) = T
+           END DO
+         ELSE
+           DO J=1,NSIZE
+             DO I=1,NDIM
+              READ(IOUNIT,IOSTAT=IOSTAT)T
+              PNODE%S2(I,J) = ' '
+              PNODE%S2(I,J) = T
+             END DO
+           END DO
+         END IF
+       END IF
+
+
+      CASE('A')
+       IF(NDIM == 1)THEN
+         IF(NSIZE > 1)THEN
+           DO I=1,NSIZE
+             READ(IOUNIT,IOSTAT=IOSTAT)ST
+             PNODE%S1(I) = ' '
+             PNODE%S1(I) = ST
+           END DO
+         ELSE
+           READ(IOUNIT,IOSTAT=IOSTAT)ST
+           PNODE%S0 = ST
+         END IF
+       ELSE
+         IF(NSIZE == 1)THEN
+           DO I=1,NDIM
+             READ(IOUNIT,IOSTAT=IOSTAT)T
+             PNODE%S1(I) = ' '
+             PNODE%S1(I) = ST
+           END DO
+         ELSE
+           DO J=1,NSIZE
+             DO I=1,NDIM
+              READ(IOUNIT,IOSTAT=IOSTAT)ST
+              PNODE%S2(I,J) = ' '
+              PNODE%S2(I,J) = ST
+             END DO
+           END DO
+         END IF
+       END IF
+
+      CASE('L')
+       IF(NDIM == 1)THEN
+         IF(NSIZE > 1)THEN
+           READ(IOUNIT,IOSTAT=IOSTAT)(PNODE%S1(I),I=1,NSIZE)
+         ELSE
+           READ(IOUNIT,IOSTAT=IOSTAT)PNODE%S0
+         END IF
+       ELSE
+         IF(NSIZE == 1)THEN
+           READ(IOUNIT,IOSTAT=IOSTAT)(PNODE%S1(I),I=1,NDIM)
+         ELSE
+           READ(IOUNIT,IOSTAT=IOSTAT)((PNODE%S2(I,J),I=1,NDIM),J=1,NSIZE)
+         END IF
+       END IF
+
+
+      CASE('N','DIR')
+         RETURN
+         
+      CASE DEFAULT
+            WRITE(*,*)' WRONG TYPE'
+     
+     END SELECT
+     
+      OK = TEST_IOSTAT(IOSTAT,FPAR)
+     
+   RETURN
+
+   END SUBROUTINE READ_DATA_FFA_BIN_OLD
 
 
    FUNCTION GET_NEW_FFA_POS(PNODE,LTYPE, NDIM, NSIZE, FPAR) RESULT (POS)
