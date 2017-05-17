@@ -8,7 +8,10 @@ Original script by D. Dickinson
 Usage
 =====
 
-Here's an example of how to use `fort_depend.py` in your makefiles:
+Here's an example of how to use `fort_depend.py` in your makefiles.
+For bigger project example, look at Makefiles, rule.mk and other files into fll project at
+https://github.com/libm3l/fll which is a linked list library written in Fortran and which uses this 
+script to get dependencies
 
     # Script to generate the dependencies
     #  for example - look into www.github.com/libm3l/fll project
