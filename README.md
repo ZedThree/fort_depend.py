@@ -1,4 +1,4 @@
-# fll is a fortran linked list library 
+# fll is a fortran linked list library with possibility of paralell IO
 
 The library enables operations with linked list.
 For more information see attached ppt or pdf file in the project root directory
