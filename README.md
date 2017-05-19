@@ -14,11 +14,17 @@ Input parameters:
 
 
    -f  --files        Files to process
+
    -o  --output       Output file
+
    -v -vv -vvv        Different level of verbosity contained in standard output
+
    -w  --overwrite    Overwrite output file without warning
+
    -r --root_dir      Project root directory
+
    -d --dep_dir       List of selected dependecy directories
+
 
 For bigger project example, look at Makefiles, rule.mk, src_dir_path.mk and other files in fll project at
 https://github.com/libm3l/fll which is a linked list library written in Fortran and which uses this 
