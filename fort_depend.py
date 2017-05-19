@@ -19,16 +19,17 @@ import sys
 
 #Definitions
 
-def run(path,dep=None,files=None,verbose=True,overwrite=None,output=None,macros={},build=''):
+def run(path,dep=None,files=None,verbose=None,overwrite=None,output=None,macros={},build=''):
    
     cwd = os.getcwd()
     
     path = check_path(path=path)
     cwd = check_path(path=cwd)
 
-    print("  ")
-    print("\033[031m Making dependencies in \033[032m"+cwd+"\033[039m directory")
-    print("  ")
+    if int(verbose) > 0:
+      print("  ")
+      print("\033[031m Making dependencies in \033[032m"+cwd+"\033[039m directory")
+      print("  ")
 #
 #  get rid of ../ in deps
 #
@@ -42,18 +43,19 @@ def run(path,dep=None,files=None,verbose=True,overwrite=None,output=None,macros=
 #
     ff=get_all_files(path=path, dep=dep) 
     
-    print(" ")
-    print("\033[031m Looking for modules in files:\033[039m")
-    print(ff)
+    if int(verbose) > 2:
+      print(" ")
+      print("\033[031m Looking for modules in files:\033[039m")
+      print(ff)
     
-    l=create_file_objs(files,macros)
+    l=create_file_objs( (verbose) ,files,macros)
     mod2fil=file_objs_to_mod_dict(file_objs=l)
 #
 #  make dependencies
 #
     depends=get_depends(verbose=verbose,cwd=cwd,fob=l,m2f=mod2fil,ffiles=ff)
 
-    if verbose:
+    if int(verbose) ==  3 :
        for i in depends.keys():
            print ("\033[032m"+i+"\033[039m depends on :\033[034m")
            for j in depends[i]: print( "\t"+j)
@@ -62,11 +64,11 @@ def run(path,dep=None,files=None,verbose=True,overwrite=None,output=None,macros=
     if output is None:
         output = "makefile.dep"
 
-    tmp=write_depend(path=path,cwd=cwd,outfile=output,dep=depends,overwrite=overwrite,build=build)
+    tmp=write_depend(verbose=verbose,path=path,cwd=cwd,outfile=output,dep=depends,overwrite=overwrite,build=build)
 
     return depends
 
-def write_depend(path,cwd,outfile="makefile.dep",dep=[],overwrite=False,build=''):
+def write_depend(verbose,path,cwd,outfile="makefile.dep",dep=[],overwrite=False,build=''):
     "Write the dependencies to outfile"
 #
 #Test file doesn't exist
@@ -84,15 +86,19 @@ def write_depend(path,cwd,outfile="makefile.dep",dep=[],overwrite=False,build=''
 #
 #Open file
 #
-    print("  ")
-    print("\033[031m Opening dependency file \033[032m"+outfile+"\033[039m ...")
-    print("  ")
+    if int(verbose) > 1:
+      print("  ")
+      print("\033[031m Opening dependency file \033[032m"+outfile+"\033[039m ...")
+      print("  ")
     f=open(outfile,'w')
     f.write('# This file is generated automatically. DO NOT EDIT!\n')
+
     for i in dep.keys():
         tmp,fil=os.path.split(i)
         stri="\n"+os.path.join(build, fil.split(".")[0]+".o"+" : ")
-        print("\033[031m Writing dependency info for \033[032m"+i+"\033[039m module")
+        if int(verbose) > 1:
+          print("\033[031m Writing dependency info for \033[032m"+i+"\033[039m module")
+
         if not(dep[i] == ""):
 
           for j in dep[i]:
@@ -117,8 +123,11 @@ def write_depend(path,cwd,outfile="makefile.dep",dep=[],overwrite=False,build=''
         f.write(stri)
 
     f.close()
-    print("\033[031m Finished ... \033[039m")
-    print("  ")
+
+    if int(verbose) > 1:
+      print("\033[031m Finished ... \033[039m")
+      print("  ")
+
     return
 
 def get_source(ext=[".f90",".F90",".f",".F"]):
@@ -170,7 +179,8 @@ def check_if_there(use,file):
     else:
        with open(file) as f:
          with open(file, errors='ignore') as f:
-            if "module" in line.lower():
+            for line in f:
+              if "module" in line.lower():
                 extrline = line.lower()
                 extrline = extrline.replace("module", "")
                 if use.lower().strip() == extrline.strip():
@@ -181,7 +191,7 @@ def check_if_there(use,file):
     return 0
 
 
-def create_file_objs(files=None, macros={}):
+def create_file_objs(verbose, files=None,  macros={}):
     l=[]
 
     if files is None:
@@ -189,23 +199,25 @@ def create_file_objs(files=None, macros={}):
 
     files = get_source()
 
-    print(" ")
-    print("\033[031m Looking for modules for files:\033[039m")
-    print(" ")
+    if int(verbose) > 1 : 
+      print(" ")
+      print("\033[031m Looking for modules for files:\033[039m")
+      print(" ")
 
 
     for i in files:
         source_file = file_obj()
 
-
-        print(i)
+        if int(verbose) > 1 :
+          print(i)
         source_file.file_name = i
         source_file.uses = get_uses(i,macros)
         source_file.contains = get_contains(i)
 
         l.append(source_file)
 
-    print(" ")
+    if int(verbose) > 1 :
+      print(" ")
 
     return l
 
@@ -271,8 +283,9 @@ def get_depends(verbose,cwd,fob=[],m2f=[], ffiles=[]):
     istat = 0
 
     for i in fob:
-        print("")
-        print("\033[031mChecking dependency for file: \033[032m"+i.file_name+"\033[039m")
+        if int(verbose) > 1 :
+          print("")
+          print("\033[031mChecking dependency for file: \033[032m"+i.file_name+"\033[039m")
         tmp=[]
         for j in i.uses:
             try:
@@ -298,15 +311,16 @@ def get_depends(verbose,cwd,fob=[],m2f=[], ffiles=[]):
                           istat = 1
                           name=os.path.splitext(k)[0]+'.o'
                           tmp.append(name.lower())
-                          print ("\033[031mNote: \033[039m module \033[032m"+j+"\033[039m not defined in any file in this directory")
-                          print ("\033[031m..... \033[039m module found in \033[032m"+name+"\033[039m file")
-                          print ("\033[031m      \033[039m adding the module to dependency file, not checking its dependency further \033[032m\033[039m")
+                          if int(verbose) > 1 :
+                            print ("\033[031mNote: \033[039m module \033[032m"+j+"\033[039m not defined in any file in this directory")
+                            print ("\033[031m..... \033[039m module found in \033[032m"+name+"\033[039m file")
+                            print ("\033[031m      \033[039m adding the module to dependency file, not checking its dependency further \033[032m\033[039m")
                 
                 if istat== 0 and not(j == ""):
-                         print("")
-                         print ("\033[031mNote!!!!: \033[039m module \033[032m"+j+"\033[039m not defined in any file")
-                         print ("\033[031m..... \033[039m assuming intrinsic module, not adding to dependency tree ... \033[032m\033[039m")
-                         print("")
+                         if int(verbose) > 1 :
+                           print("")
+                           print ("\033[031mNote!!!!: \033[039m module \033[032m"+j+"\033[039m not defined in any file")
+                           print ("\033[031m..... \033[039m assuming intrinsic module, not adding to dependency tree ... \033[032m\033[039m")
         
         if not(istat == 0):
              deps[i.file_name]=tmp
@@ -317,9 +331,10 @@ def get_depends(verbose,cwd,fob=[],m2f=[], ffiles=[]):
 
 def check_path(path):
     if path.endswith("/"):
-        print("Path correct")
+#        print(" ")
+        return path
     else:
-        print( "adding / to the path in "+path)
+#        print( "adding / to the path in "+path)
         path=path + "/"
 
     return path
@@ -361,6 +376,8 @@ if __name__ == "__main__":
                         default='')
     parser.add_argument('-o','--output',nargs=1,help='Output file')
     parser.add_argument('-v','--verbose',action='store_true',help='explain what is done')
+    parser.add_argument('-vv','--vverbose',action='store_true',help='explain what is done')
+    parser.add_argument('-vvv','--vvverbose',action='store_true',help='explain what is done')
     parser.add_argument('-w','--overwrite',action='store_true',help='Overwrite output file without warning')
     parser.add_argument('-r','--root_dir',nargs=1,help='Project root directory')
     parser.add_argument('-d','--dep_dir',nargs='+',action='append',help='Preferred dependecy directory')
@@ -385,4 +402,13 @@ if __name__ == "__main__":
         print ("\033[031mError: \033[039m missing path to project root directory \033[032m")
         sys.exit()
 
-    run(path=root_dir, dep=dep_dir, files=args.files, verbose=args.verbose, overwrite=args.overwrite, macros=macros, output=output, build=build)
+    verbose = 0
+    if(args.verbose):
+	verbose = 1
+    if(args.vverbose):
+	verbose = 2
+    if(args.vvverbose):
+	verbose = 3
+    
+
+    run(path=root_dir, dep=dep_dir, files=args.files, verbose=verbose, overwrite=args.overwrite, macros=macros, output=output, build=build)
