@@ -41,6 +41,7 @@ DEP_FILE=project.dep
 #SUBDIRS= $(dir $(wildcard $(srcdir)/*))
 SUBDIRS= \
 	Simple_data_operation \
+        Extra \
 
 ifneq ($(strip $(MPI_FC)),)
   SUBDIRS+= Example_MPI-IO
