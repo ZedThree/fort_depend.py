@@ -45,7 +45,7 @@ def run(path,dep=None,files=None,verbose=None,overwrite=None,output=None,macros=
     
     if int(verbose) > 2:
       print(" ")
-      print("\033[031m Looking for modules in files:\033[039m")
+      print("\033[031m Searching for modules in files:\033[039m")
       print(ff)
     
     l=create_file_objs( (verbose) ,files,macros)
@@ -57,7 +57,7 @@ def run(path,dep=None,files=None,verbose=None,overwrite=None,output=None,macros=
 
     if int(verbose) ==  3 :
        for i in depends.keys():
-           print ("\033[032m"+i+"\033[039m depends on :\033[034m")
+           print ("\033[032m "+i+"\033[039m depends on:\033[034m")
            for j in depends[i]: print( "\t"+j)
            print ("\033[039m")
 
@@ -201,7 +201,7 @@ def create_file_objs(verbose, files=None,  macros={}):
 
     if int(verbose) > 1 : 
       print(" ")
-      print("\033[031m Looking for modules for files:\033[039m")
+      print("\033[031m Searching modules for files:\033[039m")
       print(" ")
 
 
@@ -209,7 +209,7 @@ def create_file_objs(verbose, files=None,  macros={}):
         source_file = file_obj()
 
         if int(verbose) > 1 :
-          print(i)
+          print(" " + i)
         source_file.file_name = i
         source_file.uses = get_uses(i,macros)
         source_file.contains = get_contains(i)
@@ -284,8 +284,8 @@ def get_depends(verbose,cwd,fob=[],m2f=[], ffiles=[]):
 
     for i in fob:
         if int(verbose) > 1 :
-          print("")
-          print("\033[031mChecking dependency for file: \033[032m"+i.file_name+"\033[039m")
+#          print("")
+          print("\033[031m Checking dependency for file: \033[032m"+i.file_name+"\033[039m")
         tmp=[]
         for j in i.uses:
             try:
@@ -311,16 +311,18 @@ def get_depends(verbose,cwd,fob=[],m2f=[], ffiles=[]):
                           istat = 1
                           name=os.path.splitext(k)[0]+'.o'
                           tmp.append(name.lower())
-                          if int(verbose) > 1 :
-                            print ("\033[031mNote: \033[039m module \033[032m"+j+"\033[039m not defined in any file in this directory")
-                            print ("\033[031m..... \033[039m module found in \033[032m"+name+"\033[039m file")
-                            print ("\033[031m      \033[039m adding the module to dependency file, not checking its dependency further \033[032m\033[039m")
+                          if int(verbose) > 2 :
+                            print ("\033[031m   Note: \033[039m module \033[032m"+j+"\033[039m not defined in any file in this directory")
+                            print ("\033[031m         \033[039m module found in \033[032m"+name+"\033[039m file")
+                            print ("\033[031m         \033[039m adding the module to dependency file, not checking its dependency further \033[032m\033[039m")
+                            print(" ")
                 
                 if istat== 0 and not(j == ""):
-                         if int(verbose) > 1 :
+                         if int(verbose) > 2 :
                            print("")
-                           print ("\033[031mNote!!!!: \033[039m module \033[032m"+j+"\033[039m not defined in any file")
-                           print ("\033[031m..... \033[039m assuming intrinsic module, not adding to dependency tree ... \033[032m\033[039m")
+                           print ("\033[031m   Note!!!!: \033[039m module \033[032m"+j+"\033[039m not defined in any file")
+                           print ("\033[031m             \033[039m assuming intrinsic module, not adding to dependency tree ... \033[032m\033[039m")
+			   print(" ")
         
         if not(istat == 0):
              deps[i.file_name]=tmp
