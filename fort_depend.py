@@ -19,7 +19,7 @@ import sys
 
 #Definitions
 
-def run(path,dep=None,files=None,verbose=None,overwrite=None,output=None,macros={},build=''):
+def run(path,dep=None,ignore=None,files=None,verbose=None,overwrite=None,output=None,macros={},build=''):
    
     cwd = os.getcwd()
     
@@ -53,7 +53,7 @@ def run(path,dep=None,files=None,verbose=None,overwrite=None,output=None,macros=
 #
 #  make dependencies
 #
-    depends=get_depends(verbose=verbose,cwd=cwd,fob=l,m2f=mod2fil,ffiles=ff)
+    depends=get_depends(ignore=ignore,verbose=verbose,cwd=cwd,fob=l,m2f=mod2fil,ffiles=ff)
 
     if int(verbose) ==  3 :
        for i in depends.keys():
@@ -212,6 +212,7 @@ def create_file_objs(verbose, files=None,  macros={}):
           print(" " + i)
         source_file.file_name = i
         source_file.uses = get_uses(i,macros)
+        source_file.includes = get_includes(i,macros)
         source_file.contains = get_contains(i)
 
         l.append(source_file)
@@ -249,6 +250,30 @@ def get_uses(infile=None, macros={}):
 
     return uniq_mods
 
+def get_includes(infile=None, macros={}):
+    "Return which modules are included in infile after expanding macros"
+    p=re.compile("\#include\s*\"(?P<incfile>\w*).inc\"$",re.IGNORECASE).match
+
+    includes=[]
+
+    with open(infile,'r') as f:
+        t=f.readlines()
+
+    for i in t:
+        tmp=p(i)
+        if tmp:
+            includes.append(tmp.group('incfile').strip()+".inc")
+
+    # Remove duplicates
+    uniq_includes = list(set(includes))
+
+    for i, mod in enumerate(uniq_includes):
+        for k, v in macros.items():
+            if re.match(k, mod, re.IGNORECASE):
+                uniq_includes[i] = mod.replace(k,v)
+
+    return uniq_includes
+
 def get_contains(infile=None):
     "Return all the modules that are in infile"
     p=re.compile("^\s*module\s*(?P<modname>\w*)",re.IGNORECASE).match
@@ -278,7 +303,7 @@ def file_objs_to_mod_dict(file_objs=[]):
             dic[j.lower()]=i.file_name
     return dic
 
-def get_depends(verbose,cwd,fob=[],m2f=[], ffiles=[]):
+def get_depends(ignore,verbose,cwd,fob=[],m2f=[], ffiles=[]):
     deps={}
     istat = 0
 
@@ -288,6 +313,7 @@ def get_depends(verbose,cwd,fob=[],m2f=[], ffiles=[]):
           print("\033[031m Checking dependency for file: \033[032m"+i.file_name+"\033[039m")
         tmp=[]
         for j in i.uses:
+            if ignore and (j in ignore): continue
             try:
 #
 #  module is in the same directory, include it
@@ -361,6 +387,7 @@ class file_obj:
     def __init__(self):
         self.file_name=None
         self.uses=None
+        self.includes=None
         self.contains=None
         self.depends_on=None
 
@@ -372,6 +399,7 @@ if __name__ == "__main__":
     # Add command line arguments
     parser = argparse.ArgumentParser(description='Generate Fortran dependencies')
     parser.add_argument('-f','--files',nargs='+',help='Files to process')
+    parser.add_argument('-i','--ignore',nargs='+',help='Modules to ignore')
     parser.add_argument('-D',nargs='+',action='append',metavar='NAME=DESCRIPTION',
                         help="""The macro NAME is replaced by DEFINITION in 'use' statements""")
     parser.add_argument('-b','--build',nargs=1,help='Build Directory (prepended to all files in output',
@@ -413,4 +441,4 @@ if __name__ == "__main__":
 	verbose = 3
     
 
-    run(path=root_dir, dep=dep_dir, files=args.files, verbose=verbose, overwrite=args.overwrite, macros=macros, output=output, build=build)
+    run(path=root_dir, dep=dep_dir, ignore=args.ignore, files=args.files, verbose=verbose, overwrite=args.overwrite, macros=macros, output=output, build=build)
