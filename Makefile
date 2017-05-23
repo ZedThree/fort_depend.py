@@ -34,6 +34,7 @@ include src_dir_path.mk
 SUBDIRS= \
 data_util\
 accessories\
+mpi_util\
 examples\
 
 ifneq ($(strip $(MPI_FC)),)
