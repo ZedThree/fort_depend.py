@@ -58,6 +58,6 @@ clean:
 
 depend: $(FFILES)
 	@echo "Making dependencies!"
-	cd $(srcdir) && $(MAKEDEPEND) -r $(PROJ_ROOT_PATH)$(VERBOSE) -w -o $(srcdir)/$(DEP_FILE) -f $(FFILES)
+	cd $(srcdir) && $(MAKEDEPEND) -r $(PROJ_ROOT_PATH) $(VERBOSE) -w -o $(srcdir)/$(DEP_FILE) -f $(FFILES)
 
 -include $(srcdir)/project.dep

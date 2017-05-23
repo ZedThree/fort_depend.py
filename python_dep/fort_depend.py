@@ -209,7 +209,7 @@ def create_file_objs(verbose, files=None,  macros={}):
         source_file = file_obj()
 
         if int(verbose) > 1 :
-          print(" " + i)
+          print("\033[031m -- \033[039m" + i)
         source_file.file_name = i
         source_file.uses = get_uses(i,macros)
         source_file.includes = get_includes(i,macros)
@@ -341,19 +341,22 @@ def get_depends(ignore,verbose,cwd,fob=[],m2f=[], ffiles=[]):
                             print ("\033[031m   Note: \033[039m module \033[032m"+j+"\033[039m not defined in any file in this directory")
                             print ("\033[031m         \033[039m module found in \033[032m"+name+"\033[039m file")
                             print ("\033[031m         \033[039m adding the module to dependency file, not checking its dependency further \033[032m\033[039m")
-                            print(" ")
+#                            print(" ")
                 
                 if istat== 0 and not(j == ""):
                          if int(verbose) > 2 :
                            print("")
                            print ("\033[031m   Note!!!!: \033[039m module \033[032m"+j+"\033[039m not defined in any file")
                            print ("\033[031m             \033[039m assuming intrinsic module, not adding to dependency tree ... \033[032m\033[039m")
-			   print(" ")
+#			   print(" ")
         
         if not(istat == 0):
              deps[i.file_name]=tmp
         else:
              deps[i.file_name]="" 
+
+        if int(verbose) > 1 :
+          print("\033[031m   Done ... \033[032m")
 
     return deps
 
