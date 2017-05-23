@@ -8,6 +8,6 @@ LDFLAGS            = -g -ffpe-trap=invalid,zero,overflow -fdefault-real-8 -fdefa
 CC                 = gcc -fopenmp
 CFLAGS             = -g -fopenmp
 C_LDFLAGS          = -g -fopenmp
-MPI_FC             = mpif90
+MPI_FC             = 
 MPI_FFLAGS         = -g -ffpe-trap=invalid,zero,overflow -fdefault-real-8 -fdefault-double-8  -frecord-marker=4 -fbounds-check -Wall -Wextra -fopenmp -x f95-cpp-input
 MPI_LDFLAGS        = -g -ffpe-trap=invalid,zero,overflow -fdefault-real-8 -fdefault-double-8  -frecord-marker=4 -fbounds-check -Wall -Wextra -fopenmp
