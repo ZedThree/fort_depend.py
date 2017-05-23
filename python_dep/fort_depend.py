@@ -17,6 +17,7 @@ import fnmatch
 import os
 import sys
 
+
 #Definitions
 
 def run(path,dep=None,ignore=None,files=None,verbose=None,overwrite=None,output=None,macros={},build=''):
@@ -224,7 +225,7 @@ def create_file_objs(verbose, files=None,  macros={}):
 
 def get_uses(infile=None, macros={}):
     "Return which modules are used in infile after expanding macros"
-    p=re.compile("^\s*use\s*(?P<moduse>\w*)\s*(,)?\s*(only)?\s*(:)?.*?$",re.IGNORECASE).match
+    p=re.compile("^\s*use\s+(?P<moduse>\w*)\s*(,)?\s*(only)?\s*(:)?.*?$",re.IGNORECASE).match
 
     uses=[]
 
