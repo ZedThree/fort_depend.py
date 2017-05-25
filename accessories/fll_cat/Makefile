@@ -34,7 +34,7 @@ EXE    = fll_cat
 include src_dir_path.mk
 include ../../config.mk
 
-DEP_FILE=project.dep
+DEP_FILE=depend.mk
 
 FMODDIRS= ../../data_util
 

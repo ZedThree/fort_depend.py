@@ -57,7 +57,7 @@ def run(comp,files=None,verbose=True,overwrite=None,output=None,macros={},build=
 #  definition of parameters
 #
     print_header()
-    linkfiles =(['src_dir_path.mk', 'Makefile', 'project.dep'])
+    linkfiles =(['src_dir_path.mk', 'Makefile', 'depend.mk'])
     exclude =(['python_dep', 'config', '.git', '.svn'])     
 #
 #   get path of the source files, found from location of this script which is located in the root
@@ -166,7 +166,7 @@ def prepare_compiler(root_path,cwd, linkfiles):
 #
    linknew = copy.copy(linkfiles)
    linknew.append('rules.mk')
-   linknew.remove('project.dep')
+   linknew.remove('depend.mk')
 
    for word in linknew:
       try:
