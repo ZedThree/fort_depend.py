@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # 
 #
 #  this is a modification of the original script of D Dickinson @https://github.com/ZedThree/fort_depend.py
