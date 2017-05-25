@@ -37,7 +37,7 @@ HANDLE_UPPER_CASE_MOD_NAMES = ! [ "$(UPPER_MODFILE_NAME)" ] || ! [[ $* = *_m ]] 
 	@cd $* && $(MAKE) clean
 
 %.depend: %.mkdir
-	@cd $* && $(MAKE) depend
+	@cd $* &&  $(MAKE) depend
 
 %.install: %.mkdir
 	@cd $* && $(MAKE) install

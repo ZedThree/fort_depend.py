@@ -65,5 +65,5 @@ install: $(EXE).x $(EXE).py
 	$(INSTALL) $(EXE).x $(bin_dir)/$(EXE)$(POSTFIX).x
 	$(INSTALL) $(EXE).py $(bin_dir)/$(EXE)$(POSTFIX).py
 
-include $(srcdir)/$(DEP_FILE)
+-include $(srcdir)/$(DEP_FILE)
 
