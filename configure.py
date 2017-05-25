@@ -1,7 +1,44 @@
 #!/usr/bin/python
+#
+#     Copyright (C) 2016  Adam Jirasek
+# 
+#     This program is free software: you can redistribute it and/or modify
+#     it under the terms of the GNU Lesser General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+# 
+#     This program is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#     GNU Lesser General Public License for more details.
+# 
+#     You should have received a copy of the GNU Lesser General Public License
+#     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#     
+#     contact: libm3l@gmail.com
 # 
 #
-#  this is a python script wj
+#
+# Description: python configuration script. It loops over all subdirectories in source directories
+# in the project and links:
+# src_dir_path.mk   - specifies source directory withe source files
+# Makefike
+# project.dep       - project depenency file with source code dependencies
+# .py               - all .py scritps which may be present
+#
+# avoid links for these directories:
+# pyhon_dep         - contains python script for making dependencies, it is used in source directory
+# config            - contains files with settings specific to compiler
+# .git              - any .git repository specific files
+# .svn              - any .svn repository specific files
+#
+# 
+# History:
+# Version   Date       Patch number  CLA     Comment
+# -------   --------   --------      ---     -------
+# 1.1       10/10/16                         Initial implementation
+#
+#
 #
 import os
 import re
@@ -21,13 +58,19 @@ def run(comp,files=None,verbose=True,overwrite=None,output=None,macros={},build=
 #
     print_header()
     linkfiles =(['src_dir_path.mk', 'Makefile', 'project.dep'])
-    exclude =(['python_dep', 'config', '.git'])     
+    exclude =(['python_dep', 'config', '.git', '.svn'])     
 #
-#  
+#   get path of the source files, found from location of this script which is located in the root
+#   directory of the source code
+#
     path = os.path.dirname(os.path.abspath(__file__))
 #
+#   get current directory
+#
     cwd = os.getcwd()
-
+#
+#   if path for source does not exit, terminate
+#
     path = check_path(path=path)
     if not os.path.isdir(path):
       print("  ")
@@ -39,7 +82,10 @@ def run(comp,files=None,verbose=True,overwrite=None,output=None,macros={},build=
     print("  ")
     print("\033[031mDIAG:\033[039m project location is                  \033[032m"+path+"\033[039m")  	
     print("\033[031mDIAG:\033[039m Intended location of compillation is \033[032m"+cwd+"\033[039m")    
-
+#
+#   if pathe to source and path to location of compilation directory are the same
+#   terminate, do not allow compilation in the source code directory
+#
     if cwd == path:
         print(".....")
         print ("\033[031mError:\033[039m project location is the same as inteded location of compillation \033[032m"+path+"\033[039m")  	
@@ -52,7 +98,9 @@ def run(comp,files=None,verbose=True,overwrite=None,output=None,macros={},build=
     print("  ")
     print("\033[031mDIAG:\033[039m creating configure file \033[032m \033[039m")  	
     print("  ")
-
+#
+#  specify build directory where all executables will be located
+#
     if build == '':
       print("  ")
       print("\033[031mDIAG:\033[039m Bild directory not specified, setting it to \033[032m "+cwd+platform.machine()+"/bin\033[039m")  	
@@ -60,11 +108,13 @@ def run(comp,files=None,verbose=True,overwrite=None,output=None,macros={},build=
       bin_dir=cwd+platform.machine()+'/bin'
     else:
       bin_dir=build
-
-
+#
+#  create configuration file config.mk
+#
     ok = mkconfigfile(path=path, cwd=cwd,version=comp, bin_dir=bin_dir)
 #
 #   create structure and link necessary files
+#   ie. create the same tree structure as source files and link "linkfiles" specified above 
 #
     print("  ")
     print("\033[031mDIAG:\033[039m Recreating project tree structure and linking files \033[032m \033[039m .....")  	
@@ -160,6 +210,10 @@ def mkdir_structure(root_path,cwd, exclude, linkfiles):
     for subdir, dirs, files in os.walk(cwd):
        for dir in dirs:
           subdir = check_path(path=subdir)
+#
+#  dirtmp is a source directory
+#  newdir is a target directory
+#
           newdir = subdir+dir
           print ("\033[031mDIAG: \033[039m processing directory \033[032m"+newdir+"\033[039m ....")
           dirtmp = subdir.replace(subdir[:length], '')
@@ -167,7 +221,9 @@ def mkdir_structure(root_path,cwd, exclude, linkfiles):
           dirtmp = root_path + dirtmp+dir
 
           os.chdir(newdir)
-
+#
+#  link over list of files specified in linkfiels and link them 
+#
           for word in linkfiles:
              try:
                os.remove(word)
@@ -180,9 +236,8 @@ def mkdir_structure(root_path,cwd, exclude, linkfiles):
              if os.path.exists(source):
                print ("\033[031mDIAG: \033[039m linking file \033[032m"+source+"\033[039m ....")
                linkfile = os.symlink( source, dest)
-
 #
-# check if python script
+# check if python script, link it too
 #
           if os.path.isdir(dirtmp):
             for file in os.listdir(dirtmp):

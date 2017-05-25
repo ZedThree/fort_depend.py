@@ -20,3 +20,25 @@ MPI_FC=
 MPI_FFLAGS="$FFLAGS"
 MPI_LDFLAGS="$LDFLAGS"
 
+# -*-sh-*-
+#
+# For intel ifort 12 compiler.
+#
+
+# Fortran compiler and flags
+FC                 = ifort
+FCMODINCFLAG       = -I
+FFLAGS             = -O2 -msse3 -ip -r8 -std03 -fpp
+FFFLAGS            = -O2 -msse3 -ip -r8 -std03 -fpp
+UPPER_MODFILE_NAME =
+LDFLAGS            = -O2 -msse3 -ip -r8 -std03 -i-static
+CC                 = icc
+CFLAGS             = -O2 -msse3 -ip
+C_LDFLAGS          = -O2 -msse3 -ip -i-static
+
+# MPI fortran compiler and flags.
+# # Set MPI_FC empty if you don't have/need MPI.
+MPI_FC=
+MPI_FFLAGS="$FFLAGS"
+MPI_LDFLAGS="$LDFLAGS"
+
