@@ -71,6 +71,12 @@ To compile, type
 
 gmake 
 
+and then 
+
+gmake install
+
+This install all files to specified bin directory
+
 
 3. DEVELOPERS:
 ====================================================
