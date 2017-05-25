@@ -128,7 +128,7 @@ CONTAINS
           PTMP => FLL_CP(PNODE, PMAIN, FPAR)
 
           ALLOCATE(POS(NPROC+1), DISPL(NPROC+1), STAT = ISTAT)
-          IF(ISTAT /= 0)STOP'ERROR ALLOCATING MEMORY ==> fll_mpi_write ERR:144 '
+          IF(ISTAT /= 0)STOP'ERROR ALLOCATING MEMORY ==> fll_mpi_write_snm ERR:131 '
 !
 !  get length of each data subset of actual data
 !

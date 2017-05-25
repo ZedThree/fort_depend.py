@@ -145,7 +145,7 @@ CONTAINS
 !  subsets #2:  are actual data from each partition
 !
    ALLOCATE(POS(NPROC+1), DISPL(NPROC+1), STAT = ISTAT)
-    IF(ISTAT /= 0)STOP'ERROR ALLOCATING MEMORY ==> fll_mpi_write ERR:144 '
+    IF(ISTAT /= 0)STOP'ERROR ALLOCATING MEMORY ==> fll_mpi_write ERR:148 '
 !
 !  get length of each data subset of actual data
 !
@@ -218,7 +218,7 @@ CONTAINS
 ! free memory
 !
    DEALLOCATE(POS, DISPL, STAT = ISTAT)
-    IF(ISTAT /= 0)STOP'ERROR ALLOCATING MEMORY ==> fll_mpi_write ERR:203 '
+    IF(ISTAT /= 0)STOP'ERROR ALLOCATING MEMORY ==> fll_mpi_write ERR:221 '
     
    OK = .TRUE.
    RETURN
