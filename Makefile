@@ -70,14 +70,3 @@ depend: $(SUBDIRS:%=%.depend)
 
 install: $(SUBDIRS:%=%.all) $(SUBDIRS:%=%.install)
 
-test: $(SUBDIRS:%=%.test)
-
-#
-# The following target checks all .f90 files against
-# some of the sourcecode standard rules.
-#
-CHK_SUBDIRS:=$(filter-out adaption lapack,$(SUBDIRS))
-chk: $(CHK_SUBDIRS:%=%.chk)
-#
-#
-.PHONY: path

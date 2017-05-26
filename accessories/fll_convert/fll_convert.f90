@@ -68,10 +68,10 @@
 !
 !  read a file and save it
 !
-    READ(*,*)FILE
+    READ(*,'(A1024)')FILE
     READ(*,*)FMT 
     READ(*,'(A3)')EFMT 
-    READ(*,*)OUTFILE
+    READ(*,'(A1024)')OUTFILE
     READ(*,'(A3)')OFMT 
 
     SELECT CASE(EFMT)

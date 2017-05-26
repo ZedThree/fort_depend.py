@@ -67,7 +67,7 @@
 !
 !  read a file and print on screen
 !
-    READ(*,*)FILE
+    READ(*,'(A1024)')FILE
     READ(*,*)FMT 
     READ(*,'(A3)')EFMT 
     READ(*,*)SCAN 
