@@ -1,6 +1,8 @@
 fort_depend.py
 ==============
 
+[![Build Status](https://travis-ci.org/ZedThree/fort_depend.py.svg?branch=rewrite)](https://travis-ci.org/ZedThree/fort_depend.py)
+
 A python script to generate Fortran dependencies
 
 Original script by D. Dickinson
