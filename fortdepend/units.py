@@ -6,8 +6,12 @@ UNIT_REGEX = re.compile("^\s*(?P<unit_type>module|program)\s*(?P<modname>\w*)",
                         re.IGNORECASE)
 END_REGEX = re.compile("^\s*end\s*(?P<unit_type>module|program)\s*(?P<modname>\w*)?",
                        re.IGNORECASE)
-USE_REGEX = re.compile("^\s*use(\s*,\s*intrinsic\s*::)?\s*(?P<moduse>\w*)\s*(, )?\s*(only)?\s*(:)?.*?$",
-                       re.IGNORECASE)
+USE_REGEX = re.compile("""^\s*use
+(\s*,\s*intrinsic\s*)?(\s*::\s*|\s+)  # Valid separators between "use" and module name
+(?P<moduse>\w*)                       # The module name
+\s*(, )?\s*(only)?\s*(:)?.*?$         # Stuff that might follow the name
+""",
+                       re.IGNORECASE | re.VERBOSE)
 
 
 class FortranFile(object):
