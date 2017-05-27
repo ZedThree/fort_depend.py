@@ -438,11 +438,11 @@ if __name__ == "__main__":
 
     verbose = 0
     if(args.verbose):
-	verbose = 1
+        verbose = 1
     if(args.vverbose):
-	verbose = 2
+        verbose = 2
     if(args.vvverbose):
-	verbose = 3
+        verbose = 3
     
 
     run(path=root_dir, dep=dep_dir, ignore=args.ignore, files=args.files, verbose=verbose, overwrite=args.overwrite, macros=macros, output=output, build=build)
