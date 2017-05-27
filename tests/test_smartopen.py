@@ -28,7 +28,11 @@ def test_smart_open_stdin():
     text = "testing smart_open with stdin"
 
     oldstdin = sys.stdin
-    sys.stdin = io.StringIO(text)
+    try:
+        sys.stdin = io.StringIO(text)
+    except TypeError:
+        # Python 2 needs unicode here
+        sys.stdin = io.StringIO(unicode(text))
 
     with smart_open('-', 'r') as f:
         output = f.read()
