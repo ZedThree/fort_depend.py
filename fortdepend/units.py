@@ -60,8 +60,8 @@ class FortranFile(object):
 
         if found_units:
             if len(found_units) != len(starts) != len(ends):
-                error_string = "Unmatched start/end of modules in {} ({} begins/{} ends)".format(
-                    self.filename, len(starts), len(ends))
+                error_string = ("Unmatched start/end of modules in {} ({} begins/{} ends)"
+                                .format(self.filename, len(starts), len(ends)))
                 raise ValueError(error_string)
             for unit, start, end in zip(found_units, starts, ends):
                 name = unit.group('modname')
@@ -113,7 +113,8 @@ class FortranModule(object):
         return self.name
 
     def __repr__(self):
-        return "FortranModule({}, '{}', '{}')".format(self.unit_type, self.name, self.source_file.filename)
+        return "FortranModule({}, '{}', '{}')".format(self.unit_type, self.name,
+                                                      self.source_file.filename)
 
     def get_uses(self, contents, macros=None):
         """Return which modules are used in the file after expanding macros
