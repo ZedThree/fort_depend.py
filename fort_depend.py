@@ -170,7 +170,8 @@ def check_if_there(use,file):
     else:
        with open(file) as f:
          with open(file, errors='ignore') as f:
-            if "module" in line.lower():
+            for line in f:
+              if "module" in line.lower():
                 extrline = line.lower()
                 extrline = extrline.replace("module", "")
                 if use.lower().strip() == extrline.strip():
