@@ -134,9 +134,10 @@ class FortranModule(object):
         # Remove duplicates
         uniq_mods = list(set(uses))
 
-        for i, mod in enumerate(uniq_mods):
-            for k, v in macros.items():
-                if re.match(k, mod, re.IGNORECASE):
-                    uniq_mods[i] = mod.replace(k, v)
+        if macros is not None:
+            for i, mod in enumerate(uniq_mods):
+                for k, v in macros.items():
+                    if re.match(k, mod, re.IGNORECASE):
+                        uniq_mods[i] = mod.replace(k, v)
 
         return uniq_mods
