@@ -41,7 +41,7 @@ class FortranFile:
     def __repr__(self):
         return "FortranFile('{}')".format(self.filename)
 
-    def get_modules(self, contents, macros={}):
+    def get_modules(self, contents, macros=None):
         """Return all the modules or programs that are in the file
 
         Args:

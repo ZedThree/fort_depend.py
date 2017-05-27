@@ -40,7 +40,7 @@ class TestSimpleFortranFile:
     def test_file_repr(self):
         assert repr(self.testfile) == "FortranFile('file.f90')"
 
-    def test_get_uses(self):
+    def test_get_empty_uses(self):
         assert self.testfile.uses is None
         assert self.testfile.get_uses() == []
 
@@ -119,10 +119,24 @@ class TestReadFortranFile:
         testfile = FortranFile(filename="moduleA.f90", readfile=True)
         assert testfile.uses == []
 
-    def test_single_modules(self):
+    def test_get_single_module(self):
         testfile = FortranFile(filename="moduleA.f90", readfile=True)
-        result = "{'modA': FortranModule(module, 'moda', 'moduleA.f90')}"
-        assert str(testfile.modules) == result
+        expected = {"modA": "FortranModule(module, 'moda', 'moduleA.f90')"}
+
+        for key, value in expected.items():
+            assert key in testfile.modules
+            assert repr(testfile.modules[key]) == value
+
+    def test_get_program_and_multiple_modules(self):
+        testfile = FortranFile(filename="multiple_modules.f90", readfile=True)
+        expected = {"modA": "FortranModule(module, 'moda', 'multiple_modules.f90')",
+                    "modB": "FortranModule(module, 'modb', 'multiple_modules.f90')",
+                    "modC": "FortranModule(module, 'modc', 'multiple_modules.f90')",
+                    "progA": "FortranModule(program, 'proga', 'multiple_modules.f90')"}
+
+        for key, value in expected.items():
+            assert key in testfile.modules
+            assert repr(testfile.modules[key]) == value
 
     def test_single_uses(self):
         testfile = FortranFile(filename="moduleB.f90", readfile=True)
@@ -130,4 +144,14 @@ class TestReadFortranFile:
 
     def test_multiple_uses(self):
         testfile = FortranFile(filename="moduleC.f90", readfile=True)
-        assert testfile.uses == ['modA', 'modB']
+        assert set(testfile.uses) == set(['modA', 'modB'])
+
+    def test_multiple_uses_in_multiple_units(self):
+        testfile = FortranFile(filename="multiple_modules.f90", readfile=True)
+        assert set(testfile.uses) == set(['modA', 'modB', 'modC', 'iso_c_binding'])
+
+    def test_macro_replacement(self):
+        testfile = FortranFile(filename="moduleB.f90", readfile=True,
+                               macros={'modA': 'foo'})
+        assert testfile.uses == ['foo']
+
