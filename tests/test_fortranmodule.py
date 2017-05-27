@@ -142,3 +142,42 @@ class TestFortranModule():
 
         assert module.uses == []
 
+    def test_macro_replacement(self):
+        file_contents = [
+            "module name",
+            "use foo",
+            "end module"]
+        start = 1
+        end = len(file_contents)
+        source_file = FortranFile(filename='empty',
+                                  readfile=False)
+
+        module = FortranModule(unit_type='module',
+                               name='name',
+                               source_file=source_file,
+                               text=(file_contents, start, end),
+                               macros={'foo': 'module1'})
+
+        assert module.uses == ['module1']
+
+    def test_ignore_uses_outside_module(self):
+        file_contents = [
+            "module module1",
+            "use module2",
+            "end module",
+            "module module2",
+            "use module1",
+            "end module"]
+        start = 1
+        end = 3
+        source_file = FortranFile(filename='empty',
+                                  readfile=False)
+
+        module = FortranModule(unit_type='module',
+                               name='name',
+                               source_file=source_file,
+                               text=(file_contents, start, end),
+                               macros=None)
+
+        assert module.uses == ['module2']
+
