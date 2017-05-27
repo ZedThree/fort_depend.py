@@ -180,4 +180,3 @@ class TestFortranModule():
                                macros=None)
 
         assert module.uses == ['module2']
-
