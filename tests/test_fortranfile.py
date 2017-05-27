@@ -100,6 +100,18 @@ class TestSimpleFortranFile():
             assert key in module_list
             assert repr(module_list[key]) == value
 
+    def test_catch_unmatched_begin_end(self):
+        contents = ['module modA']
+        with pytest.raises(ValueError):
+            self.testfile.get_modules(contents)
+
+    def test_catch_unmatched_begin_end_2(self):
+        contents = ['module modA',
+                    'end module',
+                    'end module']
+        with pytest.raises(ValueError):
+            self.testfile.get_modules(contents)
+
 
 @pytest.mark.usefixtures("datadir")
 class TestReadFortranFile():

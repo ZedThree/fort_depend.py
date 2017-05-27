@@ -63,7 +63,7 @@ class FortranFile(object):
                 ends.append(num)
 
         if found_units:
-            if len(found_units) != len(starts) != len(ends):
+            if (len(found_units) != len(starts)) or (len(starts) != len(ends)):
                 error_string = ("Unmatched start/end of modules in {} ({} begins/{} ends)"
                                 .format(self.filename, len(starts), len(ends)))
                 raise ValueError(error_string)
