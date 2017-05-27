@@ -17,7 +17,7 @@ def datadir(tmpdir_factory, request):
     return tmpdir
 
 
-class TestEmptyFortranFile():
+class TestEmptyFortranFile:
     def test_empty(self):
         empty = FortranFile(filename='empty', readfile=False)
         assert empty.filename == "empty"
@@ -26,7 +26,7 @@ class TestEmptyFortranFile():
         assert empty.depends_on is None
 
 
-class TestSimpleFortranFile():
+class TestSimpleFortranFile:
     @classmethod
     def setup_class(cls):
         cls.testfile = FortranFile(filename="file.f90", readfile=False)
@@ -114,7 +114,7 @@ class TestSimpleFortranFile():
 
 
 @pytest.mark.usefixtures("datadir")
-class TestReadFortranFile():
+class TestReadFortranFile:
     def test_empty_uses(self):
         testfile = FortranFile(filename="moduleA.f90", readfile=True)
         assert testfile.uses == []

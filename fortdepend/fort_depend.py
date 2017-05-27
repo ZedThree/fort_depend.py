@@ -25,7 +25,7 @@ except NameError:
     pass
 
 
-class FortranProject(object):
+class FortranProject:
     def __init__(self, name=None, excludes=None, files=None, macros={}, verbose=False):
         """Create a list of FortranFile objects
         """

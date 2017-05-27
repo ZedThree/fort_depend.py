@@ -1,7 +1,7 @@
 from fortdepend.units import FortranModule, FortranFile
 
 
-class TestFortranModule():
+class TestFortranModule:
     def test_canonical_name(self):
         module = FortranModule(' MODULE ', ' NAME ')
         assert module.name == 'name'

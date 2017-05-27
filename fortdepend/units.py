@@ -14,7 +14,7 @@ USE_REGEX = re.compile("""^\s*use
                        re.IGNORECASE | re.VERBOSE)
 
 
-class FortranFile(object):
+class FortranFile:
     """The modules and dependencies of a Fortran source file
 
     Args:
@@ -90,7 +90,7 @@ class FortranFile(object):
                            for mod in module.uses]))
 
 
-class FortranModule(object):
+class FortranModule:
     """A Fortran Module or Program
 
     unit_type: 'module' or 'program'
