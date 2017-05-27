@@ -1,5 +1,6 @@
 from fortdepend.units import FortranModule, FortranFile
 
+
 class TestFortranModule():
     def test_canonical_name(self):
         module = FortranModule(' MODULE ', ' NAME ')
@@ -12,6 +13,14 @@ class TestFortranModule():
     def test_canonical_unit_type_program(self):
         program = FortranModule(' PROGRAM ', ' NAME ')
         assert program.unit_type == 'program'
+
+    def test_module_str(self):
+        module = FortranModule(' MODULE ', ' NAME ')
+        assert str(module) == 'name'
+
+    def test_module_repr(self):
+        module = FortranModule(' MODULE ', ' NAME ')
+        assert repr(module) == "FortranModule(module, 'name', 'empty')"
 
     def test_get_use_of_single_module(self):
         file_contents = [
