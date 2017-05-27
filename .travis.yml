@@ -10,4 +10,4 @@ python:
 install:
   - pip install .
 # command to run tests
-script: pytest -v
+script: python -m pytest -v
