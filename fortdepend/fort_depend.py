@@ -26,8 +26,17 @@ except NameError:
 
 
 class FortranProject:
-    def __init__(self, name=None, excludes=None, files=None, macros={}, verbose=False):
+    def __init__(self, name=None, exclude_files=None, files=None, ignore_modules=None,
+                 macros={}, verbose=False):
         """Create a list of FortranFile objects
+
+        Args:
+            name: Name of the project (default: name of current directory)
+            exclude_files: List of files to exclude
+            files: List of files to include (default: all in current directory)
+            ignore_modules: List of module names to ignore_mod
+            macros: Dictionary of module names and replacement values
+            verbose: Print more messages (default: False)
         """
 
         if name is None:
@@ -40,16 +49,16 @@ class FortranProject:
         elif not isinstance(files, list):
             files = [files]
 
-        if excludes is not None:
-            if not isinstance(excludes, list):
-                excludes = [excludes]
-            files = set(files) - set(excludes)
+        if exclude_files is not None:
+            if not isinstance(exclude_files, list):
+                exclude_files = [exclude_files]
+            files = set(files) - set(exclude_files)
 
         self.files = {filename: FortranFile(filename, macros)
                       for filename in files}
         self.modules = self.get_modules()
 
-        self.remove_excluded_modules(excludes)
+        self.remove_ignored_modules(ignore_modules)
 
         self.depends_by_module = self.get_depends_by_module(verbose)
         self.depends_by_file = self.get_depends_by_file(verbose)
@@ -203,26 +212,27 @@ class FortranProject:
                       format=format, view=view)
         graph.draw()
 
-    def remove_excluded_modules(self, excludes=None):
-        """Remove the modules in iterable excludes from
+    def remove_ignored_modules(self, ignore_modules=None):
+        """Remove the modules in iterable ignore_modules from
         all dependencies
         """
-        if excludes is None:
+        if ignore_modules is None:
             return
+        elif not isinstance(ignore_modules, list):
+            ignore_modules = [ignore_modules]
+
         # Remove from module dict
-        for exclude in excludes:
-            self.modules.pop(exclude, None)
-        # Remove from 'used' modules
-        for module in self.modules.values():
-            for exclude in excludes:
+        for ignore_mod in ignore_modules:
+            self.modules.pop(ignore_mod, None)
+            # Remove from 'used' modules
+            for module in self.modules.values():
                 try:
-                    module.uses.remove(exclude)
+                    module.uses.remove(ignore_mod)
                 except ValueError:
                     pass
-        # Remove from 'used' files
-        for source_file in self.files.values():
-            for exclude in excludes:
+            # Remove from 'used' files
+            for source_file in self.files.values():
                 try:
-                    source_file.uses.remove(exclude)
+                    source_file.uses.remove(ignore_mod)
                 except ValueError:
                     pass
