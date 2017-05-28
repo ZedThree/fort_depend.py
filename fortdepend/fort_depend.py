@@ -54,8 +54,16 @@ class FortranProject:
         self.depends_by_module = self.get_depends_by_module(verbose)
         self.depends_by_file = self.get_depends_by_file(verbose)
 
-    def get_source(self, extensions=[".f90", ".F90"]):
-        "Return all files ending with any of ext"
+    def get_source(self, extensions=None):
+        """Return all files ending with any of extensions (defaults to
+        [".f90", ".F90"])
+        """
+
+        if extensions is None:
+            extensions = [".f90", ".F90"]
+        elif not isinstance(extensions, list):
+            extensions = [extensions]
+
         tmp = os.listdir(".")
         files = []
         for ext in extensions:

@@ -34,6 +34,13 @@ class TestFortranProject:
 
         assert set(testproject.files) == set(expected_files)
 
+    def test_get_files_with_different_extension(self):
+        testproject = FortranProject()
+        files = testproject.get_source(extensions=".f08")
+        expected_files = ["different_ext.f08"]
+
+        assert set(files) == set(expected_files)
+
     def test_exclude_files(self):
         testproject = FortranProject(excludes="multiple_modules.f90")
         expected_files = ["moduleA.f90",
