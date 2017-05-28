@@ -4,19 +4,6 @@ import pytest
 import os
 
 
-@pytest.fixture(scope="class")
-def datadir(tmpdir_factory, request):
-    filename = request.module.__file__
-    test_dir, _ = os.path.splitext(filename)
-
-    if os.path.isdir(test_dir):
-        tmpdir = tmpdir_factory.mktemp("data")
-        dir_util.copy_tree(test_dir, str(tmpdir))
-
-    tmpdir.chdir()
-    return tmpdir
-
-
 class TestEmptyFortranFile:
     def test_empty(self):
         empty = FortranFile(filename='empty', readfile=False)
