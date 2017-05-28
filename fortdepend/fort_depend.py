@@ -124,13 +124,6 @@ class FortranProject:
     def get_depends_by_file(self, verbose=False):
         """Get the dependencies of each file in file_list
         """
-        # depends = defaultdict(list)
-        # for module, dependencies in self.depends_by_module.items():
-        #     for dependency in dependencies:
-        #         depends[module.source_file].append(
-        #             dependency.source_file)
-        #     depends[module.source_file].sort(
-        #         key=lambda f: f.filename)
         depends = {}
         for source_file in self.files.values():
             graph = []
