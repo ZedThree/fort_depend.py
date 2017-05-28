@@ -37,8 +37,12 @@ class FortranProject:
 
         if files is None:
             files = self.get_source()
+        elif not isinstance(files, list):
+            files = [files]
 
         if excludes is not None:
+            if not isinstance(excludes, list):
+                excludes = [excludes]
             files = set(files) - set(excludes)
 
         self.files = {filename: FortranFile(filename, macros)
