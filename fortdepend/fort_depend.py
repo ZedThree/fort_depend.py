@@ -27,7 +27,7 @@ except NameError:
 
 class FortranProject:
     def __init__(self, name=None, exclude_files=None, files=None, ignore_modules=None,
-                 macros={}, verbose=False):
+                 macros=None, verbose=False):
         """Create a list of FortranFile objects
 
         Args:
