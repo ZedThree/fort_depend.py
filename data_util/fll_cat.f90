@@ -34,7 +34,7 @@ MODULE FLL_CAT_M
 !
 CONTAINS
 
-   SUBROUTINE FLL_CAT(PNODE,IOUNIT,PARENT,FPAR, SCAN)
+   SUBROUTINE FLL_CAT(PNODE,IOUNIT,PARENT,FPAR, SCAN, SDIR)
 !
 ! Description: Module prints the short content of PNODE to IOUNIT
 !
@@ -52,6 +52,7 @@ CONTAINS
 ! IOUNIR       In         pointer which is to be copied
 ! PARENT       In         parameter, if .TRUE. write information about PNODE parent node
 ! FPAR         In/Out     structure containing function specific data
+! SDIR         In         if present, print DIRs only
 !
 ! Arguments declaration
 !
@@ -59,13 +60,14 @@ CONTAINS
    TYPE(FUNC_DATA_SET) :: FPAR
    INTEGER :: IOUNIT
    LOGICAL :: PARENT
-   CHARACTER, OPTIONAL :: SCAN
+   CHARACTER, OPTIONAL :: SCAN,SDIR
 !
 ! Local types
 !
    TYPE(DNODE), POINTER  :: PCHILD
    INTEGER(LINT) :: POS
    CHARACTER :: SCAN_LOC
+   INTEGER :: DIR
 ! 
 ! body of subroutine
 !
@@ -73,6 +75,12 @@ CONTAINS
      SCAN_LOC = SCAN
    ELSE
      SCAN_LOC = 'N'
+   END IF
+
+   IF(PRESENT(SDIR))THEN
+     DIR = 1
+   ELSE
+     DIR = 0
    END IF
 
    POS = 1
@@ -90,11 +98,11 @@ CONTAINS
       IF(ASSOCIATED(PNODE%PPAR))WRITE(*,*)' ===> Node has a parent, its name is: ', PNODE%PPAR%LNAME
       WRITE(*,*)
    END IF
-   CALL FLL_PRINT(PNODE, IOUNIT, POS, SCAN, FPAR)
+   CALL FLL_PRINT(PNODE, IOUNIT, POS, SCAN, DIR, FPAR)
 !
 ! IF NODE HAS CHILDREN PRINT THEM TOO
 !
-   IF(ASSOCIATED(PCHILD))CALL FLL_CAT_RECURSIVE_NODE(PCHILD,IOUNIT,POS,SCAN_LOC,FPAR)
+   IF(ASSOCIATED(PCHILD))CALL FLL_CAT_RECURSIVE_NODE(PCHILD,IOUNIT,POS,SCAN_LOC,DIR,FPAR)
 
    FPAR%SUCCESS = .TRUE.
 
@@ -102,7 +110,7 @@ CONTAINS
    END SUBROUTINE FLL_CAT
 !
 !
-  RECURSIVE SUBROUTINE FLL_CAT_RECURSIVE_NODE(PNODE,IOUNIT,POS,SCAN,FPAR)
+  RECURSIVE SUBROUTINE FLL_CAT_RECURSIVE_NODE(PNODE,IOUNIT,POS,SCAN,DIR,FPAR)
 !
 ! Description: Module prints the short content of PNODE to IOUNIT
 !
@@ -119,13 +127,14 @@ CONTAINS
 ! IOUNIR       In         pointer which is to be copied
 ! PARENT       In         parameter, if .TRUE. write information about PNODE parent node
 ! FPAR         In/Out     structure containing function specific data
+! DIR          In         = 0 print entire list, = 1 print DIR types only
 !
 ! Arguments declaration
 !
     TYPE(DNODE), POINTER  :: PNODE
     TYPE(FUNC_DATA_SET) :: FPAR
     INTEGER(LINT) :: POS 
-    INTEGER :: IOUNIT
+    INTEGER :: IOUNIT,DIR
     CHARACTER :: SCAN
 !
 !  Local variables
@@ -141,12 +150,12 @@ CONTAINS
 !
     DO WHILE(ASSOCIATED(PCURR))
 
-       CALL FLL_PRINT(PCURR, IOUNIT, POS, SCAN, FPAR)
+       CALL FLL_PRINT(PCURR, IOUNIT, POS, SCAN, DIR, FPAR)
 
        PNEXT  => PCURR%PNEXT
        PCHILD => PCURR%PCHILD
        IF(ASSOCIATED(PCHILD))THEN
-         CALL FLL_CAT_RECURSIVE_NODE(PCHILD,IOUNIT,POS,SCAN,FPAR)
+         CALL FLL_CAT_RECURSIVE_NODE(PCHILD,IOUNIT,POS,SCAN,DIR,FPAR)
        END IF
        
        PCURR => PNEXT
@@ -161,7 +170,7 @@ CONTAINS
 !
 !  FREE MEMORY FOR NODE
 !
-  SUBROUTINE FLL_PRINT(PNODE, IOUNIT, POS, SCAN, FPAR)
+  SUBROUTINE FLL_PRINT(PNODE, IOUNIT, POS, SCAN, DIR, FPAR)
 !
 ! Description: print content of PNODE
 !
@@ -179,6 +188,7 @@ CONTAINS
 ! PARENT       In         parameter, if .TRUE. write information about PNODE parent node
 ! FPAR         In/Out     structure containing function specific data
 ! POS          In         level in linked list
+! DIR          In         = 0 print entire list, = 1 print DIR types only
 !
 ! Arguments declaration
 !
@@ -191,6 +201,7 @@ CONTAINS
 !  Local variables
 !
    INTEGER(LINT) :: I,J,NDIM,NSIZE
+   INTEGER :: DIR
    LOGICAL :: SAVED
    CHARACTER*2048 :: TEXT,TEXT1
    CHARACTER*72 :: NDSTR,NSSTR
@@ -223,7 +234,7 @@ CONTAINS
           achar(27),"[32m",SPACE,ADJUSTL(PNODE%LNAME),achar(27),'[30m'
         WRITE(IOUNIT, *)TRIM(TEXT1)
         RETURN
-     ELSE 
+     ELSE IF(DIR == 0) THEN
         WRITE(TEXT1,'(A,A3,A,A,A,A,A,A16)')&
             "-",TRIM(PNODE%LTYPE),"-     ",TRIM(NDSTR),'x',ADJUSTL(TRIM(NSSTR)),SPACE,NAME
         IF(SCAN == 'Y' .AND. (NDIM*NSIZE /= 1) )THEN
@@ -231,6 +242,8 @@ CONTAINS
           RETURN
         END IF
      END IF
+
+     IF(DIR == 1)RETURN
 !
 !  print 1D arrays
 !

@@ -11,7 +11,7 @@ import ast
 
 #Definitions
 
-def run(file,fmt,efmt,scan):
+def run(file,fmt,efmt,scan,dir):
 #
 #  execute 
 #
@@ -37,6 +37,11 @@ def run(file,fmt,efmt,scan):
     else:
       print("\033[039m Specified file format is: \033[032mASCII \033[039m")  
 
+    if dir == 'Y':  
+        print(" ")
+        print("\033[035m ... printing DIR structure only ... \033[039m")  
+        if fmt == 'b'  or fmt == 'B': scan = 'Y'
+
     if scan == 'Y':  
         print(" ")
         print("\033[035m ... running in scan only mode ... \033[039m")  
@@ -44,10 +49,10 @@ def run(file,fmt,efmt,scan):
     
     if sys.version_info < (3,0):
       p = Popen([executable], stdin=PIPE) #NOTE: no shell=True here
-      p.communicate(os.linesep.join([file, fmt, efmt, scan]))
+      p.communicate(os.linesep.join([file, fmt, efmt, scan, dir]))
     else:
       p = Popen([executable], stdin=PIPE,universal_newlines=True) #NOTE: no shell=True here
-      p.communicate(os.linesep.join( [file, fmt, efmt, scan]))
+      p.communicate(os.linesep.join( [file, fmt, efmt, scan, dir]))
 
 def print_header():
      print("  ")
@@ -77,6 +82,7 @@ if __name__ == "__main__":
     parser.add_argument('-i','--file',nargs=1,help='Files to process')
     parser.add_argument('-f','--format',nargs=1,help='Format of the file')
     parser.add_argument('-s','--scan',action='store_true',help='Scan file only',required=False)
+    parser.add_argument('-D','--dir',action='store_true',help='Print DIR only',required=False)
     parser.add_argument('-e','--external_format',nargs=1,help='External format of the file')
 
     # Parse the command line arguments
@@ -86,11 +92,17 @@ if __name__ == "__main__":
     format = args.format[0] if args.format else None
     eformat = args.external_format[0] if args.external_format else None
     scan = args.scan
+    dir = args.dir
  
     if not scan:
        scan = 'n'
     else:
        scan = 'Y'
+
+    if not dir:
+       dir = 'n'
+    else:
+       dir = 'Y'
 
     if not file:
         print ("\033[031mError: \033[039m missing name of file, option\033[031m -i \033[039m")
@@ -111,4 +123,4 @@ if __name__ == "__main__":
         print ("\033[031m       \033[039m                        \033[032m ffa - ffa format\033[039m")
         sys.exit()
 
-    run(file=file,fmt=format, efmt = eformat, scan=scan)
+    run(file=file,fmt=format, efmt = eformat, scan=scan, dir=dir)
