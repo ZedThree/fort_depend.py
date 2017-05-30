@@ -63,7 +63,7 @@ CONTAINS
   WRITE(*,*)' Name of file without suffix'
   READ(*,*)NAME_OF_FILE
 
-  WRITE(*,*)' Hom many files'
+  WRITE(*,*)' How many files'
   READ(*,*)NFILES
 
   WRITE(*,*)' How many processors'
