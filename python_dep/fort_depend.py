@@ -257,7 +257,7 @@ def get_includes(infile=None, macros={}):
 
     includes=[]
 
-    with open(infile,'r') as f:
+    with open(infile,'r',encoding = "ISO-8859-1") as f:
         t=f.readlines()
 
     for i in t:
@@ -310,8 +310,8 @@ def get_depends(ignore,verbose,cwd,fob=[],m2f=[], ffiles=[]):
 
     for i in fob:
         if int(verbose) > 1 :
-#          print("")
           print("\033[031m Checking dependency for file: \033[032m"+i.file_name+"\033[039m")
+          
         tmp=[]
         for j in i.uses:
             if ignore and (j in ignore): continue
