@@ -164,7 +164,7 @@ CONTAINS
 
           PDISPL%L1 = DISPL
 
-          WRITE(*,*)' Partition ',WORLD_RANK,' saving to :',trim(NAME_OF_FILE)
+!          WRITE(*,*)' Partition ',WORLD_RANK,' saving to :',trim(NAME_OF_FILE)
           IF(.NOT.FLL_WRITE(PMAIN,TRIM(NAME_OF_FILE), IOUNIT, 'B', FPAR))STOP'Error writing file'
 !          WRITE(*,*)' Partition ',WORLD_RANK,' done saving to :',trim(NAME_OF_FILE)
 !

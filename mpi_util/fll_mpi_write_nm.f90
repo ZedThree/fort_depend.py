@@ -105,7 +105,7 @@ CONTAINS
 !
 !  Print some info
 !
-        WRITE(*,*)' Partition ',WORLD_RANK,' saving to :',trim(NAME_OF_FILE)
+!        WRITE(*,*)' Partition ',WORLD_RANK,' saving to :',trim(NAME_OF_FILE)
 !
 !  save file, ROOT_RANK is always 0, use local rank
 ! 
