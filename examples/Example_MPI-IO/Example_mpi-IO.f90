@@ -88,7 +88,9 @@ PROGRAM  EXAMPLE_MPI_IO
 !
 !   create sample data se
 !
-   NSIZE = 100000 !+ 100*WORLD_RANK
+   NSIZE = 1000000   !+ 10000*SIN(2*3.145926*world_rank/nproc)
+!   write(*,*)nsize
+
    BYTESIZE = NSIZE*8*NPROC*5
 
    CALL CREATE_DATA_SET(PDATA_SET,NSIZE, WORLD_RANK)
@@ -143,13 +145,17 @@ PROGRAM  EXAMPLE_MPI_IO
 
 
 
+   NFILES = 1
 
 
-   DO I=2,NPROC/2,2
+   DO I=1,NPROC
+
+       NFILES = NFILES*2
+       IF(NFILES > NPROC-1)EXIT
 
        IF(WORLD_RANK == 0)THEN
          WRITE(*,*)'=============================================='
-         write(*,*)' Saving to ',I,' files'
+         write(*,*)' Saving to ',NFILES,' files'
          WRITE(*,*)'=============================================='
        END IF
 !
@@ -159,8 +165,8 @@ PROGRAM  EXAMPLE_MPI_IO
 !
 !  define how to save files for N-M saving model
 !
-   	CALL  FLL_NMIO_STRUCT(PMPI,'ada','bmpi',I, FPAR)
-   	CALL  FLL_SNMIO_STRUCT(PMPI,'ceda','bmpi',I, 'I', FPAR)
+   	CALL  FLL_NMIO_STRUCT(PMPI,'ada','bmpi',NFILES, FPAR)
+   	CALL  FLL_SNMIO_STRUCT(PMPI,'ceda','bmpi',NFILES, 'I', FPAR)
 !
 !  print the strucute on the screen and save into ASCII file
 !
