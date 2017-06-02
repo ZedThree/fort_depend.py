@@ -257,12 +257,15 @@ def get_includes(infile=None, macros={}):
 
     includes=[]
 
+
     if sys.version_info < (3,0):
       with open(infile,'r') as f:
         t=f.readlines()
     else:
       with open(infile,'r',errors='ignore') as f:
         t=f.readlines()
+
+#    with open(infile,'r',encoding = "ISO-8859-1") as f:
 #    with open(infile,'r',encoding = "ISO-8859-1") as f:
 #        t=f.readlines()
 
