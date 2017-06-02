@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python
 # 
 #
 #  this is a modification of the original script of D Dickinson @https://github.com/ZedThree/fort_depend.py
@@ -257,8 +257,14 @@ def get_includes(infile=None, macros={}):
 
     includes=[]
 
-    with open(infile,'r') as f:
+    if sys.version_info < (3,0):
+      with open(infile,'r') as f:
         t=f.readlines()
+    else:
+      with open(infile,'r',errors='ignore') as f:
+        t=f.readlines()
+#    with open(infile,'r',encoding = "ISO-8859-1") as f:
+#        t=f.readlines()
 
     for i in t:
         tmp=p(i)
@@ -310,8 +316,8 @@ def get_depends(ignore,verbose,cwd,fob=[],m2f=[], ffiles=[]):
 
     for i in fob:
         if int(verbose) > 1 :
-#          print("")
           print("\033[031m Checking dependency for file: \033[032m"+i.file_name+"\033[039m")
+          
         tmp=[]
         for j in i.uses:
             if ignore and (j in ignore): continue
@@ -438,11 +444,11 @@ if __name__ == "__main__":
 
     verbose = 0
     if(args.verbose):
-	verbose = 1
+        verbose = 1
     if(args.vverbose):
-	verbose = 2
+        verbose = 2
     if(args.vvverbose):
-	verbose = 3
+        verbose = 3
     
 
     run(path=root_dir, dep=dep_dir, ignore=args.ignore, files=args.files, verbose=verbose, overwrite=args.overwrite, macros=macros, output=output, build=build)
