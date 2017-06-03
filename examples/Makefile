@@ -41,7 +41,6 @@ DEP_FILE=depend.mk
 #SUBDIRS= $(dir $(wildcard $(srcdir)/*))
 SUBDIRS= \
 	Simple_data_operation \
-        Extra \
         Example_MPI-IO\
 
 ifneq ($(strip $(MPI_FC)),)

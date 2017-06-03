@@ -110,13 +110,22 @@ use, intrinsic :: iso_fortran_env, only : stdin=>input_unit, &
          PNEXT   =>NULL(),&      ! Pointer to next list
          PPREV   =>NULL(),&      ! Pointer to previous list
          PLINK   =>NULL()      ! Pointer to link target
-         
+
+#ifdef f2008         
     REAL(RSINGLE)   , POINTER, CONTIGUOUS :: R1(:) =>NULL(), R2(:,:) => NULL()  ! real arrays
     REAL(RDOUBLE)   , POINTER, CONTIGUOUS :: D1(:) =>NULL(), D2(:,:) => NULL()  ! double arrays
     INTEGER(SINT)   , POINTER, CONTIGUOUS :: I1(:) =>NULL(), I2(:,:) => NULL()  ! integer arrays
     INTEGER(LINT)   , POINTER, CONTIGUOUS :: L1(:) =>NULL(), L2(:,:) => NULL()  ! long integer arrays
     CHARACTER(LEN=LSTRING_LENGTH), POINTER, CONTIGUOUS  :: S1(:)  => NULL()        ! 1D array of strings
     CHARACTER(LEN=LSTRING_LENGTH), POINTER, CONTIGUOUS  :: S2(:,:)=> NULL()      ! 2D array of strings
+#else
+    REAL(RSINGLE)   , POINTER :: R1(:) =>NULL(), R2(:,:) => NULL()
+    REAL(RDOUBLE)   , POINTER :: D1(:) =>NULL(), D2(:,:) => NULL()
+    INTEGER(SINT)   , POINTER :: I1(:) =>NULL(), I2(:,:) => NULL()
+    INTEGER(LINT)   , POINTER :: L1(:) =>NULL(), L2(:,:) => NULL()
+    CHARACTER(LEN=LSTRING_LENGTH), POINTER :: S1(:)  => NULL()
+    CHARACTER(LEN=LSTRING_LENGTH), POINTER :: S2(:,:)=> NULL()
+#endif
     
     REAL(RSINGLE)   :: R0                                     ! real 
     REAL(RDOUBLE)   :: D0                                     ! double
