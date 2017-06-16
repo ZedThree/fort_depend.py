@@ -37,6 +37,14 @@ fll_sweep.o :  \
 	fll_out.o \
 	fll_type.o
 
+fll_read_record.o :  \
+	fll_out.o \
+	fll_locate.o \
+	fll_rm.o \
+	fll_mk.o \
+	fll_type.o \
+	fll_read.o
+
 fll_read.o :  \
 	fll_mv.o \
 	fll_funct_prt.o \
@@ -100,6 +108,7 @@ fll_mods.o :  \
 	fll_mkdir.o \
 	fll_cat.o \
 	fll_write.o \
+	fll_read_record.o \
 	fll_write_ffa.o \
 	fll_getnbytes.o \
 	fll_mk.o \

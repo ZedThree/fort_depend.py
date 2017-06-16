@@ -102,7 +102,7 @@ use, intrinsic :: iso_fortran_env, only : stdin=>input_unit, &
     CHARACTER(LEN=TYPE_LENGTH)     :: LTYPE = ''  ! type of the list
     CHARACTER(LEN=TYPE_LENGTH)     :: FTYPE = ''  ! type of the list
     INTEGER(LINT) :: NDIM = 0, NSIZE = 0, NLINK = 0
-    INTEGER(LINT) :: DATA_LENGTH = 0
+    INTEGER(LINT) :: FP   = 0                     ! byte position in file when reading data set
 
     TYPE (DNODE), POINTER :: &
          PPAR    =>NULL(),&     ! Pointer to parent list
