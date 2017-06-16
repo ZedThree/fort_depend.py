@@ -132,8 +132,6 @@ CONTAINS
    PLIST => FLL_READ(FILE,IOUNIT,'B',FPAR,SCAN = 'Y')
    CALL FLL_CAT(PLIST, 6, .TRUE.,FPAR)
 
-   WRITE(*,*)'_++++++++++++++++++++++++++++++++++_______________',NAME,LTYPE,DATADIM,NUMBER
-
    PTMP => FLL_LOCATE(PLIST,NAME,LTYPE,DATADIM,NUMBER,.TRUE.,FPAR)
 
    IF(.NOT.ASSOCIATED(PTMP))THEN
@@ -143,9 +141,6 @@ CONTAINS
    END IF
 
    POS = PTMP%FP
-
-   write(*,*)' Found record on position ', POS
-   write(*,*)' name of record is ',ptmp%lname
 !
 !   CLEAN MEMORY
 !
