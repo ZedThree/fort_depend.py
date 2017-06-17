@@ -29,40 +29,36 @@
 #
 #
 
-EXE    = fll_test
+EXE    = fll_read_reacord
 
 include src_dir_path.mk
-include ../config.mk
+include ../../config.mk
 
 DEP_FILE=depend.mk
 
-#FMODDIRS= ../../data_util
+FMODDIRS= ../../data_util
 
-#SUBDIRS= $(dir $(wildcard $(srcdir)/*))
-SUBDIRS= \
-	Simple_data_operation \
-        Example_MPI-IO\
-	Read_Record\
-
-ifneq ($(strip $(MPI_FC)),)
-  SUBDIRS+= Example_MPI-IO
-endif
+FFILES= $(notdir $(wildcard $(srcdir)/*.f90))
 
 
+OFILES=$(FFILES:%.f90=%.o)
+XOFILES=$(wildcard ../../data_util/*.o)
 
 ###########################################################################
 
-all: $(SUBDIRS:%=%.all)
+all: $(EXE).x 
 
-include ../rules.mk
+include ../../rules.mk
 
-clean: $(SUBDIRS:%=%.clean)
-	rm -f *.x *.o *.mod
+$(EXE).x: $(OFILES) $(XOFILES)
+	$(FC) $(LDFLAGS) -o $@ $^
 
-depend: $(SUBDIRS:%=%.depend)
+clean:
+	rm -f *.x *.o *.mod $(EXE)
 
-install: $(SUBDIRS:%=%.install)
+depend: $(FFILES)
+	@echo "Making dependencies!"
+	cd $(srcdir) && $(MAKEDEPEND) -r $(PROJ_ROOT_PATH) $(VERBOSE) -w -o $(srcdir)/$(DEP_FILE) -f $(FFILES)
 
-test: $(SUBDIRS:%=%.test)
+-include $(srcdir)/$(DEP_FILE)
 
-chk: $(SUBDIRS:%=%.chk)

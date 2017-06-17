@@ -88,8 +88,7 @@ PROGRAM  EXAMPLE_MPI_IO
 !
 !   create sample data se
 !
-   NSIZE = 1000000   !+ 10000*SIN(2*3.145926*world_rank/nproc)
-!   write(*,*)nsize
+   NSIZE = 100000   !+ 10000*SIN(2*3.145926*world_rank/nproc)
 
    BYTESIZE = NSIZE*8*NPROC*5
 
