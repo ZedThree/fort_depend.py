@@ -63,8 +63,8 @@ CONTAINS
 ! PNODE        In         node to duplicate
 ! PNEW         Out        duplicate node
 ! COMMUNICATOR In         MPI communicatior
-! SENDPART     In         Sending partition
-! RECPART      In         Receiving partition
+! SENDPART     In         Sending process
+! RECPART      In         Receiving process
 ! FPAR         In/Out     structure containing function specific data
 !
 ! Arguments declaration
@@ -89,8 +89,8 @@ CONTAINS
 !
    FPAR%SUCCESS = .FALSE.
 !
-!  If not sending partition, nullify pointer
-!  owherwise check that sending partition does not send NULL pointer and 
+!  If not sending process, nullify pointer
+!  owherwise check that sending process does not send NULL pointer and 
 !  associate returning pointer with sending
 !
    CALL MPI_Comm_rank ( COMMUNICATOR, RANK, IERR )

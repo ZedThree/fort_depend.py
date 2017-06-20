@@ -47,29 +47,29 @@ CONTAINS
 !
 !  the main directory is a partitioned_file
 !     followed by displacement which is a byte position of each partiton in the file 
-!     each data on patition is in subset partition
+!     each data on patition is in subset process
 !  
-!   this is an example of a file with four partitions
+!   this is an example of a file with four processes
 !
 ! -DIR-   5\           partitioned_file
 !   -L-     5x1            displacements                                1                  113             40000301
-!   -DIR-   4\              partition
-!   -L-     1x1               part_number                                   1
+!   -DIR-   4\              process
+!   -L-     1x1               process_number                                   1
 !   -D-     1000000x1               pressure     
 !   -D-     1000000x1               density     
 !   -D-     1000000x3               velocity        
-!   -DIR-   4\              partition
-!   -L-     1x1               part_number                                   2
+!   -DIR-   4\              process
+!   -L-     1x1               process_number                                   2
 !   -D-     1100000x1               pressure     
 !   -D-     1100000x1               density     
 !   -D-     1100000x3               velocity     
-!   -DIR-   4\              partition
-!   -L-     1x1               part_number                                   3
+!   -DIR-   4\              process
+!   -L-     1x1               process_number                                   3
 !   -D-     1200000x1               pressure   
 !   -D-     1200000x1               density   
 !   -D-     1200000x3               velocity    
-!   -DIR-   4\              partition
-!   -L-     1x1               part_number                                   4
+!   -DIR-   4\              process
+!   -L-     1x1               process_number                                   4
 !   -D-     1300000x1               pressure  
 !   -D-     1300000x1               density   
 !   -D-     1300000x3               velocity    
@@ -142,7 +142,7 @@ CONTAINS
 !  Get position and length of each data set
 !  there will be totally n+1 subset, 
 !  subset  #1 is a headet of the file 
-!  subsets #2:  are actual data from each partition
+!  subsets #2:  are actual data from each process
 !
    ALLOCATE(POS(NPROC+1), DISPL(NPROC+1), STAT = ISTAT)
     IF(ISTAT /= 0)STOP'ERROR ALLOCATING MEMORY ==> fll_mpi_write ERR:148 '
@@ -161,13 +161,13 @@ CONTAINS
         POS(1) = 36 + 36 + (NPROC+1)*8
    END IF
 !
-!  ... and distribute length of each subset to all partitions
+!  ... and distribute length of each subset to all processes
 !
    CALL FLL_MPI_SUM(COMMUNICATOR, 1_LINT+NPROC,L1=POS)
 !
 !  Calculate displacement, ie where each subset starts
 !
-   PART_NUM = FLL_GETNDATA_L0(PNODE, 'part_number',1_LINT, FPAR)
+   PART_NUM = FLL_GETNDATA_L0(PNODE, 'process_number',1_LINT, FPAR)
 !
 !  the first subset will start always at position 1
 !  ie. beginning of the file
@@ -179,8 +179,8 @@ CONTAINS
      LOC_DISPL = LOC_DISPL + POS(I-1)
    END DO
 !
-!  define subset position for all other partitions
-!  and propagate this to all partitions
+!  define subset position for all other processes
+!  and propagate this to all processes
 !
    DISPL(RANK+2) = LOC_DISPL
    CALL FLL_MPI_SUM(COMMUNICATOR, NPROC+1_LINT,L1=DISPL)
@@ -228,7 +228,7 @@ CONTAINS
 
   FUNCTION FLL_PART_FILE_HEADER(IOUNIT, NPROC, DISPL, FPAR) RESULT(POS)
 !
-! Description: write header for partitioned file
+! Description: write header for processed file
 !
 ! 
 ! History:
@@ -247,7 +247,7 @@ CONTAINS
 ! Arguments description
 ! Name         In/Out     Function
 ! NPROC        In         Number of processes
-! DISPL        In         Length of each partition record
+! DISPL        In         Length of each process record
 ! IOUNIT       In         Number of unit
 ! FPAR         In/Out     structure containing function specific data
 ! OK           Out        Success or fail
@@ -262,10 +262,10 @@ CONTAINS
 !
    TYPE(DNODE), POINTER :: PTMP
 !
-!  make a head node and say it contains number of partitions + one subsets
+!  make a head node and say it contains number of processes + one subsets
 !
    PTMP => FLL_MKDIR('partitioned_file', FPAR)
-   PTMP%NDIM = NPROC + 1   ! Number of partitioned solutions and displacement vector
+   PTMP%NDIM = NPROC + 1   ! Number of processed solutions and displacement vector
 !
 !  save it 
 !

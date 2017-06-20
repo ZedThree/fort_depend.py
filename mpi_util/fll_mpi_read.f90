@@ -47,29 +47,29 @@ CONTAINS
 !
 !  the main directory is a partitioned_file
 !     followed by displacement which is a byte position of each partiton in the file 
-!     each data on patition is in subset partition
+!     each data on patition is in subset process
 !  
-!   this is an example of a file with four partitions
+!   this is an example of a file with four processes
 !
 ! -DIR-   5\           partitioned_file
 !   -L-     5x1            displacements                                1                  113             40000301
-!   -DIR-   4\              partition
-!   -L-     1x1               part_number                                   1
+!   -DIR-   4\              process
+!   -L-     1x1               process_number                                   1
 !   -D-     1000000x1               pressure     
 !   -D-     1000000x1               density     
 !   -D-     1000000x3               velocity        
-!   -DIR-   4\              partition
-!   -L-     1x1               part_number                                   2
+!   -DIR-   4\              process
+!   -L-     1x1               process_number                                   2
 !   -D-     1100000x1               pressure     
 !   -D-     1100000x1               density     
 !   -D-     1100000x3               velocity     
-!   -DIR-   4\              partition
-!   -L-     1x1               part_number                                   3
+!   -DIR-   4\              process
+!   -L-     1x1               process_number                                   3
 !   -D-     1200000x1               pressure   
 !   -D-     1200000x1               density   
 !   -D-     1200000x3               velocity    
-!   -DIR-   4\              partition
-!   -L-     1x1               part_number                                   4
+!   -DIR-   4\              process
+!   -L-     1x1               process_number                                   4
 !   -D-     1300000x1               pressure  
 !   -D-     1300000x1               density   
 !   -D-     1300000x3               velocity    
@@ -133,19 +133,19 @@ CONTAINS
 
    CALL MPI_BARRIER(COMMUNICATOR, IERR)
 !
-!  If root processor, read initial set and 
-!  get positions for each subset, ie. each partition solution
+!  If root process, read initial set and 
+!  get positions for each subset, ie. each process solution
 !
    IF(RANK == ROOT_RANK)THEN
     PTMP => FLL_RPART_FILE_HEADER(IOUNIT, FPAR) 
    END IF
 !
-!  distribute that info to all partitions
+!  distribute that info to all processes
 !
    PTMP1 => FLL_MPI_CP_ALL(PTMP,COMMUNICATOR,ROOT_RANK,FPAR)
    IF(RANK /= ROOT_RANK) PTMP => PTMP1
 !
-!  get position in a file for each partition
+!  get position in a file for each process
 !  
    DISPL => PTMP%L1
 !
@@ -181,7 +181,7 @@ CONTAINS
 
   FUNCTION FLL_RPART_FILE_HEADER(IOUNIT, FPAR) RESULT(PNEW)
 !
-! Description: Reads header of partitione file containing
+! Description: Reads header of partitioned file containing
 !              positions of each record in the file
 !
 ! 

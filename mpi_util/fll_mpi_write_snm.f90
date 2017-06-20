@@ -58,7 +58,7 @@ CONTAINS
 ! FILE         In         Name of file
 ! PNODE        In         Node to be written
 ! IOUNIT       In         Number of unit
-! FILE_TAB     In         Specifies which partition saves to which file
+! FILE_TAB     In         Specifies which process saves to which file
 ! FPAR         In/Out     structure containing function specific data
 ! OK           Out        Success or fail
 !
@@ -111,7 +111,7 @@ CONTAINS
         PROC_NUM => FLL_GETNDATA_L1(PIO,'proc', 1_LINT, FPAR)
         NPROC = SIZE(PROC_NUM, DIM = 1, KIND = LINT)
 !
-!  if first partition in group get data from other partitions and
+!  if first process in group get data from other processes and
 !  save the file
 !
         IF(LOCRANK == 0)THEN
@@ -119,7 +119,7 @@ CONTAINS
 !  Create header for the file 
 !
           PMAIN => FLL_MKDIR('partitioned_file', FPAR)
-          PMAIN%NDIM = NPROC + 1   ! Number of partitioned solutions and displacement vector
+          PMAIN%NDIM = NPROC + 1   ! Number of processed solutions and displacement vector
           PDISPL  => FLL_MK('displacements','L', NPROC+1_LINT, 1_LINT, FPAR)
           OK = FLL_MV(PDISPL, PMAIN, FPAR)
 !
@@ -142,7 +142,7 @@ CONTAINS
           POS(1) = 36 + 36 + (NPROC+1)*8
           POS(2) = FLL_GETNBYTES(PNODE,FPAR)
 !
-!  get solutions from associated partitions and add it to the main tree
+!  get solutions from associated processes and add it to the main tree
 !
           DO J=2,NPROC
             TMPINT = J-1
@@ -175,7 +175,7 @@ CONTAINS
 
         ELSE
 !
-!  Other then group root partition, copy data set to root partition
+!  Other then group root process, copy data set to root processes
 !
           PTMP => FLL_MPI_CP(PNODE,COMM,LOCRANK,0,FPAR)
 

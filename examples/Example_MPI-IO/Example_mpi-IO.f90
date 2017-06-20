@@ -98,7 +98,7 @@ PROGRAM  EXAMPLE_MPI_IO
    BYTESN = FLL_GETNBYTES(PDATA_SET,FPAR)
    IF(WORLD_RANK == 0) WRITE(*,*)' Partitions created data set size of ', WORLD_RANK,BYTESN
 !
-!  save to one file, all partitions at the same time
+!  save to one file, all processes at the same time
 ! 
        IF(WORLD_RANK == 0)THEN
          WRITE(*,*)'=============================================='
@@ -210,7 +210,7 @@ PROGRAM  EXAMPLE_MPI_IO
      END IF       
 
 !
-!  save to 2 separate files all partitions at the same time
+!  save to 2 separate files all processes at the same time
 !
         CPUAVE = 0
         DO J=1,NCYC
@@ -226,7 +226,7 @@ PROGRAM  EXAMPLE_MPI_IO
    	  IF(WORLD_RANK == 0)THEN 
       	  CALL DATE_AND_TIME(VALUES=VALS)
           CPUE = REAL(VALS(5)*3600+VALS(6)*60+VALS(7))+REAL(VALS(8))*0.001
-!          WRITE(*,*)"Time writing paralell to partitions file (N-M model):",CPUE-CPUS
+!          WRITE(*,*)"Time writing paralell to processes file (N-M model):",CPUE-CPUS
           CPTIMERMS(J) = CPUE-CPUS
           CPUAVE = CPUAVE + CPUE-CPUS
    	END IF
@@ -321,16 +321,16 @@ PROGRAM  EXAMPLE_MPI_IO
         write(*,*)
      END IF
 !
-!  Copy FLL_MPI_STRUCT date set which now exists on root partition only
-!  to all other partitions
+!  Copy FLL_MPI_STRUCT date set which now exists on root process only
+!  to all other processes
 !  Upon return, the function will return pointer to newly allocated data
-!  for all other partition then root partition
-!  On root partition, the PNEW pointer is pointing on FLL_MPI_STRUCT
+!  for all other process then root process
+!  On root process, the PNEW pointer is pointing on FLL_MPI_STRUCT
 !
 !   PNEW => FLL_MPI_CP_ALL(FLL_MPI_STRUCT,MPI_COMM_WORLD,0,FPAR)
 !   IF(WORLD_RANK /= 0)THEN
 !
-!  make FLL_MPI_STRUCT point to PNEW so that we cane use the same names for all partitions
+!  make FLL_MPI_STRUCT point to PNEW so that we cane use the same names for all processes
 !  
 !     FLL_MPI_STRUCT => PNEW
 !   END IF

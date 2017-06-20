@@ -57,7 +57,7 @@ CONTAINS
 ! FILE         In         Name of file
 ! PNODE        In         Node to be written
 ! IOUNIT       In         Number of unit
-! FILE_TAB     In         Specifies which partition saves to which file
+! FILE_TAB     In         Specifies which process saves to which file
 ! FPAR         In/Out     structure containing function specific data
 ! OK           Out        Success or fail
 !

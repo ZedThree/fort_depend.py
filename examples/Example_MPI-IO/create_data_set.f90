@@ -27,7 +27,7 @@
 !
 !
 !     Description: creates mpi struct defining how many files will be 
-!                  saved and which partitions will be saving to each 
+!                  saved and which processes will be saving to each 
 !                  file
 !
 !
@@ -67,11 +67,11 @@ CONTAINS
 !
 !  MAKE STRUCTURE
 !
-  PNODE => FLL_MKDIR('partition',FPAR)
+  PNODE => FLL_MKDIR('process',FPAR)
 !
-!  add number of partition
+!  add number of process
 !
-  PTMP  => FLL_MK('part_number','L', 1_LINT, 1_LINT, FPAR)
+  PTMP  => FLL_MK('process_number','L', 1_LINT, 1_LINT, FPAR)
   PTMP%L0 = RANK+1
   IF(.NOT.FLL_MV(PTMP, PNODE, FPAR))STOP' ERROR MOVING NODE'
 !

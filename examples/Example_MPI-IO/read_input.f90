@@ -27,7 +27,7 @@
 !
 !
 !     Description: creates mpi struct defining how many files will be 
-!                  saved and which partitions will be saving to each 
+!                  saved and which processes will be saving to each 
 !                  file
 !
 !

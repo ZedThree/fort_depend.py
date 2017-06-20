@@ -63,8 +63,8 @@ CONTAINS
 ! PNODE        In         node to duplicate
 ! PNEW         Out        duplicate node
 ! COMMUNICATOR In         MPI communicatior
-! SENDPART     In         Sending partition
-! RECPART      In         Receiving partition
+! SENDPART     In         Sending process
+! RECPART      In         Receiving process
 ! FPAR         In/Out     structure containing function specific data
 !
 ! Arguments declaration
@@ -89,8 +89,8 @@ CONTAINS
 !
    FPAR%SUCCESS = .FALSE.
 !
-!  If not sending partition, nullify pointer
-!  owherwise check that sending partition does not send NULL pointer and 
+!  If not sending process, nullify pointer
+!  owherwise check that sending process does not send NULL pointer and 
 !  associate returning pointer with sending
 !
    CALL MPI_Comm_rank ( COMMUNICATOR, RANK, IERR )
@@ -117,7 +117,7 @@ CONTAINS
 
    ELSE
 !
-!  Sending partition
+!  Sending process
 !
      IF(.NOT.ASSOCIATED(PNODE))THEN
        WRITE(FPAR%MESG,'(A)')' DUPLICATE - null node '
@@ -168,8 +168,8 @@ CONTAINS
 ! Arguments description
 ! Name         In/Out     Function
 ! PNODE        In         pointer which is to be duplicated
-! SENDPART     In         sending partition rank
-! RECPART      In         receiving partition rank
+! SENDPART     In         sending process rank
+! RECPART      In         receiving process rank
 ! COMMUNICATOR In         Commuticator
 ! FPAR         In/Out     structure containing function specific data
 !
@@ -236,7 +236,7 @@ CONTAINS
 ! Name         In/Out     Function
 ! PNODE        In         pointer which is to be duplicated
 ! PNEW         In         recevied pointer
-! SENDPART     In         sending partition rank
+! SENDPART     In         sending process rank
 ! COMMUNICATOR In         Commuticator
 ! FPAR         In/Out     structure containing function specific data
 !
@@ -292,8 +292,8 @@ CONTAINS
 ! Name         In/Out     Function
 ! PNODE        In         pointer data which is to be duplicated
 ! COMMUNICATOR In         communicator
-! SENDPART     In         sending partition
-! RECPART      In         receiving partition
+! SENDPART     In         sending process
+! RECPART      In         receiving process
 ! FPAR         In/Out     structure containing function specific data
 !
 ! Arguments declaration
@@ -416,7 +416,7 @@ CONTAINS
 ! Name         In/Out     Function
 ! PNODE        In         pointer data which is to be duplicated
 ! COMMUNICATOR In         communicator
-! SENDPART     In         sending partition
+! SENDPART     In         sending process
 ! FPAR         In/Out     structure containing function specific data
 !
 ! Arguments declaration

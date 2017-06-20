@@ -212,10 +212,10 @@ CONTAINS
 !
 !  group processes 
 !  there will be NFILES group
-!  each group would have max NPROC/NFILES partitions and the increment 
+!  each group would have max NPROC/NFILES processes and the increment 
 !  between them is NFILES
 !
-!  in this way, each file should be associated to one partition from each node
+!  in this way, each file should be associated to one process from each node
 !
     NSTEP = NPROC/NFILES
 
@@ -229,7 +229,7 @@ CONTAINS
     ALLOCATE(EVEN_RANK(NSTEP), STAT = IERR)
      IF(IERR /= 0)STOP' ERROR ALLOCATING MEMORY ==> fll_mpi_proc_struct ERR:230 '
 !
-!  loop over number of separate files, define which partition is going to be
+!  loop over number of separate files, define which process is going to be
 !  saving in what file (defined by EVEN_RANK array
 !
     DO J=1,NFILES
@@ -268,15 +268,15 @@ CONTAINS
 !
 !  group processes 
 !  there will be NFILES group
-!  each group would have max NPROC/NFILES partitions and the increment 
+!  each group would have max NPROC/NFILES processes and the increment 
 !  between them is NFILES
 !
-!  in this way, each file should be associated to one partition from each node
+!  in this way, each file should be associated to one process from each node
 !
       COUNT = 1
       DO I=J,NPROC,NFILES
 !
-!  fill partition numbers
+!  fill process numbers
 !
          PTMP%L1(COUNT)   = I
 !
@@ -424,10 +424,10 @@ CONTAINS
 !
 !  group processes 
 !  there will be NFILES group
-!  each group would have max NPROC/NFILES partitions and the increment 
+!  each group would have max NPROC/NFILES processes and the increment 
 !  between them is NFILES
 !
-!  in this way, each file should be associated to one partition from each node
+!  in this way, each file should be associated to one process from each node
 !
     NSTEP = NPROC/NFILES
 
@@ -441,7 +441,7 @@ CONTAINS
     ALLOCATE(EVEN_RANK(NSTEP), STAT = IERR)
      IF(IERR /= 0)STOP' ERROR ALLOCATING MEMORY ==> fll_mpi_proc_struct ERR:442 '
 !
-!  loop over number of separate files, define which partition is going to be
+!  loop over number of separate files, define which process is going to be
 !  saving in what file (defined by EVEN_RANK array
 !
     DO J=1,NFILES
@@ -480,15 +480,15 @@ CONTAINS
 !
 !  group processes 
 !  there will be NFILES group
-!  each group would have max NPROC/NFILES partitions and the increment 
+!  each group would have max NPROC/NFILES processes and the increment 
 !  between them is NFILES
 !
-!  in this way, each file should be associated to one partition from each node
+!  in this way, each file should be associated to one process from each node
 !
       COUNT = 1
       DO I=1+(J-1)*NSTEP,J*NSTEP
 !
-!  fill partition numbers
+!  fill process numbers
 !
          PTMP%L1(COUNT)   = I
 !
