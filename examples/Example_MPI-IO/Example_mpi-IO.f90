@@ -72,7 +72,7 @@ PROGRAM  EXAMPLE_MPI_IO
 
   TYPE(DNODE), POINTER ::PIOSTR,PSUBPROC,PIO
 
-  REAL :: CPUE,CPUS,CPUAVE,CPTIMERMS(100),BYTESIZE,BYTESPEED
+  REAL :: CPUE,CPUS,CPUAVE,CPTIMERMS(100),BYTESPEED
   INTEGER :: VALS(8)
 
   INTEGER :: NCYC
@@ -89,8 +89,6 @@ PROGRAM  EXAMPLE_MPI_IO
 !   create sample data se
 !
    NSIZE = 100000   !+ 10000*SIN(2*3.145926*world_rank/nproc)
-
-   BYTESIZE = NSIZE*8*NPROC*5
 
    CALL CREATE_DATA_SET(PDATA_SET,NSIZE, WORLD_RANK)
 !   IF(WORLD_RANK == 0) OK = FLL_WRITE_FFA(PDATA_SET,'test.bcs',10,'B',FPAR)
@@ -135,7 +133,7 @@ PROGRAM  EXAMPLE_MPI_IO
           CPTIMERMS(J) = (CPTIMERMS(J)-CPUAVE)**2
         END DO
         write(*,*)' >>>>>>>>>>>>>  average time of saving (N-1 model) is ',CPUAVE, SQRT(SUM(CPTIMERMS(1:NCYC)))/FLOAT(NCYC)
-        BYTESPEED = BYTESIZE/CPUAVE/1048576
+        BYTESPEED = BYTESN/CPUAVE/1048576
         write(*,*)' >>>>>>>>>>>>>  average speed of saving (N-1 model) is ',&
             BYTESPEED, BYTESPEED/CPUAVE*SQRT(SUM(CPTIMERMS(1:NCYC)))/FLOAT(NCYC)
         write(*,*)
@@ -205,7 +203,7 @@ PROGRAM  EXAMPLE_MPI_IO
           CPTIMERMS(J) = (CPTIMERMS(J)-CPUAVE)**2
         END DO
         write(*,*)' >>>>>>>>>>>>>  average time of saving (S-N-M model) is ',CPUAVE, SQRT(SUM(CPTIMERMS(1:NCYC)))/FLOAT(NCYC)
-        BYTESPEED = BYTESIZE/CPUAVE/1048576
+        BYTESPEED = BYTESN/CPUAVE/1048576
         write(*,*)' >>>>>>>>>>>>>  average speed of saving (S-N-M model) is ',&
             BYTESPEED, BYTESPEED/CPUAVE*SQRT(SUM(CPTIMERMS(1:NCYC)))/FLOAT(NCYC)
         write(*,*)
@@ -241,7 +239,7 @@ PROGRAM  EXAMPLE_MPI_IO
           CPTIMERMS(J) = (CPTIMERMS(J)-CPUAVE)**2
         END DO
         write(*,*)' >>>>>>>>>>>>>  average time of saving (N-M model) is ',CPUAVE, SQRT(SUM(CPTIMERMS(1:NCYC)))/FLOAT(NCYC)
-        BYTESPEED = BYTESIZE/CPUAVE/1048576
+        BYTESPEED = BYTESN/CPUAVE/1048576
         write(*,*)' >>>>>>>>>>>>>  average speed of saving (N-M model) is ',&
             BYTESPEED, BYTESPEED/CPUAVE*SQRT(SUM(CPTIMERMS(1:NCYC)))/FLOAT(NCYC)
         write(*,*)
@@ -292,7 +290,7 @@ PROGRAM  EXAMPLE_MPI_IO
           CPTIMERMS(J) = (CPTIMERMS(J)-CPUAVE)**2
         END DO
         write(*,*)' >>>>>>>>>>>>>  average time of saving (N-N model) is ',CPUAVE, SQRT(SUM(CPTIMERMS(1:NCYC)))/FLOAT(NCYC)
-        BYTESPEED = BYTESIZE/CPUAVE/1048576
+        BYTESPEED = BYTESN/CPUAVE/1048576
         write(*,*)' >>>>>>>>>>>>>  average speed of saving (N-N model) is ',&
             BYTESPEED, BYTESPEED/CPUAVE*SQRT(SUM(CPTIMERMS(1:NCYC)))/FLOAT(NCYC)
         write(*,*)
@@ -317,7 +315,7 @@ PROGRAM  EXAMPLE_MPI_IO
           CPTIMERMS(J) = (CPTIMERMS(J)-CPUAVE)**2
         END DO
         write(*,*)' >>>>>>>>>>>>>  average time of saving (1-1 model) is ',CPUAVE, SQRT(SUM(CPTIMERMS(1:NCYC)))/FLOAT(NCYC)
-        BYTESPEED = BYTESIZE/CPUAVE/1048576
+        BYTESPEED = BYTESN/CPUAVE/1048576
         write(*,*)' >>>>>>>>>>>>>  average speed of saving (1-1 model) is ',&
             BYTESPEED, BYTESPEED/CPUAVE*SQRT(SUM(CPTIMERMS(1:NCYC)))/FLOAT(NCYC)
         write(*,*)
