@@ -320,6 +320,7 @@ def get_depends(ignore,verbose,cwd,fob=[],m2f=[], ffiles=[]):
           
         tmp=[]
         for j in i.uses:
+
             if ignore and (j in ignore): continue
             try:
 #
@@ -333,6 +334,7 @@ def get_depends(ignore,verbose,cwd,fob=[],m2f=[], ffiles=[]):
 #  these are files found in function get_all_files
 #
                 for k in ffiles:
+
                     dir,fil=os.path.split(k)
                     dir = dir+ "/"
                     retval = 0
@@ -349,6 +351,7 @@ def get_depends(ignore,verbose,cwd,fob=[],m2f=[], ffiles=[]):
                             print ("\033[031m         \033[039m module found in \033[032m"+name+"\033[039m file")
                             print ("\033[031m         \033[039m adding the module to dependency file, not checking its dependency further \033[032m\033[039m")
 #                            print(" ")
+                            break    #break loop, dependency declared
                 
                 if istat== 0 and not(j == ""):
                          if int(verbose) > 2 :
@@ -356,6 +359,7 @@ def get_depends(ignore,verbose,cwd,fob=[],m2f=[], ffiles=[]):
                            print ("\033[031m   Note!!!!: \033[039m module \033[032m"+j+"\033[039m not defined in any file")
                            print ("\033[031m             \033[039m assuming intrinsic module, not adding to dependency tree ... \033[032m\033[039m")
 #			   print(" ")
+                           break    #break loop, dependency declared 
         
         if not(istat == 0):
              deps[i.file_name]=tmp
