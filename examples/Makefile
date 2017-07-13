@@ -36,17 +36,16 @@ include ../config.mk
 
 DEP_FILE=depend.mk
 
-#FMODDIRS= ../../data_util
-
 #SUBDIRS= $(dir $(wildcard $(srcdir)/*))
 SUBDIRS= \
 	Simple_data_operation \
-        Example_MPI-IO\
 	Read_Record\
 
-ifneq ($(strip $(MPI_FC)),)
+#ifneq ($(strip $(MPI_FC)),)
+ifneq ($(MPI_FC),)
   SUBDIRS+= Example_MPI-IO
 endif
+
 
 
 
