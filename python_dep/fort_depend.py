@@ -154,20 +154,25 @@ def get_all_files(path,dep):
         if not(dep == None):
             for i in dep:                
                 if i.strip() in root:
-                     for filename in fnmatch.filter(filenames, '*.f*'):
-                         matches.append(os.path.join(root, filename))
+                     #for filename in fnmatch.filter(filenames, '*.F*'):
+                     for filename in filenames:
+                         if filename.endswith(('.f', '.f90', '.F', '.F90')):
+                             matches.append(os.path.join(root, filename))
 #
 #  otherwise include all files from path dir
 #                         
         else:
-            for filename in fnmatch.filter(filenames, '*.f*'):
-              matches.append(os.path.join(root, filename))
+            #for filename in fnmatch.filter(filenames, '*.f*'):
+              #matches.append(os.path.join(root, filename)) 
+              for filename in filenames:
+                    if filename.endswith(('.f', '.f90', '.F', '.F90')):
+                        matches.append(os.path.join(root, filename))
         
     return matches
 
 def check_if_there(use,file):
     "return if you see module name"
-
+    
     if sys.version_info < (3,0):
       with open(file) as f:
         for line in f:
@@ -183,7 +188,7 @@ def check_if_there(use,file):
             for line in f:
               if "module" in line.lower():
                 extrline = line.lower()
-                extrline = extrline.replace("module", "")
+                extrline = extrline.replace("module", "",1)
                 if use.lower().strip() == extrline.strip():
                     f.close()
                     return 1
@@ -320,7 +325,6 @@ def get_depends(ignore,verbose,cwd,fob=[],m2f=[], ffiles=[]):
           
         tmp=[]
         for j in i.uses:
-
             if ignore and (j in ignore): continue
             try:
 #
