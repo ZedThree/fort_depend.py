@@ -43,6 +43,8 @@ def run(path,dep=None,ignore=None,files=None,verbose=None,overwrite=None,output=
 #  list all file in path dir
 #
     ff=get_all_files(path=path, dep=dep) 
+
+   
     
     if int(verbose) > 2:
       print(" ")
@@ -178,7 +180,7 @@ def check_if_there(use,file):
         for line in f:
             if "module" in line.lower():
                 extrline = line.lower()
-                extrline = extrline.replace("module", "")
+                extrline = extrline.replace("module", "",1)
                 if use.lower().strip() == extrline.strip():
                     f.close()
                     return 1
