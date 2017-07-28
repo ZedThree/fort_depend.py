@@ -220,8 +220,6 @@ def get_all_files(path,dep):
                    cwurrdirr=cwurrdirr.replace(path,'')
                    cwurrdirr = relapth + cwurrdirr + "/"
                    matches.append(os.path.join(cwurrdirr, filename))
-
-
         
     return matches
 
