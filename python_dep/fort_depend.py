@@ -10,6 +10,7 @@
 #  if fortran source uses module from other directory the script will add the module too
 #  the project root directory is specified as an input parameter with an option -r  
 #
+#
 import os
 import re
 import glob
