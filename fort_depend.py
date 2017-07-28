@@ -10,6 +10,7 @@
 #  if fortran source uses module from other directory the script will add the module too
 #  the project root directory is specified as an input parameter with an option -r  
 #
+#
 import os
 import re
 import glob
@@ -32,19 +33,12 @@ def run(path,dep=None,ignore=None,files=None,verbose=None,overwrite=None,output=
       print("\033[031m Making dependencies in \033[032m"+cwd+"\033[039m directory")
       print("  ")
 #
-#  get rid of ../ in deps
-#
-    if not(dep == None):
-        dep = [w.replace('../', ' ') for w in dep]
-#
 #  get files where to look for modules
 #  if list of preferred directories is specified in dep
 #  list only these files, otherwise
 #  list all file in path dir
 #
     ff=get_all_files(path=path, dep=dep) 
-
-   
     
     if int(verbose) > 2:
       print(" ")
@@ -98,30 +92,45 @@ def write_depend(verbose,path,cwd,outfile="makefile.dep",dep=[],overwrite=False,
 
     for i in dep.keys():
         tmp,fil=os.path.split(i)
+#
+#  get name of file for which you write dependencies with .o 
+#
         stri="\n"+os.path.join(build, fil.split(".")[0]+".o"+" : ")
         if int(verbose) > 1:
           print("\033[031m Writing dependency info for \033[032m"+i+"\033[039m module")
 
         if not(dep[i] == ""):
-
+#
+#  add module name to stri and separate by new line and tab
+#
           for j in dep[i]:
+#            stri=stri+" \\\n\t" +j.split(".")[0]+".o"
+
             npathseg = j.count('/')
             if npathseg == 0:
 #
 #  module is in the file located in the same directory
 #
                 tmp,fil=os.path.split(j)
+#
+#  replace suffix with .o
+#
+                fil= os.path.splitext(j)[0]+'.o'
             else:
 #
 #  module is in file located in different directory
 #
-                fil = get_relative_path_name(j,path=path,cwd=cwd)
+#                fil = get_relative_path_name(j,path=path,cwd=cwd)
+                 fil = j
 
             if "../" in fil:
                 stri = stri + " \\\n\t" + fil
             else:
                 stri=stri+" \\\n\t"+os.path.join(build, fil.split(".")[0]+".o")
-                
+            
+#
+#  add the last new line and write to a file
+#           
         stri=stri+"\n"
         f.write(stri)
 
@@ -145,30 +154,74 @@ def get_source(ext=[".f90",".F90",".f",".F"]):
 
 def get_all_files(path,dep):
 #
-#  list all fortran files
+#  list all fortran files where to look for possible module
+#  once found add their relative path from this directory to project root directory
+#  it is important to do so when the project is compiled in a different directory
+#  the path of all modules should be relatie
 #
     matches = []
-    for root, dirnames, filenames in os.walk(path):
 #
 #  specified list of preferred directories
-#  list only those
+#  list only files located in those
 #
-        if not(dep == None):
-            for i in dep:                
-                if i.strip() in root:
-                     #for filename in fnmatch.filter(filenames, '*.F*'):
-                     for filename in filenames:
-                         if filename.endswith(('.f', '.f90', '.F', '.F90')):
-                             matches.append(os.path.join(root, filename))
+    if not(dep == None):
+       for i in dep:
+#
+#   use basolute path to preferred directories ie.: os.path.abspath(i) 
+#
+          for root, dirnames, filenames in os.walk(os.path.abspath(i)):   
+#
+#  list all files and check if they end up with given suffix, if yes, add to the list
+#
+                for filename in filenames:
+                  if filename.endswith(('.f', '.f90', '.F', '.F90')):
+#                   matches.append(os.path.join(root, filename))
+#
+#    add specified dependency directory location (i) rather then aboslute path
+#
+                    matches.append(os.path.join(i, filename))
 #
 #  otherwise include all files from path dir
 #                         
-        else:
-            #for filename in fnmatch.filter(filenames, '*.f*'):
-              #matches.append(os.path.join(root, filename)) 
-              for filename in filenames:
-                    if filename.endswith(('.f', '.f90', '.F', '.F90')):
-                        matches.append(os.path.join(root, filename))
+    else: 
+#
+#  path is a root dorectory of the entire project, loop all file in it
+#   get how many ../ you have to go up to reach the project root directory
+#
+       currdirr = os.getcwd()
+       relapth = currdirr
+       relapth=relapth.replace(path,'')
+       relapth = relapth + "/"
+       slsh_count  = relapth.count('/')
+       relapth = ''
+       for isl in range(0, slsh_count):
+            relapth += "../"
+#
+#  loop over all file in project root path directory 
+#
+       for root, dirnames, filenames in os.walk(path):
+       
+         for filename in filenames:
+             if filename.endswith(('.f', '.f90', '.F', '.F90')):
+ #                matches.append(os.path.join(root, filename))
+ 
+                 if(root == currdirr):
+#
+#   file is in this directory add juts its name
+#
+                      matches.append(filename)
+                 else:
+#
+#   file is different directory, 
+#   sybstract project root parth from the file path
+#   add trailing /   and then add ../ to get to project root path
+#
+                   cwurrdirr = root
+                   cwurrdirr=cwurrdirr.replace(path,'')
+                   cwurrdirr = relapth + cwurrdirr + "/"
+                   matches.append(os.path.join(cwurrdirr, filename))
+
+
         
     return matches
 
@@ -202,8 +255,8 @@ def check_if_there(use,file):
 def create_file_objs(verbose, files=None,  macros={}):
     l=[]
 
-    if files is None:
-        files = get_source()
+#    if files is None:
+#        files = get_source()
 
     files = get_source()
 
