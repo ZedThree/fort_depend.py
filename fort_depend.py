@@ -32,19 +32,12 @@ def run(path,dep=None,ignore=None,files=None,verbose=None,overwrite=None,output=
       print("\033[031m Making dependencies in \033[032m"+cwd+"\033[039m directory")
       print("  ")
 #
-#  get rid of ../ in deps
-#
-    if not(dep == None):
-        dep = [w.replace('../', ' ') for w in dep]
-#
 #  get files where to look for modules
 #  if list of preferred directories is specified in dep
 #  list only these files, otherwise
 #  list all file in path dir
 #
     ff=get_all_files(path=path, dep=dep) 
-
-   
     
     if int(verbose) > 2:
       print(" ")
@@ -145,30 +138,36 @@ def get_source(ext=[".f90",".F90",".f",".F"]):
 
 def get_all_files(path,dep):
 #
-#  list all fortran files
+#  list all fortran files where to look for possible module 
 #
     matches = []
-    for root, dirnames, filenames in os.walk(path):
 #
 #  specified list of preferred directories
-#  list only those
+#  list only files located in those
 #
-        if not(dep == None):
-            for i in dep:                
-                if i.strip() in root:
-                     #for filename in fnmatch.filter(filenames, '*.F*'):
-                     for filename in filenames:
-                         if filename.endswith(('.f', '.f90', '.F', '.F90')):
-                             matches.append(os.path.join(root, filename))
+    if not(dep == None):
+       for i in dep:
+#
+#   use basolute path ie.: os.path.abspath(i) 
+#
+          for root, dirnames, filenames in os.walk(os.path.abspath(i)):   
+#
+#  list all files and check if they end up with given suffix, if yes, add to the list
+#
+                for filename in filenames:
+                  if filename.endswith(('.f', '.f90', '.F', '.F90')):
+                   matches.append(os.path.join(root, filename))
 #
 #  otherwise include all files from path dir
 #                         
-        else:
-            #for filename in fnmatch.filter(filenames, '*.f*'):
-              #matches.append(os.path.join(root, filename)) 
-              for filename in filenames:
-                    if filename.endswith(('.f', '.f90', '.F', '.F90')):
-                        matches.append(os.path.join(root, filename))
+    else: 
+#
+#  path is a root dorectory of the entire project, loop all file in it
+#
+       for root, dirnames, filenames in os.walk(path):
+         for filename in filenames:
+             if filename.endswith(('.f', '.f90', '.F', '.F90')):
+                 matches.append(os.path.join(root, filename))
         
     return matches
 
