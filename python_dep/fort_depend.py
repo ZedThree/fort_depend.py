@@ -161,6 +161,18 @@ def get_all_files(path,dep):
 #
     matches = []
 #
+#  path is a root dorectory of the entire project, loop all file in it
+#   get how many ../ you have to go up to reach the project root directory
+#
+    currdirr = os.getcwd()
+    relapth = currdirr
+    relapth=relapth.replace(path,'')
+    relapth = relapth + "/"
+    slsh_count  = relapth.count('/')
+    relapth = ''
+    for isl in range(0, slsh_count):
+            relapth += "../"
+#
 #  specified list of preferred directories
 #  list only files located in those
 #
@@ -174,28 +186,32 @@ def get_all_files(path,dep):
 #  list all files and check if they end up with given suffix, if yes, add to the list
 #
                 for filename in filenames:
-                  if filename.endswith(('.f', '.f90', '.F', '.F90')):
-#                   matches.append(os.path.join(root, filename))
+                    if filename.endswith(('.f', '.f90', '.F', '.F90')):
+##                   matches.append(os.path.join(root, filename))
+##
+##    add specified dependency directory location (i) rather then aboslute path
+##
+                    #matches.append(os.path.join(i, filename))
+                    
+                       if(root == currdirr):
 #
-#    add specified dependency directory location (i) rather then aboslute path
+#   file is in this directory add juts its name
 #
-                    matches.append(os.path.join(i, filename))
+                            matches.append(filename)
+                       else:
+#
+#   file is different directory, 
+#   sybstract project root parth from the file path
+#   add trailing /   and then add ../ to get to project root path
+#
+                          cwurrdirr = root
+                          cwurrdirr=cwurrdirr.replace(path,'')
+                          cwurrdirr = relapth + cwurrdirr + "/"
+                          matches.append(os.path.join(cwurrdirr, filename))
 #
 #  otherwise include all files from path dir
 #                         
     else: 
-#
-#  path is a root dorectory of the entire project, loop all file in it
-#   get how many ../ you have to go up to reach the project root directory
-#
-       currdirr = os.getcwd()
-       relapth = currdirr
-       relapth=relapth.replace(path,'')
-       relapth = relapth + "/"
-       slsh_count  = relapth.count('/')
-       relapth = ''
-       for isl in range(0, slsh_count):
-            relapth += "../"
 #
 #  loop over all file in project root path directory 
 #
@@ -220,7 +236,6 @@ def get_all_files(path,dep):
                    cwurrdirr=cwurrdirr.replace(path,'')
                    cwurrdirr = relapth + cwurrdirr + "/"
                    matches.append(os.path.join(cwurrdirr, filename))
-
 
         
     return matches
