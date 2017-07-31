@@ -189,9 +189,9 @@ def get_all_files(path,dep):
 #  get relative path of current directory
 #
     currdirr = os.getcwd()
+    currdirr = check_path(path=currdirr)
     relapth = currdirr
     relapth=relapth.replace(path,'')
-    relapth = relapth + "/"
     slsh_count  = relapth.count('/')
     relapth = ''
     for isl in range(0, slsh_count):
