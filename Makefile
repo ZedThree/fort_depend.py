@@ -28,7 +28,7 @@
 #
 #
 #
-include src_dir_path.mk
+-include src_dir_path.mk
 -include config.mk
 
 SUBDIRS= \
