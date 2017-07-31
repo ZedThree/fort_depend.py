@@ -44,7 +44,9 @@ def run(path,dep=None,ignore=None,files=None,verbose=None,overwrite=None,output=
       print(" ")
       print("\033[031m Searching for modules in files:\033[039m")
       print(ff)
-    
+#
+#  loop through all files and look for pattern (use etc and add it to a list)
+#    
     l=create_file_objs( (verbose) ,files,macros)
     mod2fil=file_objs_to_mod_dict(file_objs=l)
 #
@@ -424,7 +426,6 @@ def get_depends(ignore,verbose,cwd,fob=[],m2f=[], ffiles=[]):
                             print ("\033[031m   Note: \033[039m module \033[032m"+j+"\033[039m not defined in any file in this directory")
                             print ("\033[031m         \033[039m module found in \033[032m"+name+"\033[039m file")
                             print ("\033[031m         \033[039m adding the module to dependency file, not checking its dependency further \033[032m\033[039m")
-#                            print(" ")
                             break    #break loop, dependency declared
                 
                 if istat== 0 and not(j == ""):
@@ -432,8 +433,7 @@ def get_depends(ignore,verbose,cwd,fob=[],m2f=[], ffiles=[]):
                            print("")
                            print ("\033[031m   Note!!!!: \033[039m module \033[032m"+j+"\033[039m not defined in any file")
                            print ("\033[031m             \033[039m assuming intrinsic module, not adding to dependency tree ... \033[032m\033[039m")
-#			   print(" ")
-                           break    #break loop, dependency declared 
+#                           break    #break loop, dependency declared 
         
         if not(istat == 0):
              deps[i.file_name]=tmp
