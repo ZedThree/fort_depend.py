@@ -458,7 +458,7 @@ def get_depends(ignore,verbose,cwd,fob=[],m2f=[], ffiles=[]):
 #
 #   once module found, break the loop
 #
-                           break    #break loop, dependency declared 
+#                           break    #break loop, dependency declared 
         
         if not(istat == 0):
 #
@@ -474,7 +474,7 @@ def get_depends(ignore,verbose,cwd,fob=[],m2f=[], ffiles=[]):
     return deps
 
 def check_path(path):
-    if path.endswith("/")
+    if path.endswith("/"):
         return path
     else:
         path=path + "/"
