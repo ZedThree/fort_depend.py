@@ -112,7 +112,7 @@ def write_depend(verbose,path,cwd,outfile="makefile.dep",dep=[],overwrite=False,
       print("\033[031m Opening dependency file \033[032m"+outfile+"\033[039m ...")
       print("  ")
     f=open(outfile,'w')
-    f.write('# This file is generated automatically. DO NOT EDIT!\n')
+    f.write('# This file is generated automatically by fort_depend.py. DO NOT EDIT!\n')
 
     for i in dep.keys():
         tmp,fil=os.path.split(i)
@@ -201,9 +201,6 @@ def get_all_files(path,dep):
 #  list only files located in those
 #
     if not(dep == None):
-#
-#  add current directory to list of specified directories with dependencies
-#
        dep.append(currdirr)
        for i in dep:
 #
@@ -231,9 +228,13 @@ def get_all_files(path,dep):
 #   add trailing /   and then add ../ to get to project root path, ie..file will have relative path
 #
                           cwurrdirr = root
-                          cwurrdirr=cwurrdirr.replace(path,'')
-                          cwurrdirr = relapth + cwurrdirr + "/"
-                          matches.append(os.path.join(cwurrdirr, filename))
+                          cwurrdirr = cwurrdirr.replace(path,'')
+#
+#   if specified directory is a subdirectory in projet root path then add files
+#   otherwise not (it is possible then some external library is specified)
+                          if root != cwurrdirr:
+                            cwurrdirr = relapth + cwurrdirr + "/"
+                            matches.append(os.path.join(cwurrdirr, filename))
 #
 #  otherwise include all files from path dir
 #                         
