@@ -1,4 +1,4 @@
-# This file is generated automatically. DO NOT EDIT!
+# This file is generated automatically by fort_depend.py. DO NOT EDIT!
 
 fll_deattach.o :  \
 	fll_stich.o \

@@ -1,4 +1,4 @@
-# This file is generated automatically. DO NOT EDIT!
+# This file is generated automatically by fort_depend.py. DO NOT EDIT!
 
 fll_mpi_mods.o :  \
 	fll_mpi_write_snm.o \
