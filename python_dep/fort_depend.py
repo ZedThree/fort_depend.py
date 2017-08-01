@@ -201,6 +201,10 @@ def get_all_files(path,dep):
 #  list only files located in those
 #
     if not(dep == None):
+#
+#  add current directory to list of specified directories with dependencies
+#
+       dep.append(currdirr)
        for i in dep:
 #
 #   use basolute path to preferred directories ie.: os.path.abspath(i) 
