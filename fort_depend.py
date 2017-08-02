@@ -197,7 +197,6 @@ def get_all_files(path,dep):
     for isl in range(0, slsh_count):
             relapth += "../"
 #
-#  specified list of preferred directories
 #  list only files located in those
 #
     if not(dep == None):
@@ -442,6 +441,7 @@ def get_depends(ignore,verbose,cwd,fob=[],m2f=[], ffiles=[]):
                     retval = 0
                     
                     if not(cwd.strip() == dir):
+                        
                         retval=check_if_there(use=j,file=k)
                        
                         if retval > 0:
@@ -454,8 +454,10 @@ def get_depends(ignore,verbose,cwd,fob=[],m2f=[], ffiles=[]):
                             print ("\033[031m         \033[039m adding the module to dependency file, not checking its dependency further \033[032m\033[039m")
 #                            print(" ")
                             break    #break loop, dependency declared
+                        else:
+                          istat = 0 
                 
-                if istat== 0 and not(j == ""):
+                if istat== 0 and (j != ""):
                          if int(verbose) > 2 :
                            print("")
                            print ("\033[031m   Note!!!!: \033[039m module \033[032m"+j+"\033[039m not defined in any file")
