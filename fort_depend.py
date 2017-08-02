@@ -448,14 +448,12 @@ def get_depends(ignore,verbose,cwd,fob=[],m2f=[], ffiles=[]):
                           istat = 1
                           name=os.path.splitext(k)[0]+'.o'
                           tmp.append(name.lower())
+
                           if int(verbose) > 2 :
                             print ("\033[031m   Note: \033[039m module \033[032m"+j+"\033[039m not defined in any file in this directory")
                             print ("\033[031m         \033[039m module found in \033[032m"+name+"\033[039m file")
                             print ("\033[031m         \033[039m adding the module to dependency file, not checking its dependency further \033[032m\033[039m")
-#                            print(" ")
-                            break    #break loop, dependency declared
-                        else:
-                          istat = 0 
+                          break    #break loop, dependency declared
                 
                 if istat== 0 and (j != ""):
                          if int(verbose) > 2 :
@@ -466,8 +464,7 @@ def get_depends(ignore,verbose,cwd,fob=[],m2f=[], ffiles=[]):
 #   once module found, break the loop
 #
 #                           break    #break loop, dependency declared 
-        
-        if not(istat == 0):
+        if (istat != 0):
 #
 #   if file containign module, add to the list 
 #
