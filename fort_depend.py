@@ -45,7 +45,12 @@ import sys
 def run(path,dep=None,ignore=None,files=None,verbose=None,overwrite=None,output=None,macros={},build=''):
    
     cwd = os.getcwd()
-    
+#
+#  if project root path not specified, used current directory
+#
+    if(path == None):
+       path = os.getcwd()
+       
     path = check_path(path=path)
     cwd = check_path(path=cwd)
 
