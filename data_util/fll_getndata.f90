@@ -149,6 +149,7 @@ CONTAINS
       FPAR%SUCCESS = .FALSE.
       WRITE(FPAR%MESG,'(A,A,A,A)')'FLL_GETNDATA_R1 - Node ',&
             TRIM(PNODE%LNAME),' does not contain specified data ',NAME
+      R1=>NULL()
       CALL FLL_OUT('ALL',FPAR)
       RETURN
    END IF
@@ -213,6 +214,7 @@ CONTAINS
       WRITE(FPAR%MESG,'(A,A,A,A)')'FLL_GETNDATA_R2 - Node ',&
             TRIM(PNODE%LNAME),' does not contain specified data ',NAME
       CALL FLL_OUT('ALL',FPAR)
+      R2=>NULL()
       RETURN
    END IF
 
@@ -343,6 +345,7 @@ CONTAINS
       WRITE(FPAR%MESG,'(A,A,A,A)')'FLL_GETNDATA_D1 - Node ',&
             TRIM(PNODE%LNAME),' does not contain specified data ',NAME
       CALL FLL_OUT('ALL',FPAR)
+      R1=>NULL()
       RETURN
    END IF
 
@@ -407,6 +410,7 @@ CONTAINS
       WRITE(FPAR%MESG,'(A,A,A,A)')'FLL_GETNDATA_D2 - Node ',&
             TRIM(PNODE%LNAME),' does not contain specified data ',NAME
       CALL FLL_OUT('ALL',FPAR)
+      R2=>NULL()
       RETURN
    END IF
 
@@ -536,6 +540,7 @@ CONTAINS
       WRITE(FPAR%MESG,'(A,A,A,A)')'FLL_GETNDATA_I1 - Node ',&
             TRIM(PNODE%LNAME),' does not contain specified data ',NAME
       CALL FLL_OUT('ALL',FPAR)
+      I1=>NULL()
       RETURN
    END IF
 
@@ -598,6 +603,7 @@ CONTAINS
       WRITE(FPAR%MESG,'(A,A,A,A)')'FLL_GETNDATA_I2 - Node ',&
             TRIM(PNODE%LNAME),' does not contain specified data ',NAME
       CALL FLL_OUT('ALL',FPAR)
+      I2=>NULL()
       RETURN
    END IF
 
@@ -715,6 +721,7 @@ CONTAINS
       WRITE(FPAR%MESG,'(A,A,A,A)')'FLL_GETNDATA_L1 - Node ',&
             TRIM(PNODE%LNAME),' does not contain specified data ',NAME
       CALL FLL_OUT('ALL',FPAR)
+      I1=>NULL()
       RETURN
    END IF
 
@@ -777,6 +784,7 @@ CONTAINS
       WRITE(FPAR%MESG,'(A,A,A,A)')'FLL_GETNDATA_L2 - Node ',&
             TRIM(PNODE%LNAME),' does not contain specified data ',NAME
       CALL FLL_OUT('ALL',FPAR)
+      I2=>NULL()
       RETURN
    END IF
 
@@ -901,6 +909,7 @@ FUNCTION FLL_GETNDATA_S1(PNODE,NAME,NUMBER,FPAR) RESULT(STRING)
       WRITE(FPAR%MESG,'(A,A,A,A)')'FLL_GETNDATA_L0 - Node ',&
             TRIM(PNODE%LNAME),' does not contain specified data ',NAME
       CALL FLL_OUT('ALL',FPAR)
+      STRING=>NULL()
       RETURN
    END IF
 
@@ -963,6 +972,7 @@ FUNCTION FLL_GETNDATA_S1(PNODE,NAME,NUMBER,FPAR) RESULT(STRING)
       WRITE(FPAR%MESG,'(A,A,A,A)')'FLL_GETNDATA_L0 - Node ',&
             TRIM(PNODE%LNAME),' does not contain specified data ',NAME
       CALL FLL_OUT('ALL',FPAR)
+      STRING=>NULL()
       RETURN
    END IF
 
