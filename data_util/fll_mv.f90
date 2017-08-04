@@ -114,14 +114,14 @@ CONTAINS
    
    FPAR%SUCCESS = .FALSE.
    IF(.NOT.ASSOCIATED(PWHAT))THEN
-      WRITE(FPAR%MESG,'(A,A)')' Mv, Cp  - null node '
+      WRITE(FPAR%MESG,'(A,A)')' Mv  - Pwhat null node'
       CALL FLL_OUT('ALL',FPAR)
       FPAR%SUCCESS = .FALSE.
       RETURN
    END IF
    
    IF(.NOT.ASSOCIATED(PWHERE))THEN
-      WRITE(FPAR%MESG,'(A,A)')' Mv, Cp  - null node '
+      WRITE(FPAR%MESG,'(A,A)')' Mv  - Pwhere null node'
       CALL FLL_OUT('ALL',FPAR)
       FPAR%SUCCESS = .FALSE.
       RETURN

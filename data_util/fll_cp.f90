@@ -76,7 +76,7 @@ CONTAINS
        
        IF(.NOT.ASSOCIATED(PWHAT))THEN
           WRITE(*,*)' Cp - SOURCE IS NULL NODE'
-          WRITE(FPAR%MESG,'(A,A)')' Mv, Cp  - null node '
+          WRITE(FPAR%MESG,'(A,A)')' Cp  - Pwhat null node '
           CALL FLL_OUT('ALL',FPAR)
           FPAR%SUCCESS = .FALSE.
           RETURN
@@ -146,7 +146,7 @@ CONTAINS
    FPAR%SUCCESS = .FALSE.
    IF(.NOT.ASSOCIATED(PWHAT))THEN
       WRITE(*,*)' Cp - SOURCE IS NULL NODE'
-      WRITE(FPAR%MESG,'(A,A)')' Mv, Cp  - null node '
+      WRITE(FPAR%MESG,'(A,A)')' Cp  - Pwhat null node'
       CALL FLL_OUT('ALL',FPAR)
       FPAR%SUCCESS = .FALSE.
       RETURN
@@ -155,7 +155,7 @@ CONTAINS
 !  check that pwhere is associated
 !
    IF(.NOT.ASSOCIATED(PWHERE))THEN
-      WRITE(FPAR%MESG,'(A,A)')' Mv, Cp  - null node '
+      WRITE(FPAR%MESG,'(A,A)')' Cp  - Pwhere null node'
       CALL FLL_OUT('ALL',FPAR)
       FPAR%SUCCESS = .FALSE.
       RETURN
