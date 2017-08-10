@@ -107,7 +107,7 @@ if __name__ == "__main__":
         sys.exit()
 
     if not format:
-        print ("\033[031mError: \033[039m missing file format, option\033[031m -c \033[039m")
+        print ("\033[031mError: \033[039m missing file format, option\033[031m -f \033[039m")
         print ("\033[031m       \033[039m available options are: \033[032m a - ASCII\033[039m")
         print ("\033[031m       \033[039m                        \033[032m b - binary format\033[039m")
         sys.exit()
