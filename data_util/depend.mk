@@ -68,6 +68,10 @@ fll_scan_file.o :  \
 	fll_out.o \
 	fll_type.o
 
+fll_rename.o :  \
+	fll_out.o \
+	fll_type.o
+
 fll_mv.o :  \
 	fll_stich.o \
 	fll_out.o \
@@ -115,6 +119,7 @@ fll_mods.o :  \
 	fll_mkdir.o \
 	fll_cat.o \
 	fll_write.o \
+	fll_rename.o \
 	fll_read_record.o \
 	fll_write_ffa.o \
 	fll_getnbytes.o \
