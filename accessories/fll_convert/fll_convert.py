@@ -104,11 +104,17 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     file = args.file[0]   if args.file else None
-    format = args.format[0] if args.format else None
+    format_i = args.format[0] if args.format_i else None
     eformat = args.format_input[0] if args.format_input else None
     oformat = args.format_output[0] if args.format_output else None
     output = args.output_file[0] if args.output_file else None
     formato = args.format_o[0] if args.format_o else None
+
+
+    if not len(sys.argv) > 1:
+        print("\nfll_convert - converts files\n")
+        print("usage: fll_convert.py [-h] [-i FILE] [-o OUTPUT_FILE] [-fi FORMAT_I] \n [-ei FORMAT_INPUT] [-fe FORMAT_O] [-eo FORMAT_OUTPUT]\n")
+        sys.exit()
 
     if not file:
         print ("\033[031mError: \033[039m missing name of file, option \033[031m -i \033[039m")

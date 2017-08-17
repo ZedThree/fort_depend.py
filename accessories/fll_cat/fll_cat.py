@@ -104,6 +104,11 @@ if __name__ == "__main__":
     else:
        dir = 'Y'
 
+    if not len(sys.argv) > 1:
+        print("\nfll_cat - prints content of file on standard output\n")
+        print("usage: fll_cat.py [-h] [-i FILE] [-f FORMAT] [-s] [-D] [-e EXTERNAL_FORMAT]\n")
+        sys.exit()
+
     if not file:
         print ("\033[031mError: \033[039m missing name of file, option\033[031m -i \033[039m")
         sys.exit()
