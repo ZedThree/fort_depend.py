@@ -101,8 +101,6 @@ CONTAINS
    INTEGER :: ISTAT
    INTEGER(LINT) :: POS
 
-   write(*,*)' here in ther'
-
    INQUIRE (FILE=TRIM(FILE), EXIST=OK)
    IF(.NOT.OK) THEN
       WRITE(FPAR%MESG,'(A,A)')' Read  - file does not exist ',TRIM(FILE)
@@ -112,10 +110,8 @@ CONTAINS
       RETURN
    END IF
 !
-!   DETERMINE RORMAT
+!   DETERMINE FORMAT
 !
-   write(*,*)' here in ther1'
-
    SELECT CASE(FMT)
    CASE('A','a')
      FMT_LOC = 'A'
@@ -133,8 +129,6 @@ CONTAINS
 !
 !   OPEN THE FILE
 !
-   write(*,*)' here in ther2'
-
    SELECT CASE(FMT_LOC)
     CASE('B')
       OPEN(UNIT=IOUNIT,STATUS='UNKNOWN',FILE=TRIM(FILE),FORM='UNFORMATTED',&
@@ -154,7 +148,6 @@ CONTAINS
 !
 !   READ INITIAL NODE
 !
-   write(*,*)' here in ther3'
     POS = 1
     PNODE => READ_NODE_UCD(IOUNIT,FMT_LOC,FPAR)
     
@@ -274,8 +267,6 @@ CONTAINS
       END SELECT
 
     END DO
-
-       WRITE(*,*)N3,N4,N3+N4
 !
 !  add it to the structure
 !   
