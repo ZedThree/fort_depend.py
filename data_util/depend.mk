@@ -54,6 +54,12 @@ fll_read.o :  \
 	fll_out.o \
 	fll_type.o
 
+fll_read_ucd.o :  \
+	fll_mv.o \
+	fll_mk.o \
+	fll_out.o \
+	fll_type.o
+
 fll_cp.o :  \
 	fll_mv.o \
 	fll_cat.o \
@@ -129,6 +135,7 @@ fll_mods.o :  \
 	fll_duplicate.o \
 	fll_sweep.o \
 	fll_rm.o \
+	fll_read_ucd.o \
 	fll_nnodes.o \
 	fll_getndata.o \
 	fll_read_ffa.o \
