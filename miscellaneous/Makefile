@@ -28,46 +28,39 @@
 #
 #
 #
--include src_dir_path.mk
--include config.mk
 
+EXE    = fll_test
+
+include src_dir_path.mk
+include ../config.mk
+
+DEP_FILE=depend.mk
+
+#SUBDIRS= $(dir $(wildcard $(srcdir)/*))
 SUBDIRS= \
-data_util\
-accessories\
-mpi_util\
-examples\
-miscellaneous\
+	Forces\
 
-ifneq ($(strip $(MPI_FC)),)
-  SUBDIRS+= mpi_util
+#ifneq ($(strip $(MPI_FC)),)
+ifneq ($(MPI_FC),)
+#  SUBDIRS+= Example_MPI-IO
 endif
 
-SUBCLEAN=$(SUBDIRS)
+
+
 
 ###########################################################################
 
 all: $(SUBDIRS:%=%.all)
-	@echo '************************************************'
-	@echo '*'
-	@echo '* FLL built successfully!'
-	@echo '*'
-	@echo '************************************************'
 
-include rules.mk
+include ../rules.mk
 
-
-init:
-	echo PROJ_ROOT_PATH=$(PWD) > config.mk
-	echo MAKEDEPEND=$(PWD)/python_dep/fort_depend.py >> config.mk
-	echo MPI_FC=YES >> config.mk
-	echo VERBOSE=-vvv >> config.mk
-
-data_util.all: 
-test.all: data_util.all
-
-clean: $(SUBCLEAN:%=%.clean)
+clean: $(SUBDIRS:%=%.clean)
+	rm -f *.x *.o *.mod
 
 depend: $(SUBDIRS:%=%.depend)
 
-install: $(SUBDIRS:%=%.all) $(SUBDIRS:%=%.install)
+install: $(SUBDIRS:%=%.install)
 
+test: $(SUBDIRS:%=%.test)
+
+chk: $(SUBDIRS:%=%.chk)
