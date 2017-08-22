@@ -28,46 +28,37 @@
 #
 #
 #
--include src_dir_path.mk
--include config.mk
 
-SUBDIRS= \
-data_util\
-accessories\
-mpi_util\
-examples\
-miscellaneous\
+EXE    = fll_forces
 
-ifneq ($(strip $(MPI_FC)),)
-  SUBDIRS+= mpi_util
-endif
+include src_dir_path.mk
+include ../../config.mk
 
-SUBCLEAN=$(SUBDIRS)
+DEP_FILE=depend.mk
+
+FMODDIRS= ../../data_util
+
+FFILES= $(notdir $(wildcard $(srcdir)/*.f90))
+
+
+OFILES=$(FFILES:%.f90=%.o)
+XOFILES=$(wildcard ../../data_util/*.o)
 
 ###########################################################################
 
-all: $(SUBDIRS:%=%.all)
-	@echo '************************************************'
-	@echo '*'
-	@echo '* FLL built successfully!'
-	@echo '*'
-	@echo '************************************************'
+all: $(EXE).x 
 
-include rules.mk
+include ../../rules.mk
 
+$(EXE).x: $(OFILES) $(XOFILES)
+	$(FC) $(LDFLAGS) -o $@ $^
 
-init:
-	echo PROJ_ROOT_PATH=$(PWD) > config.mk
-	echo MAKEDEPEND=$(PWD)/python_dep/fort_depend.py >> config.mk
-	echo MPI_FC=YES >> config.mk
-	echo VERBOSE=-vvv >> config.mk
+clean:
+	rm -f *.x *.o *.mod $(EXE)
 
-data_util.all: 
-test.all: data_util.all
+depend: $(FFILES)
+	@echo "Making dependencies!"
+	cd $(srcdir) && $(MAKEDEPEND) -r $(PROJ_ROOT_PATH) $(VERBOSE) -w -o $(srcdir)/$(DEP_FILE) -f $(FFILES)
 
-clean: $(SUBCLEAN:%=%.clean)
-
-depend: $(SUBDIRS:%=%.depend)
-
-install: $(SUBDIRS:%=%.all) $(SUBDIRS:%=%.install)
+-include $(srcdir)/$(DEP_FILE)
 
