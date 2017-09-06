@@ -59,7 +59,6 @@ def run(file,fmt,efmt,ofile,ofmt,fmto):
     else:
       print("\033[039m Specified output file type is: \033[032mFFA \033[039m") 
 
-      
     if sys.version_info < (3,0):
       p = Popen([executable], stdin=PIPE) #NOTE: no shell=True here
       p.communicate(os.linesep.join([file, fmt, efmt, ofile,ofmt,fmto]))
@@ -104,7 +103,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     file = args.file[0]   if args.file else None
-    format_i = args.format[0] if args.format_i else None
+    format_i = args.format_i[0] if args.format_i else None
     eformat = args.format_input[0] if args.format_input else None
     oformat = args.format_output[0] if args.format_output else None
     output = args.output_file[0] if args.output_file else None
@@ -120,7 +119,7 @@ if __name__ == "__main__":
         print ("\033[031mError: \033[039m missing name of file, option \033[031m -i \033[039m")
         sys.exit()
 
-    if not format:
+    if not format_i:
         print ("\033[031mError: \033[039m missing input file format, option\033[031m -f \033[039m")
         print ("\033[031m       \033[039m available options are: \033[032m a - ASCII\033[039m")
         print ("\033[031m       \033[039m                        \033[032m b - binary format\033[039m")
@@ -157,4 +156,4 @@ if __name__ == "__main__":
         print ("\033[031m       \033[039m                        \033[032m ffa - ffa format\033[039m")
         sys.exit()
 
-    run(file=file,fmt=format, efmt = eformat, ofile=output, ofmt = oformat, fmto = formato)
+    run(file=file,fmt=format_i, efmt = eformat, ofile=output, ofmt = oformat, fmto = formato)
