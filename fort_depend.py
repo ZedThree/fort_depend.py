@@ -22,14 +22,22 @@
 #SOFTWARE.
 # 
 #
-#  this is a modification of the original script of D Dickinson @https://github.com/ZedThree/fort_depend.py
-#  done by Adam Jirasek
+#  this is a modification of the original script of D Dickinson and Peter Hill
+#  @https://github.com/ZedThree/fort_depend.py
+#
+#  The modification was done by Adam Jirasek 
 #  the modified version can be found @https://github.com/libm3l/fort_depend.py
 #
-#  this is a script which maked fortran project dependecies
-#  it is executed in each directory separately and creates a project.dep file with fortran dependencies
-#  if fortran source uses module from other directory the script will add the module too
-#  the project root directory is specified as an input parameter with an option -r  
+#  the major update is that the dependency script can make dependenies 
+#  from files located in different directories, so it is more suitable 
+#  for bigger project 
+#
+# History:
+# Version   Date       Author        Patch number  CLA  Comment
+# -------   --------   --------      ------------  ---  -------
+# 1.1       01/09/17   Adam Jirasek                     Rewrite original version
+#
+#
 #
 #
 import os
