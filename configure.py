@@ -52,7 +52,7 @@ import platform
 
 #Definitions
 
-def run(comp,files=None,verbose=True,overwrite=None,output=None,macros={},build=''):
+def run(comp,files=None,verbose=True,overwrite=None,output=None,macros={},build='',lib=''):
 #
 #  definition of parameters
 #
@@ -106,12 +106,24 @@ def run(comp,files=None,verbose=True,overwrite=None,output=None,macros={},build=
       print("\033[031mDIAG:\033[039m Bild directory not specified, setting it to \033[032m "+cwd+platform.machine()+"/bin\033[039m")  	
       print("  ")
       bin_dir=cwd+platform.machine()+'/bin'
+      lib_dir=cwd+platform.machine()+'/lib64'
     else:
       bin_dir=build
+      lib_dir=lib
+#
+#  specify lib directory where all executables will be located
+#
+    if build == '':
+      print("  ")
+      print("\033[031mDIAG:\033[039m Library directory not specified, setting it to \033[032m "+cwd+platform.machine()+"/lib64\033[039m")  	
+      print("  ")
+      lib_dir=cwd+platform.machine()+'/lib64'
+    else:
+      lib_dir=lib
 #
 #  create configuration file config.mk
 #
-    ok = mkconfigfile(path=path, cwd=cwd,version=comp, bin_dir=bin_dir)
+    ok = mkconfigfile(path=path, cwd=cwd,version=comp, bin_dir=bin_dir, lib_dir=lib_dir)
 #
 #   create structure and link necessary files
 #   ie. create the same tree structure as source files and link "linkfiles" specified above 
@@ -266,7 +278,7 @@ def check_path(path):
 
     return path
 
-def mkconfigfile(path, cwd,version, bin_dir):
+def mkconfigfile(path, cwd,version, bin_dir, lib_dir):
     filename = path+'/config/compset.'+version
 
     if not(os.path.exists(filename)):
@@ -305,9 +317,13 @@ def mkconfigfile(path, cwd,version, bin_dir):
                 fconfig.write(line)
 
     fconfig.write("#\n")  
-    fconfig.write("#  bin_dir is the base directory where executables will be installed\n")
+    fconfig.write("#  bin_dir is the base directory with installed executables\n")
     fconfig.write("#\n")
     fconfig.write('bin_dir='+exec_dir+"\n")
+    fconfig.write("#\n")
+    fconfig.write("#  lib_dir is the fll library directory\n")
+    fconfig.write("#\n")
+    fconfig.write('lib_dir='+lib_dir+"\n")
     fconfig.write("#\n")
     fconfig.write("#\n")
     fconfig.write("#  MACHINE identifies the host machine type")
@@ -330,6 +346,14 @@ def mkconfigfile(path, cwd,version, bin_dir):
       print("  ")
       print("\033[031mERROR:\033[039m Creating exec directory \033[032m"+exec_dir+"\033[039m .... ")
       os.makedirs(exec_dir) 
+
+#
+#  make library directory
+#
+    if not os.path.isdir(lib_dir):
+      print("  ")
+      print("\033[031mERROR:\033[039m Creating library directory \033[032m"+lib_dir+"\033[039m .... ")
+      os.makedirs(lib_dir)
 
     cwd = check_path(path=cwd)
 
@@ -356,8 +380,8 @@ if __name__ == "__main__":
     parser.add_argument('-f','--files',nargs='+',help='Files to process')
     parser.add_argument('-D',nargs='+',action='append',metavar='NAME=DESCRIPTION',
                         help="""The macro NAME is replaced by DEFINITION in 'use' statements""")
-    parser.add_argument('-b','--build',nargs=1,help='Build Directory (prepended to all files in output',
-                        default='')
+    parser.add_argument('-b','--build',nargs=1,help='Build directory', default='')
+    parser.add_argument('-L','--libdir',nargs=1,help='FLL library directory', default='')
     parser.add_argument('-o','--output',nargs=1,help='Output file')
     parser.add_argument('-v','--verbose',action='store_true',help='explain what is done')
     parser.add_argument('-w','--overwrite',action='store_true',help='Overwrite output file without warning')
@@ -376,6 +400,7 @@ if __name__ == "__main__":
 
     output = args.output[0] if args.output else None
     build = args.build[0] if args.build else ''
+    libdir = args.libdir[0] if args.libdir else ''
 
     compiler = args.compiler[0] if args.compiler else None
     
@@ -387,4 +412,4 @@ if __name__ == "__main__":
         print ("\033[031m       \033[039m                        \033[032m x86_64_debug\033[039m") 
         sys.exit()
 
-    run(comp=compiler,verbose=args.verbose, overwrite=args.overwrite, macros=macros, output=output, build=build)
+    run(comp=compiler,verbose=args.verbose, overwrite=args.overwrite, macros=macros, output=output, build=build, lib=libdir)

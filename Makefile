@@ -47,6 +47,9 @@ SUBCLEAN=$(SUBDIRS)
 ###########################################################################
 
 all: $(SUBDIRS:%=%.all)
+
+	ar rcs fll.a data_util/*.o
+
 	@echo '************************************************'
 	@echo '*'
 	@echo '* FLL built successfully!'
@@ -70,4 +73,5 @@ clean: $(SUBCLEAN:%=%.clean)
 depend: $(SUBDIRS:%=%.depend)
 
 install: $(SUBDIRS:%=%.all) $(SUBDIRS:%=%.install)
+	$(INSTALL) fll.a $(lib_dir)/fll.a
 
