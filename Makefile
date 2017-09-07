@@ -73,5 +73,5 @@ clean: $(SUBCLEAN:%=%.clean)
 depend: $(SUBDIRS:%=%.depend)
 
 install: $(SUBDIRS:%=%.all) $(SUBDIRS:%=%.install)
-	$(INSTALL) fll.a $(lib_dir)/fll.a
+	mv fll.a $(lib_dir)/fll.a
 
