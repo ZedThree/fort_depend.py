@@ -38,7 +38,8 @@ import glob
 import fnmatch
 import os
 import sys
-
+from time import gmtime, strftime
+import getpass
 
 #Definitions
 
@@ -118,6 +119,14 @@ def write_depend(verbose,path,cwd,outfile="makefile.dep",dep=[],overwrite=False,
       print("  ")
     f=open(outfile,'w')
     f.write('# This file is generated automatically by fort_depend.py. DO NOT EDIT!\n')
+#
+#  header 
+#
+    username = getpass.getuser()
+    f.write("#\n")
+    f.write("#  Created by: "+username+"\n")
+    f.write("#  Date: "+strftime("%Y-%m-%d %H:%M:%S", gmtime()) + "\n")
+    f.write("#\n")
 
     for i in dep.keys():
         tmp,fil=os.path.split(i)
