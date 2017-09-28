@@ -73,5 +73,6 @@ clean: $(SUBCLEAN:%=%.clean)
 depend: $(SUBDIRS:%=%.depend)
 
 install: $(SUBDIRS:%=%.all) $(SUBDIRS:%=%.install)
+	ar rcs fll.a data_util/*.o
 	mv fll.a $(lib_dir)/fll.a
 
