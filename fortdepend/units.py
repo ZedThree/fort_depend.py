@@ -2,7 +2,7 @@ import re
 
 from .smartopen import smart_open
 
-UNIT_REGEX = re.compile("^\s*(?P<unit_type>module|program)\s*(?P<modname>\w*)",
+UNIT_REGEX = re.compile("^\s*(?P<unit_type>module(?!\s+procedure)|program)\s*(?P<modname>\w*)",
                         re.IGNORECASE)
 END_REGEX = re.compile("^\s*end\s*(?P<unit_type>module|program)\s*(?P<modname>\w*)?",
                        re.IGNORECASE)

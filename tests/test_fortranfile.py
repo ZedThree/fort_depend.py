@@ -58,6 +58,19 @@ class TestSimpleFortranFile:
             assert key in module_list
             assert repr(module_list[key]) == value
 
+    def test_module_with_module_procedure(self):
+        contents = ['module modA',
+                    'module procedure foo',
+                    'end module modA']
+        expected = {"modA": "FortranModule(module, 'moda', 'file.f90')"}
+
+        assert self.testfile.modules is None
+        module_list = self.testfile.get_modules(contents)
+
+        for key, value in expected.items():
+            assert key in module_list
+            assert repr(module_list[key]) == value
+
     def test_get_program(self):
         contents = ['program progA', 'end program progA']
         expected = {"progA": "FortranModule(program, 'proga', 'file.f90')"}
