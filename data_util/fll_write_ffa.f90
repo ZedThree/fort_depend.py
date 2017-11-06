@@ -323,10 +323,10 @@ CONTAINS
         END IF
      ELSE 
         IF(TRIM(LTYPE) == 'S') THEN
-          IF(LTYPE == 'S')THEN
-            LTYPE = 'S'
+          IF(TRIM(FTYPE) == 'L')
+             LTYPE = 'L'
           ELSE
-            LTYPE ='L'
+             LTYPE ='S'
           END IF
         ELSE IF(TRIM(LTYPE) == 'L') THEN
           LTYPE ='I'
@@ -340,8 +340,6 @@ CONTAINS
              LTYPE(2:2) = 'F'
           END SELECT
         END IF
-
-        write(*,*)' LTYPE is ', ltype
         WRITE(IOUNIT, *)TRIM(PNODE%LNAME),' ', TRIM(LTYPE),' ', PNODE%NSIZE, ' ',PNODE%NDIM,' ',0
      END IF
 !
@@ -477,7 +475,7 @@ CONTAINS
    
    SAVED = .FALSE.
    LTYPE = PNODE%LTYPE
-   
+
    IF(TRIM(PNODE%LTYPE) == 'DIR' .OR.TRIM(PNODE%LTYPE) == 'N')THEN
       IF(PNODE%NLINK > 0)THEN 
          WRITE(IOUNIT)PNODE%LNAME,PNODE%FTYPE,1_LINT,1_LINT,PNODE%NDIM
@@ -488,10 +486,10 @@ CONTAINS
       END IF
    ELSE 
       IF(TRIM(LTYPE) == 'S') THEN
-        IF(LTYPE == 'S')THEN
-           LTYPE = 'S'
+        IF(TRIM(FTYPE) == 'L')
+           LTYPE = 'L'
         ELSE
-           LTYPE ='L'
+           LTYPE ='S'
         END IF
       ELSE IF(TRIM(LTYPE) == 'L') THEN
         LTYPE ='J'
