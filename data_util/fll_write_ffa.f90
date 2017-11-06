@@ -323,7 +323,7 @@ CONTAINS
         END IF
      ELSE 
         IF(TRIM(LTYPE) == 'S') THEN
-          IF(TRIM(FTYPE) == 'L')
+          IF(TRIM(PNODE%FTYPE) == 'L')THEN
              LTYPE = 'L'
           ELSE
              LTYPE ='S'
@@ -486,7 +486,7 @@ CONTAINS
       END IF
    ELSE 
       IF(TRIM(LTYPE) == 'S') THEN
-        IF(TRIM(FTYPE) == 'L')
+        IF(TRIM(PNODE%FTYPE) == 'L')THEN
            LTYPE = 'L'
         ELSE
            LTYPE ='S'
