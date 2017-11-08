@@ -107,6 +107,7 @@ CONTAINS
 ! 
    TYPE(DNODE), POINTER  :: PTNEXT, PTPREV,PTPAR,&
      PLAST, PSOURCETMP,PCHILD
+   LOGICAL :: OK
 !   
 !   BODY OF SUBROUTINE
 !   
@@ -192,15 +193,21 @@ CONTAINS
 !  PWHERE WAS THE FIRST NODE IN THE LIST
 !
        PTPAR%PCHILD => PSOURCETMP
-       PTPAR%NDIM     = PTPAR%NDIM + 1
+       PTPAR%NDIM   =  PTPAR%NDIM + 1
 
-       PSOURCETMP%PPAR   => PTPAR
+       PSOURCETMP%PPAR  => PTPAR
        PSOURCETMP%PPREV => NULL()
-       PSOURCETMP%PPAR  => PWHERE
-       PTPAR%NDIM     = PTPAR%NDIM + 1
        
        IF(ASSOCIATED(PTNEXT))THEN
-         PSOURCETMP%PNEXT => PTNEXT
+         IF(.NOT.ASSOCIATED(PWHAT, PTNEXT))THEN
+!
+!  if pnext and pwhat are not the same
+!  associate pnext from pwhere%next
+!  otherwise leave pwhat%pnext as it is
+!  the list is just move one step up
+!
+           PSOURCETMP%PNEXT => PTNEXT
+         END IF
        ELSE
          PSOURCETMP%PNEXT => NULL()
        END IF
@@ -214,7 +221,15 @@ CONTAINS
        PSOURCETMP%PPAR  => PWHERE
       
        IF(ASSOCIATED(PTNEXT))THEN
-         PSOURCETMP%PNEXT => PTNEXT
+        IF(.NOT.ASSOCIATED(PWHAT, PTNEXT))THEN
+!
+!  if pnext and pwhat are not the same
+!  associate pnext from pwhere%next
+!  otherwise leave pwhat%pnext as it is
+!  the list is just move one step up
+!
+           PSOURCETMP%PNEXT => PTNEXT
+         END IF
        ELSE
          PSOURCETMP%PNEXT => NULL()
        END IF
