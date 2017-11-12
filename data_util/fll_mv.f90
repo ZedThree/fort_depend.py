@@ -63,7 +63,9 @@ CONTAINS
 !
 ! Local declarations
 !
-       TYPE(DNODE), POINTER  :: PSOURCETMP    
+       TYPE(DNODE), POINTER  :: PSOURCETMP
+       
+       IF(ASSOCIATED(PWHAT,PWHERE))THEN
     
        PSOURCETMP => FLL_MVCP(PWHAT,PWHERE,'M',FPAR) 
        OK = FPAR%SUCCESS
