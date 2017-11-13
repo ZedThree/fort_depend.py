@@ -32,7 +32,7 @@ MODULE FLL_LOCATE_M
 !
 CONTAINS
 
-   RECURSIVE FUNCTION FLL_LOCATE(PNODE,NAME,LTYPE,DATADIM,NUMBER,RECURSE,FPAR) RESULT(PFIND)
+   RECURSIVE FUNCTION FLL_LOCATE(PNODE,NAME,LTYPE,DATADIM,NUMBER,RECURSE,FPAR,ACTION) RESULT(PFIND)
 !
 ! Description: function finds node identified by name, type, position in list, dimensions of data it contains
 !                       search can be done recursively
@@ -59,6 +59,7 @@ CONTAINS
 ! RECURSE      In         search recursively
 ! PFIND        Out        return pointer to located node
 ! FPAR         In/Out     structure containing function specific data
+! ACTION       In/Out     where to print err messages
 !
 ! Arguments declaration
 !
@@ -68,22 +69,29 @@ CONTAINS
    CHARACTER(*) :: LTYPE
    INTEGER(LINT) :: NUMBER,DATADIM
    LOGICAL :: RECURSE
+   CHARACTER(*), OPTIONAL :: ACTION
 !
 ! Local declarations
 !
    CHARACTER(LEN=TYPE_LENGTH) :: TLTYPE
    TYPE(DNODE), POINTER  :: PCURR, PCHLD
    INTEGER(LINT) :: LOCNUM,NDIM, NSIZE
+   CHARACTER(LEN=10) :: LOC_ACT
 !   
 !  remove empty spaces
 !
    NULLIFY(PFIND)
+   IF(.NOT.PRESENT(ACTION))THEN
+     LOC_ACT='ALL'
+   ELSE
+     LOC_ACT = ACTION
+   END IF
 
    TLTYPE = ADJUSTL(TRIM(LTYPE(1:)))
    
    IF(.NOT.ASSOCIATED(PNODE))THEN
       WRITE(FPAR%MESG,'(A,A)')'Locate - Null node: ',TRIM(NAME)
-      CALL FLL_OUT('ALL',FPAR)
+      CALL FLL_OUT(LOC_ACT,FPAR)
       FPAR%SUCCESS = .FALSE.
       RETURN
    END IF
@@ -165,7 +173,7 @@ CONTAINS
    PFIND => NULL()
    FPAR%SUCCESS = .FALSE.
 !   WRITE(FPAR%MESG,'(A,A)')' Locate -  node not found: ',TRIM(NAME)
-!   CALL FLL_OUT('ALL',FPAR)
+!   CALL FLL_OUT(LOC_ACT,FPAR)
 
    RETURN
    END FUNCTION FLL_LOCATE
