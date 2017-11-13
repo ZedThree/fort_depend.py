@@ -34,7 +34,7 @@ MODULE FLL_DEATTACH_M
 ! External Modules used
 
 CONTAINS
-   FUNCTION FLL_DEATTACH(PWHAT,FPAR) RESULT(OK)
+   FUNCTION FLL_DEATTACH(PWHAT,FPAR,ACTION) RESULT(OK)
 !
 ! Description: Deattach PWHAT node from the list
 !              upon return, PWHAT parent is set to NULL and 
@@ -67,13 +67,23 @@ CONTAINS
        TYPE(DNODE), POINTER  :: PWHAT
        TYPE(FUNC_DATA_SET) :: FPAR
        LOGICAL::  OK
+       CHARACTER(*), OPTIONAL :: ACTION
+       CHARACTER(LEN=10) :: LOC_ACT
+!   
+!  local action
+!
+       IF(.NOT.PRESENT(ACTION))THEN
+         LOC_ACT='ALL'
+       ELSE
+         LOC_ACT = ACTION
+       END IF
 !
 !  check that PWAT is not null node
 !
        OK = .FALSE.
        IF(.NOT.ASSOCIATED(PWHAT))THEN
          WRITE(FPAR%MESG,'(A,A)')' Deattach - null node '
-         CALL FLL_OUT('ALL',FPAR)
+         CALL FLL_OUT(LOC_ACT,FPAR)
          FPAR%SUCCESS = .FALSE.
          RETURN
        END IF

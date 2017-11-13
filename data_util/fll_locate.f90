@@ -78,7 +78,7 @@ CONTAINS
    INTEGER(LINT) :: LOCNUM,NDIM, NSIZE
    CHARACTER(LEN=10) :: LOC_ACT
 !   
-!  remove empty spaces
+!  define LOC_ACT
 !
    NULLIFY(PFIND)
    IF(.NOT.PRESENT(ACTION))THEN
