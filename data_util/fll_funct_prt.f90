@@ -71,7 +71,7 @@ CONTAINS
       RETURN
     END FUNCTION ERR_MSG
     
-    FUNCTION TEST_IOSTAT(IOSTAT, FPAR) RESULT(OK)
+    FUNCTION TEST_IOSTAT(IOSTAT, FPAR,ACTION) RESULT(OK)
 !
 ! Description: tests IOSTAT return parameter from R/W functions
 !
@@ -91,15 +91,26 @@ CONTAINS
     INTEGER :: IOSTAT
     TYPE(FUNC_DATA_SET) :: FPAR
     LOGICAL :: OK
+    CHARACTER(*), OPTIONAL :: ACTION
+
+    CHARACTER(LEN=10) :: LOC_ACT
+!   
+!  local action
+!
+    IF(.NOT.PRESENT(ACTION))THEN
+      LOC_ACT='ALL'
+    ELSE
+      LOC_ACT = ACTION
+    END IF
 !     
     OK = .FALSE.
     IF (IOSTAT > 0)  THEN
       WRITE(FPAR%MESG,'(A)')' Read  - error readig node data'
-      CALL FLL_OUT('ALL',FPAR)
+      CALL FLL_OUT(LOC_ACT,FPAR)
       FPAR%SUCCESS = .FALSE.
    ELSE IF (IOSTAT < 0) THEN
       WRITE(FPAR%MESG,'(A)')' Read  - EOF reached'
-      CALL FLL_OUT('ALL',FPAR)
+      CALL FLL_OUT(LOC_ACT,FPAR)
       FPAR%SUCCESS = .FALSE.
    ELSE
       FPAR%SUCCESS = .TRUE.
