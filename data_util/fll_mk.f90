@@ -36,7 +36,7 @@ MODULE FLL_MK_M
 ! External Modules used
 !
 CONTAINS
-   FUNCTION FLL_MK(NAME,LTYPE,NDIM,NSIZE,FPAR) RESULT(PNEW)
+   FUNCTION FLL_MK(NAME,LTYPE,NDIM,NSIZE,FPAR,ACTION) RESULT(PNEW)
 !
 ! Description: function creates node specified by name, type and dimensions
 !
@@ -64,10 +64,20 @@ CONTAINS
        CHARACTER(*)  :: NAME
        CHARACTER(*)  :: LTYPE
        INTEGER(LINT) :: NDIM, NSIZE
+       CHARACTER(*), OPTIONAL :: ACTION
 !
 ! Local declarations
 !       
        INTEGER :: ISTAT
+       CHARACTER(LEN=10) :: LOC_ACT
+!   
+!  local action
+!
+       IF(.NOT.PRESENT(ACTION))THEN
+         LOC_ACT='ALL'
+       ELSE
+         LOC_ACT = ACTION
+       END IF
        
        PNEW => NULL()
 !
@@ -75,19 +85,19 @@ CONTAINS
 !
        IF(LEN_TRIM(LTYPE)<1.OR.LEN_TRIM(LTYPE)>TYPE_LENGTH) THEN
          WRITE(FPAR%MESG,'(A,A)')' Wrong type: ',TRIM(LTYPE)
-         CALL FLL_OUT('ALL',FPAR)
+         CALL FLL_OUT(LOC_ACT,FPAR)
          RETURN
       END IF
 
       IF(LEN_TRIM(NAME)>NAME_LENGTH) THEN
         WRITE(FPAR%MESG,'(A,A)')' Wrong name: ',TRIM(NAME)
-        CALL FLL_OUT('ALL',FPAR)
+        CALL FLL_OUT(LOC_ACT,FPAR)
         RETURN
       END IF
 
       IF(.NOT.ANY(LTYPE(1:1)==(/'C','S','I','L','R','D','N'/))) THEN
         WRITE(FPAR%MESG,'(A,A)')' Wrong type: ',TRIM(LTYPE)
-        CALL FLL_OUT('ALL',FPAR)
+        CALL FLL_OUT(LOC_ACT,FPAR)
         RETURN
       END IF
 
@@ -115,7 +125,7 @@ CONTAINS
 
       IF(NDIM < 1 .OR. NSIZE < 1)THEN
         WRITE(FPAR%MESG,'(A,A,I5,I5)')' Wrong dimensions for node ',TRIM(NAME), NDIM, NSIZE
-        CALL FLL_OUT('ALL',FPAR)
+        CALL FLL_OUT(LOC_ACT,FPAR)
         RETURN
       END IF
 !

@@ -30,7 +30,7 @@ MODULE FLL_STICH_M
 ! External Modules used
 !
 CONTAINS
-   SUBROUTINE FLL_STICH(PNODE,FPAR)
+   SUBROUTINE FLL_STICH(PNODE,FPAR, ACTION)
 !
 ! Description: subroutine stiches list after PNODE
 !              is taken away
@@ -56,16 +56,26 @@ CONTAINS
 !
     TYPE(DNODE), POINTER  :: PNODE
     TYPE(FUNC_DATA_SET) :: FPAR
+    CHARACTER(*), OPTIONAL :: ACTION
 !
 ! Local declarations
 !
     TYPE(DNODE), POINTER  :: PNEXT=>NULL(), PPREV=>NULL(),PPAR=>NULL()
+    CHARACTER(LEN=10) :: LOC_ACT
+!   
+!  local action
+!
+    IF(.NOT.PRESENT(ACTION))THEN
+      LOC_ACT='ALL'
+    ELSE
+      LOC_ACT = ACTION
+    END IF
 !   
 !   BODY OF SUBROUTINE
 !      
    IF(.NOT.ASSOCIATED(PNODE))THEN
      WRITE(FPAR%MESG,'(A)')' Stich  - null node '
-     CALL FLL_OUT('ALL',FPAR)
+     CALL FLL_OUT(LOC_ACT,FPAR)
      FPAR%SUCCESS = .FALSE.
      RETURN
    END IF
@@ -78,7 +88,7 @@ CONTAINS
 
    IF(.NOT.ASSOCIATED(PNODE%PPAR))THEN
      WRITE(FPAR%MESG,'(A,A)')' Stich - null node '
-     CALL FLL_OUT('ALL',FPAR)
+     CALL FLL_OUT(LOC_ACT,FPAR)
      FPAR%SUCCESS = .FALSE.
      RETURN
    END IF

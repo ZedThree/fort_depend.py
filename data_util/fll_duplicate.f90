@@ -33,7 +33,7 @@ MODULE FLL_DUPLICATE_M
 ! External Modules used
 !
 CONTAINS
-   FUNCTION FLL_DUPLICATE(PNODE,FPAR) RESULT(PNEW)
+   FUNCTION FLL_DUPLICATE(PNODE,FPAR,ACTION) RESULT(PNEW)
 !
 ! Description: Contains duplicates node to PNEW mode
 !              the parent, previous and next pointers of PNEW node are NULL
@@ -66,10 +66,20 @@ CONTAINS
 !
    TYPE(DNODE), POINTER  :: PNODE,PNEW
    TYPE(FUNC_DATA_SET) :: FPAR
+   CHARACTER(*), OPTIONAL :: ACTION
 !
 ! Local declarations
 !
    TYPE(DNODE), POINTER :: PCHILD
+   CHARACTER(LEN=10) :: LOC_ACT
+!   
+!  local action
+!
+   IF(.NOT.PRESENT(ACTION))THEN
+     LOC_ACT='ALL'
+   ELSE
+     LOC_ACT = ACTION
+   END IF
 !   
 !   BODY OF SUBROUTINE
 !   
@@ -80,7 +90,7 @@ CONTAINS
    FPAR%SUCCESS = .FALSE.
    IF(.NOT.ASSOCIATED(PNODE))THEN
       WRITE(FPAR%MESG,'(A)')' DUPLICATE - null node '
-      CALL FLL_OUT('ALL',FPAR)
+      CALL FLL_OUT(LOC_ACT,FPAR)
       FPAR%SUCCESS = .FALSE.
       RETURN
    END IF
@@ -90,7 +100,7 @@ CONTAINS
 ! IF NODE HAS CHILDREN, DUPLICATE ALL OF THEM
 !
    IF(ASSOCIATED(PCHILD))THEN
-     PNEW => FLL_MK(PNODE%LNAME,'DIR',0_LINT,0_LINT,FPAR)
+     PNEW => FLL_MK(PNODE%LNAME,'DIR',0_LINT,0_LINT,FPAR,LOC_ACT)
      IF(.NOT.ASSOCIATED(PNEW))THEN
        WRITE(FPAR%MESG,'(A)')' DUPLICATE - error allocating PNEW '
        FPAR%SUCCESS = .FALSE.
@@ -98,10 +108,10 @@ CONTAINS
        RETURN
      END IF
      
-     CALL FLL_DUPLICATE_RECURSIVE_NODE(PCHILD,PNEW,FPAR)
+     CALL FLL_DUPLICATE_RECURSIVE_NODE(PCHILD,PNEW,FPAR,LOC_ACT)
       IF(.NOT.FPAR%SUCCESS)THEN
         WRITE(FPAR%MESG,'(A)')' DUPLICATE - error duplicting children nodes '
-        CALL FLL_OUT('ALL',FPAR)
+        CALL FLL_OUT(LOC_ACT,FPAR)
         FPAR%SUCCESS = .FALSE.
         PNEW => NULL()
         RETURN
@@ -111,15 +121,15 @@ CONTAINS
 !
 !  NODE IS A FILE NODE
 !
-    PNEW => FLL_MK(PNODE%LNAME,PNODE%LTYPE,PNODE%NDIM,PNODE%NSIZE,FPAR)
+    PNEW => FLL_MK(PNODE%LNAME,PNODE%LTYPE,PNODE%NDIM,PNODE%NSIZE,FPAR,ACTION=LOC_ACT)
     IF(.NOT.ASSOCIATED(PNEW))THEN
       WRITE(FPAR%MESG,'(A)')' DUPLICATE - error allocating PNEW '
-      CALL FLL_OUT('ALL',FPAR)
+      CALL FLL_OUT(LOC_ACT,FPAR)
       FPAR%SUCCESS = .FALSE.
       PNEW => NULL()
       RETURN
     END IF
-    CALL FLL_COPY_NODE_ARRAYS(PNODE, PNEW,FPAR)
+    CALL FLL_COPY_NODE_ARRAYS(PNODE, PNEW,FPAR,LOC_ACT)
 
    END IF
 
@@ -130,7 +140,7 @@ CONTAINS
 !
 !  DELETE CHID WITH ALL ITS CHILDREN
 !
-  RECURSIVE SUBROUTINE FLL_DUPLICATE_RECURSIVE_NODE(PNODE,PDUPL,FPAR)
+  RECURSIVE SUBROUTINE FLL_DUPLICATE_RECURSIVE_NODE(PNODE,PDUPL,FPAR,LOC_ACT)
 !
 ! Description: makes recursive duplicate of PNODE
 !
@@ -155,6 +165,7 @@ CONTAINS
 ! 
     TYPE(DNODE), POINTER  :: PNODE,PDUPL
     TYPE(FUNC_DATA_SET) :: FPAR
+    CHARACTER(*) :: LOC_ACT
 !
 ! Local declarations
 !
@@ -170,29 +181,29 @@ CONTAINS
      PNEXT => PCURR%PNEXT
      PCHILD=> PCURR%PCHILD
 
-     PNEW => FLL_MK(PCURR%LNAME,PCURR%LTYPE,PCURR%NDIM,PCURR%NSIZE,FPAR)
+     PNEW => FLL_MK(PCURR%LNAME,PCURR%LTYPE,PCURR%NDIM,PCURR%NSIZE,FPAR,ACTION=LOC_ACT)
      IF(.NOT.ASSOCIATED(PNEW))THEN
       WRITE(FPAR%MESG,'(A)')' DUPLICATE - error allocating PNEW '
-      CALL FLL_OUT('ALL',FPAR)
+      CALL FLL_OUT(LOC_ACT,FPAR)
       FPAR%SUCCESS = .FALSE.
       PNEW => NULL()
       RETURN
      END IF
 
      IF(.NOT.ASSOCIATED(PCHILD))THEN
-       CALL FLL_COPY_NODE_ARRAYS(PCURR, PNEW, FPAR)
+       CALL FLL_COPY_NODE_ARRAYS(PCURR, PNEW, FPAR,LOC_ACT)
 
      ELSE
 !
 !  NODE HAS CHILDREN
 !
-         CALL FLL_DUPLICATE_RECURSIVE_NODE(PCHILD,PNEW, FPAR)
+         CALL FLL_DUPLICATE_RECURSIVE_NODE(PCHILD,PNEW, FPAR,LOC_ACT)
          IF(.NOT.FPAR%SUCCESS) STOP'DUPLICATE - Error duplicating nodes'
      END IF
 !
 !  ADD TO PDUPL LIST
 !
-     OK = FLL_MV(PNEW,PDUPL,FPAR)
+     OK = FLL_MV(PNEW,PDUPL,FPAR,ACTION=LOC_ACT)
 
      PCURR => PNEXT
 
@@ -206,7 +217,7 @@ CONTAINS
 !
 ! 
 !
-  SUBROUTINE FLL_COPY_NODE_ARRAYS(PNODE,PNEW,FPAR)
+  SUBROUTINE FLL_COPY_NODE_ARRAYS(PNODE,PNEW,FPAR,LOC_ACT)
 !
 ! Description: duplicated data of the node
 !
@@ -235,6 +246,7 @@ CONTAINS
 !
    TYPE(DNODE), POINTER  :: PNODE,PNEW
    TYPE(FUNC_DATA_SET) :: FPAR
+   CHARACTER(*) :: LOC_ACT
 !
 ! Local declarations
 !
@@ -245,7 +257,7 @@ CONTAINS
    IF(TRIM(PNODE%LTYPE) /= TRIM(PNEW%LTYPE))THEN
      WRITE(FPAR%MESG,'(A,A,A,A)')' DUPLICATE - nodes do not have same dimensions', TRIM(PNODE%LNAME),' ', TRIM(PNEW%LNAME)
      FPAR%SUCCESS = .FALSE.
-     CALL FLL_OUT('ALL',FPAR)
+     CALL FLL_OUT(LOC_ACT,FPAR)
      RETURN
    END IF
 !
@@ -270,7 +282,7 @@ CONTAINS
        IF(NDIM /= NNDIM)THEN
          WRITE(FPAR%MESG,'(A,A,A,A)')' DUPLICATE - nodes do not have same dimensions', TRIM(PNODE%LNAME),' ', TRIM(PNEW%LNAME)
          FPAR%SUCCESS = .FALSE.
-         CALL FLL_OUT('ALL',FPAR)
+         CALL FLL_OUT(LOC_ACT,FPAR)
          RETURN
        END IF
 
@@ -278,7 +290,7 @@ CONTAINS
      ELSE
        WRITE(FPAR%MESG,'(A,A,A,A)')' DUPLICATE - R1 array not allocated ',TRIM(PNEW%LNAME)
        FPAR%SUCCESS = .FALSE.
-       CALL FLL_OUT('ALL',FPAR)
+       CALL FLL_OUT(LOC_ACT,FPAR)
        RETURN 
      END IF     
 
@@ -293,7 +305,7 @@ CONTAINS
        IF(NDIM /= NNDIM)THEN
          WRITE(FPAR%MESG,'(A,A,A,A)')' DUPLICATE - nodes do not have same dimensions', TRIM(PNODE%LNAME),' ', TRIM(PNEW%LNAME)
          FPAR%SUCCESS = .FALSE.
-         CALL FLL_OUT('ALL',FPAR)
+         CALL FLL_OUT(LOC_ACT,FPAR)
          RETURN
        END IF
 
@@ -301,7 +313,7 @@ CONTAINS
      ELSE
        WRITE(FPAR%MESG,'(A,A,A,A)')' DUPLICATE - D1 array not allocated ',TRIM(PNEW%LNAME)
        FPAR%SUCCESS = .FALSE.
-       CALL FLL_OUT('ALL',FPAR)
+       CALL FLL_OUT(LOC_ACT,FPAR)
        RETURN 
      END IF   
 
@@ -317,14 +329,14 @@ CONTAINS
        IF(NDIM /= NNDIM)THEN
          WRITE(FPAR%MESG,'(A,A,A,A)')' DUPLICATE - nodes do not have same dimensions', TRIM(PNODE%LNAME),' ', TRIM(PNEW%LNAME)
          FPAR%SUCCESS = .FALSE.
-         CALL FLL_OUT('ALL',FPAR)
+         CALL FLL_OUT(LOC_ACT,FPAR)
          RETURN
        END IF
        PNEW%I1(1:NDIM) = PNODE%I1(1:NDIM)
      ELSE
        WRITE(FPAR%MESG,'(A,A,A,A)')' DUPLICATE - I1 array not allocated ',TRIM(PNEW%LNAME)
        FPAR%SUCCESS = .FALSE.
-       CALL FLL_OUT('ALL',FPAR)
+       CALL FLL_OUT(LOC_ACT,FPAR)
        RETURN 
      END IF  
 
@@ -339,7 +351,7 @@ CONTAINS
        IF(NDIM /= NNDIM)THEN
          WRITE(FPAR%MESG,'(A,A,A,A)')' DUPLICATE - nodes do not have same dimensions', TRIM(PNODE%LNAME),' ', TRIM(PNEW%LNAME)
          FPAR%SUCCESS = .FALSE.
-         CALL FLL_OUT('ALL',FPAR)
+         CALL FLL_OUT(LOC_ACT,FPAR)
          RETURN
        END IF
 
@@ -347,7 +359,7 @@ CONTAINS
      ELSE
        WRITE(FPAR%MESG,'(A,A,A,A)')' DUPLICATE - L1 array not allocated ',TRIM(PNEW%LNAME)
        FPAR%SUCCESS = .FALSE.
-       CALL FLL_OUT('ALL',FPAR)
+       CALL FLL_OUT(LOC_ACT,FPAR)
        RETURN 
      END IF   
 
@@ -362,7 +374,7 @@ CONTAINS
        IF(NDIM /= NNDIM)THEN
          WRITE(FPAR%MESG,'(A,A,A,A)')' DUPLICATE - nodes do not have same dimensions', TRIM(PNODE%LNAME),' ', TRIM(PNEW%LNAME)
          FPAR%SUCCESS = .FALSE.
-         CALL FLL_OUT('ALL',FPAR)
+         CALL FLL_OUT(LOC_ACT,FPAR)
          RETURN
        END IF
 
@@ -370,7 +382,7 @@ CONTAINS
      ELSE
        WRITE(FPAR%MESG,'(A,A,A,A)')' DUPLICATE - S1 array not allocated ',TRIM(PNEW%LNAME)
        FPAR%SUCCESS = .FALSE.
-       CALL FLL_OUT('ALL',FPAR)
+       CALL FLL_OUT(LOC_ACT,FPAR)
        RETURN 
      END IF 
    END IF      
@@ -388,7 +400,7 @@ CONTAINS
        IF(NDIM /= NNDIM .OR. NSIZE /= NNSIZE)THEN
          WRITE(FPAR%MESG,'(A,A,A,A)')' DUPLICATE - nodes do not have same dimensions', TRIM(PNODE%LNAME),' ', TRIM(PNEW%LNAME)
          FPAR%SUCCESS = .FALSE.
-         CALL FLL_OUT('ALL',FPAR)
+         CALL FLL_OUT(LOC_ACT,FPAR)
          RETURN
        END IF
 
@@ -396,7 +408,7 @@ CONTAINS
      ELSE
        WRITE(FPAR%MESG,'(A,A,A,A)')' DUPLICATE - R2 array not allocated ',TRIM(PNEW%LNAME)
        FPAR%SUCCESS = .FALSE.
-       CALL FLL_OUT('ALL',FPAR)
+       CALL FLL_OUT(LOC_ACT,FPAR)
        RETURN 
      END IF     
    END IF
@@ -412,7 +424,7 @@ CONTAINS
        IF(NDIM /= NNDIM .OR. NSIZE /= NNSIZE)THEN
          WRITE(FPAR%MESG,'(A,A,A,A)')' DUPLICATE - nodes do not have same dimensions', TRIM(PNODE%LNAME),' ', TRIM(PNEW%LNAME)
          FPAR%SUCCESS = .FALSE.
-         CALL FLL_OUT('ALL',FPAR)
+         CALL FLL_OUT(LOC_ACT,FPAR)
          RETURN
        END IF
 
@@ -420,7 +432,7 @@ CONTAINS
      ELSE
        WRITE(FPAR%MESG,'(A,A,A,A)')' DUPLICATE - D2 array not allocated ',TRIM(PNEW%LNAME)
        FPAR%SUCCESS = .FALSE.
-       CALL FLL_OUT('ALL',FPAR)
+       CALL FLL_OUT(LOC_ACT,FPAR)
        RETURN 
      END IF     
    END IF
@@ -436,7 +448,7 @@ CONTAINS
        IF(NDIM /= NNDIM .OR. NSIZE /= NNSIZE)THEN
          WRITE(FPAR%MESG,'(A,A,A,A)')' DUPLICATE - nodes do not have same dimensions', TRIM(PNODE%LNAME),' ', TRIM(PNEW%LNAME)
          FPAR%SUCCESS = .FALSE.
-         CALL FLL_OUT('ALL',FPAR)
+         CALL FLL_OUT(LOC_ACT,FPAR)
          RETURN
        END IF
 
@@ -444,7 +456,7 @@ CONTAINS
      ELSE
        WRITE(FPAR%MESG,'(A,A,A,A)')' DUPLICATE - I2 array not allocated ',TRIM(PNEW%LNAME)
        FPAR%SUCCESS = .FALSE.
-       CALL FLL_OUT('ALL',FPAR)
+       CALL FLL_OUT(LOC_ACT,FPAR)
        RETURN 
      END IF     
    END IF
@@ -460,7 +472,7 @@ CONTAINS
        IF(NDIM /= NNDIM .OR. NSIZE /= NNSIZE)THEN
          WRITE(FPAR%MESG,'(A,A,A,A)')' DUPLICATE - nodes do not have same dimensions', TRIM(PNODE%LNAME),' ', TRIM(PNEW%LNAME)
          FPAR%SUCCESS = .FALSE.
-         CALL FLL_OUT('ALL',FPAR)
+         CALL FLL_OUT(LOC_ACT,FPAR)
          RETURN
        END IF
 
@@ -468,7 +480,7 @@ CONTAINS
      ELSE
        WRITE(FPAR%MESG,'(A,A,A,A)')' DUPLICATE - L2 array not allocated ',TRIM(PNEW%LNAME)
        FPAR%SUCCESS = .FALSE.
-       CALL FLL_OUT('ALL',FPAR)
+       CALL FLL_OUT(LOC_ACT,FPAR)
        RETURN 
      END IF     
    END IF
@@ -484,7 +496,7 @@ CONTAINS
        IF(NDIM /= NNDIM .OR. NSIZE /= NNSIZE)THEN
          WRITE(FPAR%MESG,'(A,A,A,A)')' DUPLICATE - nodes do not have same dimensions', TRIM(PNODE%LNAME),' ', TRIM(PNEW%LNAME)
          FPAR%SUCCESS = .FALSE.
-         CALL FLL_OUT('ALL',FPAR)
+         CALL FLL_OUT(LOC_ACT,FPAR)
          RETURN
        END IF
 
@@ -492,7 +504,7 @@ CONTAINS
      ELSE
        WRITE(FPAR%MESG,'(A,A,A,A)')' DUPLICATE - S2 array not allocated ',TRIM(PNEW%LNAME)
        FPAR%SUCCESS = .FALSE.
-       CALL FLL_OUT('ALL',FPAR)
+       CALL FLL_OUT(LOC_ACT,FPAR)
        RETURN 
      END IF     
    END IF
