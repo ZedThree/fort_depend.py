@@ -89,6 +89,8 @@ CONTAINS
 ! FILE         In         Name of file
 ! PNODE        Out        Node to a first node in list from a file
 ! IOUNIT       In         Number of unit
+! PLIST        In         List of items in file, can be obtained by
+!                         FLL_READ with SCAN = 'Y' optional parameter
 ! NAME         In         name of node
 ! NUMBER       In         position of node in list
 ! LTYPE        In         type of node  - can be *
