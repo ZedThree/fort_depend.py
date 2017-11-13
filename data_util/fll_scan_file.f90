@@ -21,7 +21,7 @@
 !
 MODULE FLL_SCAN_FILE_M
 !
-! Description: Contains function fll_cp
+! Description: Contains function fll_scan_file
 !
 ! 
 ! History:
@@ -34,7 +34,7 @@ MODULE FLL_SCAN_FILE_M
 !
 CONTAINS
 
-   FUNCTION FLL_SCAN_FILE(FILENAME,IOUNIT,FMT,FPAR) RESULT(PNODE)
+   FUNCTION FLL_SCAN_FILE(FILENAME,IOUNIT,FMT,FPAR,ACTION) RESULT(PNODE)
 !
 ! Description: Scan file, returns fll list with data names in file and their
 !       position in file in bytes
@@ -63,15 +63,25 @@ CONTAINS
    INTEGER :: IOUNIT
    CHARACTER(LEN=FILE_NAME_LENGTH) :: FILENAME
    CHARACTER :: FMT
+   CHARACTER(*), OPTIONAL :: ACTION
 !
 ! Local types
 !
    LOGICAL :: OK
+   CHARACTER(LEN=10) :: LOC_ACT
+!   
+!  local action
+!
+   IF(.NOT.PRESENT(ACTION))THEN
+     LOC_ACT='ALL'
+   ELSE
+     LOC_ACT = ACTION
+   END IF
 
    INQUIRE (FILE=TRIM(FILENAME), EXIST=OK)
    IF(.NOT.OK) THEN
       WRITE(FPAR%MESG,'(A,A)')' Read  - file does not exist ',TRIM(FILENAME)
-      CALL FLL_OUT('ALL',FPAR)
+      CALL FLL_OUT(LOC_ACT,FPAR)
       FPAR%SUCCESS = .FALSE.
       PNODE => NULL()
       RETURN
@@ -79,7 +89,7 @@ CONTAINS
 !
 !  GET FILE STRUCTURE
 !
-   PNODE => FLL_READ(FILENAME,IOUNIT,FMT,FPAR,SCAN = 'Y')
+   PNODE => FLL_READ(FILENAME,IOUNIT,FMT,FPAR,SCAN = 'Y', ACTION=LOC_ACT)
 
    RETURN 
 

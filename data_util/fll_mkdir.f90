@@ -31,7 +31,7 @@ MODULE FLL_MKDIR_M
 ! External Modules used
 !
 CONTAINS
-   FUNCTION FLL_MKDIR(NAME,FPAR) RESULT(PNEW)
+   FUNCTION FLL_MKDIR(NAME,FPAR,ACTION) RESULT(PNEW)
 !
 ! Description: function creates node specified by name, type and dimensions
 !
@@ -54,14 +54,24 @@ CONTAINS
        TYPE(FUNC_DATA_SET)   :: FPAR
        TYPE(DNODE), POINTER  :: PNEW
        CHARACTER(LEN=*) :: NAME
+       CHARACTER(LEN=*), OPTIONAL :: ACTION       
 !
 ! Local declarations
 !              
+       CHARACTER(LEN=10) :: LOC_ACT
+!   
+!  local action
+!
+       IF(.NOT.PRESENT(ACTION))THEN
+         LOC_ACT='ALL'
+       ELSE
+         LOC_ACT = ACTION
+       END IF
        PNEW => NULL()
 !
 ! Body
 !
-       PNEW => FLL_MK(NAME,'DIR',0_LINT, 0_LINT, FPAR)
+       PNEW => FLL_MK(NAME,'DIR',0_LINT, 0_LINT, FPAR,ACTION=LOC_ACT)
 
     RETURN
    END FUNCTION FLL_MKDIR

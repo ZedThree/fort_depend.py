@@ -34,7 +34,7 @@ MODULE FLL_RENAME_M
 !
 
 CONTAINS
-   FUNCTION FLL_RENAME(PWHAT,INAME,FPAR) RESULT(OK)
+   FUNCTION FLL_RENAME(PWHAT,INAME,FPAR,ACTION) RESULT(OK)
 !
 ! Description: Renames node
 !
@@ -59,13 +59,23 @@ CONTAINS
        TYPE(FUNC_DATA_SET)   :: FPAR
        CHARACTER(LEN=*) :: INAME
        LOGICAL :: OK
+       CHARACTER(*), OPTIONAL :: ACTION
+       CHARACTER(LEN=10) :: LOC_ACT
+!   
+!  local action
+!
+       IF(.NOT.PRESENT(ACTION))THEN
+         LOC_ACT='ALL'
+       ELSE
+         LOC_ACT = ACTION
+       END IF
 !
 !  check that PWHAT is not NULL
 !      
        IF(.NOT.ASSOCIATED(PWHAT))THEN
           WRITE(*,*)' Rename - SOURCE IS NULL NODE'
           WRITE(FPAR%MESG,'(A,A)')' Rename  - Pwhat null node '
-          CALL FLL_OUT('ALL',FPAR)
+          CALL FLL_OUT(LOC_ACT,FPAR)
           FPAR%SUCCESS = .FALSE.
           OK = .FALSE.
           RETURN
