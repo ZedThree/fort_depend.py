@@ -101,20 +101,20 @@ CONTAINS
    LOGICAL :: OK
    CHARACTER :: FMT_LOC
    INTEGER :: ISTAT
-   CHARACTER(LEN=10) :: LOC_ACT
+   CHARACTER(LEN=10) :: LOC_ERRMSG
 !   
 !  local action
 !
    IF(.NOT.PRESENT(ACTION))THEN
-     LOC_ACT='ALL'
+     LOC_ERRMSG='ALL'
    ELSE
-     LOC_ACT = ACTION
+     LOC_ERRMSG = ACTION
    END IF
 
    INQUIRE (FILE=TRIM(FILE), EXIST=OK)
    IF(.NOT.OK) THEN
       WRITE(FPAR%MESG,'(A,A)')' Read  - file does not exist ',TRIM(FILE)
-      CALL FLL_OUT(LOC_ACT,FPAR)
+      CALL FLL_OUT(LOC_ERRMSG,FPAR)
       FPAR%SUCCESS = .FALSE.
       PNODE => NULL()
       RETURN
@@ -131,7 +131,7 @@ CONTAINS
       FMT_LOC = 'U'
     CASE DEFAULT
       WRITE(FPAR%MESG,'(A,A)')' Read  - unknown format',TRIM(FMT)
-      CALL FLL_OUT(LOC_ACT,FPAR)
+      CALL FLL_OUT(LOC_ERRMSG,FPAR)
       FPAR%SUCCESS = .FALSE.
       PNODE => NULL()
       RETURN
@@ -150,7 +150,7 @@ CONTAINS
 
     IF(ISTAT/=0) THEN
       WRITE(FPAR%MESG,'(A,A)')' Read  - error opening file ',TRIM(FILE)
-      CALL FLL_OUT(LOC_ACT,FPAR)
+      CALL FLL_OUT(LOC_ERRMSG,FPAR)
       FPAR%SUCCESS = .FALSE.
       PNODE => NULL()
       RETURN
@@ -160,9 +160,9 @@ CONTAINS
 !
     SELECT CASE(ITYPE)
       CASE('I','i')
-        PNODE => READ_NODE_UCD(IOUNIT,FMT_LOC,FPAR,LOC_ACT)
+        PNODE => READ_NODE_UCD(IOUNIT,FMT_LOC,FPAR,LOC_ERRMSG)
       CASE('L','l')
-        PNODE => READ_NODE_UCD_L(IOUNIT,FMT_LOC,FPAR,LOC_ACT)
+        PNODE => READ_NODE_UCD_L(IOUNIT,FMT_LOC,FPAR,LOC_ERRMSG)
       CASE DEFAULT
         STOP'WRONG DATA FORMAT FOR UCD DATA SET'
     END SELECT
@@ -170,7 +170,7 @@ CONTAINS
     CLOSE(IOUNIT)
     IF(.NOT.ASSOCIATED(PNODE))THEN
        WRITE(FPAR%MESG,'(A,A)')' Read  - error reading file ',TRIM(FILE)
-       CALL FLL_OUT(LOC_ACT,FPAR)
+       CALL FLL_OUT(LOC_ERRMSG,FPAR)
        FPAR%SUCCESS = .FALSE.
     END IF
     
@@ -181,7 +181,7 @@ CONTAINS
 
 
 
-  FUNCTION READ_NODE_UCD(IOUNIT,FMT,FPAR,LOC_ACT) RESULT(PNODE)
+  FUNCTION READ_NODE_UCD(IOUNIT,FMT,FPAR,LOC_ERRMSG) RESULT(PNODE)
 !
 ! Description: Function reads a node
 !
@@ -217,7 +217,7 @@ CONTAINS
     TYPE(FUNC_DATA_SET) :: FPAR
     INTEGER :: IOUNIT
     CHARACTER :: FMT
-    CHARACTER(*) :: LOC_ACT
+    CHARACTER(*) :: LOC_ERRMSG
 !
 !  Local declarations
 !
@@ -243,14 +243,14 @@ CONTAINS
 !
 !  allocate memory for coordinates
 !
-    PNODE => FLL_MKDIR('unstr_grid_data', FPAR,LOC_ACT)
-    PREG  => FLL_MKDIR('region', FPAR,LOC_ACT)
-    OK = FLL_MV(PREG,PNODE,FPAR,LOC_ACT)
-    PBND  => FLL_MKDIR('boundary', FPAR,LOC_ACT)
-    OK = FLL_MV(PBND,PREG,FPAR,LOC_ACT)
+    PNODE => FLL_MKDIR('unstr_grid_data', FPAR,LOC_ERRMSG)
+    PREG  => FLL_MKDIR('region', FPAR,LOC_ERRMSG)
+    OK = FLL_MV(PREG,PNODE,FPAR,LOC_ERRMSG)
+    PBND  => FLL_MKDIR('boundary', FPAR,LOC_ERRMSG)
+    OK = FLL_MV(PBND,PREG,FPAR,LOC_ERRMSG)
 
-    PTMP => FLL_MK('coordinates','D',NPTS,3_LINT,FPAR,LOC_ACT)
-    OK = FLL_MV(PTMP,PREG,FPAR,LOC_ACT)    
+    PTMP => FLL_MK('coordinates','D',NPTS,3_LINT,FPAR,LOC_ERRMSG)
+    OK = FLL_MV(PTMP,PREG,FPAR,LOC_ERRMSG)    
     COO => PTMP%D2
 
     DO I=1,NPTS
@@ -259,7 +259,7 @@ CONTAINS
 !
 !   add boundary name
 !
-    PTMP => FLL_MK('boundary_name','S',1_LINT,1_LINT,FPAR,LOC_ACT)
+    PTMP => FLL_MK('boundary_name','S',1_LINT,1_LINT,FPAR,LOC_ERRMSG)
     PTMP%S0 = 'wall'
 !
 !   read elements
@@ -289,26 +289,26 @@ CONTAINS
 !   
     IF(N3> 0)THEN
 
-      PBELEM  => FLL_MKDIR('belem_group', FPAR,LOC_ACT)
-      OK = FLL_MV(PBELEM,PBND,FPAR,LOC_ACT)
-      PTMP => FLL_MK('bound_elem_type','S',1_LINT,1_LINT,FPAR,LOC_ACT)
-      OK = FLL_MV(PTMP,PBELEM,FPAR,LOC_ACT)
+      PBELEM  => FLL_MKDIR('belem_group', FPAR,LOC_ERRMSG)
+      OK = FLL_MV(PBELEM,PBND,FPAR,LOC_ERRMSG)
+      PTMP => FLL_MK('bound_elem_type','S',1_LINT,1_LINT,FPAR,LOC_ERRMSG)
+      OK = FLL_MV(PTMP,PBELEM,FPAR,LOC_ERRMSG)
       PTMP%S0 = 'tria3'
-      PTMP => FLL_MK('bound_elem_nodes','I',N3,3_LINT,FPAR,LOC_ACT)       
+      PTMP => FLL_MK('bound_elem_nodes','I',N3,3_LINT,FPAR,LOC_ERRMSG)       
       PTMP%I2 = I3(1:N3,:)
-      OK = FLL_MV(PTMP,PBELEM,FPAR,LOC_ACT)
+      OK = FLL_MV(PTMP,PBELEM,FPAR,LOC_ERRMSG)
     END IF
 
     IF(N4> 0)THEN
 
-      PBELEM  => FLL_MKDIR('belem_group', FPAR,LOC_ACT)
-      OK = FLL_MV(PBELEM,PBND,FPAR,LOC_ACT)
-      PTMP => FLL_MK('bound_elem_type','S',1_LINT,1_LINT,FPAR,LOC_ACT)
-      OK = FLL_MV(PTMP,PBELEM,FPAR,LOC_ACT)
+      PBELEM  => FLL_MKDIR('belem_group', FPAR,LOC_ERRMSG)
+      OK = FLL_MV(PBELEM,PBND,FPAR,LOC_ERRMSG)
+      PTMP => FLL_MK('bound_elem_type','S',1_LINT,1_LINT,FPAR,LOC_ERRMSG)
+      OK = FLL_MV(PTMP,PBELEM,FPAR,LOC_ERRMSG)
       PTMP%S0 = 'quad4'
-      PTMP => FLL_MK('bound_elem_nodes','I',N4,4_LINT,FPAR,LOC_ACT)       
+      PTMP => FLL_MK('bound_elem_nodes','I',N4,4_LINT,FPAR,LOC_ERRMSG)       
       PTMP%I2 = I4(1:N4,:)
-      OK = FLL_MV(PTMP,PBELEM,FPAR,LOC_ACT)
+      OK = FLL_MV(PTMP,PBELEM,FPAR,LOC_ERRMSG)
 
     END IF
 
@@ -319,7 +319,7 @@ CONTAINS
   END FUNCTION READ_NODE_UCD
 
 
-  FUNCTION READ_NODE_UCD_L(IOUNIT,FMT,FPAR,LOC_ACT) RESULT(PNODE)
+  FUNCTION READ_NODE_UCD_L(IOUNIT,FMT,FPAR,LOC_ERRMSG) RESULT(PNODE)
 !
 ! Description: Function reads a node
 !
@@ -367,7 +367,7 @@ CONTAINS
     INTEGER :: ISTAT
     LOGICAL :: OK
     CHARACTER(LEN = 200)TEXTLONG
-    CHARACTER(LEN=*) :: LOC_ACT
+    CHARACTER(LEN=*) :: LOC_ERRMSG
 !
 !   disregard all lines starting with #  - 3 lines
 !
@@ -381,14 +381,14 @@ CONTAINS
 !
 !  allocate memory for coordinates
 !
-    PNODE => FLL_MKDIR('unstr_grid_data', FPAR,LOC_ACT)
-    PREG  => FLL_MKDIR('region', FPAR,LOC_ACT)
-    OK = FLL_MV(PREG,PNODE,FPAR,LOC_ACT)
-    PBND  => FLL_MKDIR('boundary', FPAR,LOC_ACT)
-    OK = FLL_MV(PBND,PREG,FPAR,LOC_ACT)
+    PNODE => FLL_MKDIR('unstr_grid_data', FPAR,LOC_ERRMSG)
+    PREG  => FLL_MKDIR('region', FPAR,LOC_ERRMSG)
+    OK = FLL_MV(PREG,PNODE,FPAR,LOC_ERRMSG)
+    PBND  => FLL_MKDIR('boundary', FPAR,LOC_ERRMSG)
+    OK = FLL_MV(PBND,PREG,FPAR,LOC_ERRMSG)
 
-    PTMP => FLL_MK('coordinates','D',NPTS,3_LINT,FPAR,LOC_ACT)
-    OK = FLL_MV(PTMP,PREG,FPAR,LOC_ACT)    
+    PTMP => FLL_MK('coordinates','D',NPTS,3_LINT,FPAR,LOC_ERRMSG)
+    OK = FLL_MV(PTMP,PREG,FPAR,LOC_ERRMSG)    
     COO => PTMP%D2
 
     DO I=1,NPTS
@@ -397,7 +397,7 @@ CONTAINS
 !
 !   add boundary name
 !
-    PTMP => FLL_MK('boundary_name','S',1_LINT,1_LINT,FPAR,LOC_ACT)
+    PTMP => FLL_MK('boundary_name','S',1_LINT,1_LINT,FPAR,LOC_ERRMSG)
     PTMP%S0 = 'wall'
 !
 !   read elements
@@ -427,26 +427,26 @@ CONTAINS
 !   
     IF(N3> 0)THEN
 
-      PBELEM  => FLL_MKDIR('belem_group', FPAR,LOC_ACT)
-      OK = FLL_MV(PBELEM,PBND,FPAR,LOC_ACT)
-      PTMP => FLL_MK('bound_elem_type','S',1_LINT,1_LINT,FPAR,LOC_ACT)
-      OK = FLL_MV(PTMP,PBELEM,FPAR,LOC_ACT)
+      PBELEM  => FLL_MKDIR('belem_group', FPAR,LOC_ERRMSG)
+      OK = FLL_MV(PBELEM,PBND,FPAR,LOC_ERRMSG)
+      PTMP => FLL_MK('bound_elem_type','S',1_LINT,1_LINT,FPAR,LOC_ERRMSG)
+      OK = FLL_MV(PTMP,PBELEM,FPAR,LOC_ERRMSG)
       PTMP%S0 = 'tria3'
-      PTMP => FLL_MK('bound_elem_nodes','L',N3,3_LINT,FPAR,LOC_ACT)       
+      PTMP => FLL_MK('bound_elem_nodes','L',N3,3_LINT,FPAR,LOC_ERRMSG)       
       PTMP%L2 = I3(1:N3,:)
-      OK = FLL_MV(PTMP,PBELEM,FPAR,LOC_ACT)
+      OK = FLL_MV(PTMP,PBELEM,FPAR,LOC_ERRMSG)
     END IF
 
     IF(N4> 0)THEN
 
-      PBELEM  => FLL_MKDIR('belem_group', FPAR,LOC_ACT)
-      OK = FLL_MV(PBELEM,PBND,FPAR,LOC_ACT)
-      PTMP => FLL_MK('bound_elem_type','S',1_LINT,1_LINT,FPAR,LOC_ACT)
-      OK = FLL_MV(PTMP,PBELEM,FPAR,LOC_ACT)
+      PBELEM  => FLL_MKDIR('belem_group', FPAR,LOC_ERRMSG)
+      OK = FLL_MV(PBELEM,PBND,FPAR,LOC_ERRMSG)
+      PTMP => FLL_MK('bound_elem_type','S',1_LINT,1_LINT,FPAR,LOC_ERRMSG)
+      OK = FLL_MV(PTMP,PBELEM,FPAR,LOC_ERRMSG)
       PTMP%S0 = 'quad4'
-      PTMP => FLL_MK('bound_elem_nodes','L',N4,4_LINT,FPAR,LOC_ACT)       
+      PTMP => FLL_MK('bound_elem_nodes','L',N4,4_LINT,FPAR,LOC_ERRMSG)       
       PTMP%L2 = I4(1:N4,:)
-      OK = FLL_MV(PTMP,PBELEM,FPAR,LOC_ACT)
+      OK = FLL_MV(PTMP,PBELEM,FPAR,LOC_ERRMSG)
 
     END IF
 

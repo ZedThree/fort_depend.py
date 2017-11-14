@@ -65,19 +65,19 @@ CONTAINS
 ! Local declarations
 !
        TYPE(DNODE), POINTER  :: PSOURCETMP
-       CHARACTER(LEN=10) :: LOC_ACT
+       CHARACTER(LEN=10) :: LOC_ERRMSG
 !   
 !  local action
 !
        IF(.NOT.PRESENT(ACTION))THEN
-         LOC_ACT='ALL'
+         LOC_ERRMSG='ALL'
        ELSE
-         LOC_ACT = ACTION
+         LOC_ERRMSG = ACTION
        END IF
        
        IF(.NOT.ASSOCIATED(PWHAT,PWHERE))THEN
     
-         PSOURCETMP => FLL_MVCP(PWHAT,PWHERE,'M',FPAR,LOC_ACT) 
+         PSOURCETMP => FLL_MVCP(PWHAT,PWHERE,'M',FPAR,LOC_ERRMSG) 
          OK = FPAR%SUCCESS
 
        END IF
@@ -85,7 +85,7 @@ CONTAINS
        RETURN
    END FUNCTION FLL_MV
 
-   FUNCTION  FLL_MVCP(PWHAT,PWHERE,MODE,FPAR,LOC_ACT) RESULT(PSOURCETMP)
+   FUNCTION  FLL_MVCP(PWHAT,PWHERE,MODE,FPAR,LOC_ERRMSG) RESULT(PSOURCETMP)
 !
 ! Description: Module moves or copies PWHAT pointer to PWHERE pointer
 !              depending on MODE values (C or M)
@@ -106,7 +106,7 @@ CONTAINS
    TYPE(DNODE), POINTER  :: PWHAT,PWHERE
    TYPE(FUNC_DATA_SET) :: FPAR
    CHARACTER :: MODE    ! 'C' - COPY,   'M' - MOVE
-   CHARACTER(*) :: LOC_ACT
+   CHARACTER(*) :: LOC_ERRMSG
 !
 ! Declarations
 !
@@ -131,14 +131,14 @@ CONTAINS
    FPAR%SUCCESS = .FALSE.
    IF(.NOT.ASSOCIATED(PWHAT))THEN
       WRITE(FPAR%MESG,'(A,A)')' Mv  - Pwhat null node'
-      CALL FLL_OUT(LOC_ACT,FPAR)
+      CALL FLL_OUT(LOC_ERRMSG,FPAR)
       FPAR%SUCCESS = .FALSE.
       RETURN
    END IF
    
    IF(.NOT.ASSOCIATED(PWHERE))THEN
       WRITE(FPAR%MESG,'(A,A)')' Mv  - Pwhere null node'
-      CALL FLL_OUT(LOC_ACT,FPAR)
+      CALL FLL_OUT(LOC_ERRMSG,FPAR)
       FPAR%SUCCESS = .FALSE.
       RETURN
    END IF

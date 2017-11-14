@@ -68,14 +68,14 @@ CONTAINS
        TYPE(FUNC_DATA_SET) :: FPAR
        LOGICAL::  OK
        CHARACTER(*), OPTIONAL :: ACTION
-       CHARACTER(LEN=10) :: LOC_ACT
+       CHARACTER(LEN=10) :: LOC_ERRMSG
 !   
 !  local action
 !
        IF(.NOT.PRESENT(ACTION))THEN
-         LOC_ACT='ALL'
+         LOC_ERRMSG='ALL'
        ELSE
-         LOC_ACT = ACTION
+         LOC_ERRMSG = ACTION
        END IF
 !
 !  check that PWAT is not null node
@@ -83,7 +83,7 @@ CONTAINS
        OK = .FALSE.
        IF(.NOT.ASSOCIATED(PWHAT))THEN
          WRITE(FPAR%MESG,'(A,A)')' Deattach - null node '
-         CALL FLL_OUT(LOC_ACT,FPAR)
+         CALL FLL_OUT(LOC_ERRMSG,FPAR)
          FPAR%SUCCESS = .FALSE.
          RETURN
        END IF

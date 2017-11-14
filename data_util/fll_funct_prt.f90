@@ -93,24 +93,24 @@ CONTAINS
     LOGICAL :: OK
     CHARACTER(*), OPTIONAL :: ACTION
 
-    CHARACTER(LEN=10) :: LOC_ACT
+    CHARACTER(LEN=10) :: LOC_ERRMSG
 !   
 !  local action
 !
     IF(.NOT.PRESENT(ACTION))THEN
-      LOC_ACT='ALL'
+      LOC_ERRMSG='ALL'
     ELSE
-      LOC_ACT = ACTION
+      LOC_ERRMSG = ACTION
     END IF
 !     
     OK = .FALSE.
     IF (IOSTAT > 0)  THEN
       WRITE(FPAR%MESG,'(A)')' Read  - error readig node data'
-      CALL FLL_OUT(LOC_ACT,FPAR)
+      CALL FLL_OUT(LOC_ERRMSG,FPAR)
       FPAR%SUCCESS = .FALSE.
    ELSE IF (IOSTAT < 0) THEN
       WRITE(FPAR%MESG,'(A)')' Read  - EOF reached'
-      CALL FLL_OUT(LOC_ACT,FPAR)
+      CALL FLL_OUT(LOC_ERRMSG,FPAR)
       FPAR%SUCCESS = .FALSE.
    ELSE
       FPAR%SUCCESS = .TRUE.

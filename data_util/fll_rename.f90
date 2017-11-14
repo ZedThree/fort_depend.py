@@ -60,14 +60,14 @@ CONTAINS
        CHARACTER(LEN=*) :: INAME
        LOGICAL :: OK
        CHARACTER(*), OPTIONAL :: ACTION
-       CHARACTER(LEN=10) :: LOC_ACT
+       CHARACTER(LEN=10) :: LOC_ERRMSG
 !   
 !  local action
 !
        IF(.NOT.PRESENT(ACTION))THEN
-         LOC_ACT='ALL'
+         LOC_ERRMSG='ALL'
        ELSE
-         LOC_ACT = ACTION
+         LOC_ERRMSG = ACTION
        END IF
 !
 !  check that PWHAT is not NULL
@@ -75,7 +75,7 @@ CONTAINS
        IF(.NOT.ASSOCIATED(PWHAT))THEN
           WRITE(*,*)' Rename - SOURCE IS NULL NODE'
           WRITE(FPAR%MESG,'(A,A)')' Rename  - Pwhat null node '
-          CALL FLL_OUT(LOC_ACT,FPAR)
+          CALL FLL_OUT(LOC_ERRMSG,FPAR)
           FPAR%SUCCESS = .FALSE.
           OK = .FALSE.
           RETURN

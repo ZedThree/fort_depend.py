@@ -58,20 +58,20 @@ CONTAINS
 !
 ! Local declarations
 !              
-       CHARACTER(LEN=10) :: LOC_ACT
+       CHARACTER(LEN=10) :: LOC_ERRMSG
 !   
 !  local action
 !
        IF(.NOT.PRESENT(ACTION))THEN
-         LOC_ACT='ALL'
+         LOC_ERRMSG='ALL'
        ELSE
-         LOC_ACT = ACTION
+         LOC_ERRMSG = ACTION
        END IF
        PNEW => NULL()
 !
 ! Body
 !
-       PNEW => FLL_MK(NAME,'DIR',0_LINT, 0_LINT, FPAR,ACTION=LOC_ACT)
+       PNEW => FLL_MK(NAME,'DIR',0_LINT, 0_LINT, FPAR,ACTION=LOC_ERRMSG)
 
     RETURN
    END FUNCTION FLL_MKDIR
