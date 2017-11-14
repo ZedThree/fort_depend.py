@@ -30,7 +30,7 @@ MODULE FLL_MV_M
 ! External Modules used
 !
 CONTAINS 
-   FUNCTION FLL_MV(PWHAT,PWHERE,FPAR,ACTION) RESULT(OK)
+   FUNCTION FLL_MV(PWHAT,PWHERE,FPAR,ERRMSG) RESULT(OK)
 !
 ! Description: Module moves PWHAT pointer to PWHERE pointer
 !
@@ -60,7 +60,7 @@ CONTAINS
        TYPE(DNODE), POINTER  :: PWHAT,PWHERE
        TYPE(FUNC_DATA_SET)   :: FPAR
        LOGICAL OK
-       CHARACTER(*), OPTIONAL :: ACTION
+       CHARACTER(*), OPTIONAL :: ERRMSG
 !
 ! Local declarations
 !
@@ -69,10 +69,10 @@ CONTAINS
 !   
 !  local action
 !
-       IF(.NOT.PRESENT(ACTION))THEN
+       IF(.NOT.PRESENT(ERRMSG))THEN
          LOC_ERRMSG='ALL'
        ELSE
-         LOC_ERRMSG = ACTION
+         LOC_ERRMSG = ERRMSG
        END IF
        
        IF(.NOT.ASSOCIATED(PWHAT,PWHERE))THEN

@@ -32,7 +32,7 @@ MODULE FLL_LOCATE_M
 !
 CONTAINS
 
-   RECURSIVE FUNCTION FLL_LOCATE(PNODE,NAME,LTYPE,DATADIM,NUMBER,RECURSE,FPAR,ACTION) RESULT(PFIND)
+   RECURSIVE FUNCTION FLL_LOCATE(PNODE,NAME,LTYPE,DATADIM,NUMBER,RECURSE,FPAR,ERRMSG) RESULT(PFIND)
 !
 ! Description: function finds node identified by name, type, position in list, dimensions of data it contains
 !                       search can be done recursively
@@ -59,7 +59,7 @@ CONTAINS
 ! RECURSE      In         search recursively
 ! PFIND        Out        return pointer to located node
 ! FPAR         In/Out     structure containing function specific data
-! ACTION       In/Out     where to print err messages
+! ERRMSG       In/Out     where to print err messages
 !
 ! Arguments declaration
 !
@@ -69,7 +69,7 @@ CONTAINS
    CHARACTER(*) :: LTYPE
    INTEGER(LINT) :: NUMBER,DATADIM
    LOGICAL :: RECURSE
-   CHARACTER(*), OPTIONAL :: ACTION
+   CHARACTER(*), OPTIONAL :: ERRMSG
 !
 ! Local declarations
 !
@@ -81,10 +81,10 @@ CONTAINS
 !  define LOC_ERRMSG
 !
    NULLIFY(PFIND)
-   IF(.NOT.PRESENT(ACTION))THEN
+   IF(.NOT.PRESENT(ERRMSG))THEN
      LOC_ERRMSG='ALL'
    ELSE
-     LOC_ERRMSG = ACTION
+     LOC_ERRMSG = ERRMSG
    END IF
 
    TLTYPE = ADJUSTL(TRIM(LTYPE(1:)))

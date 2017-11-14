@@ -36,7 +36,7 @@ MODULE FLL_MK_M
 ! External Modules used
 !
 CONTAINS
-   FUNCTION FLL_MK(NAME,LTYPE,NDIM,NSIZE,FPAR,ACTION) RESULT(PNEW)
+   FUNCTION FLL_MK(NAME,LTYPE,NDIM,NSIZE,FPAR,ERRMSG) RESULT(PNEW)
 !
 ! Description: function creates node specified by name, type and dimensions
 !
@@ -64,7 +64,7 @@ CONTAINS
        CHARACTER(*)  :: NAME
        CHARACTER(*)  :: LTYPE
        INTEGER(LINT) :: NDIM, NSIZE
-       CHARACTER(*), OPTIONAL :: ACTION
+       CHARACTER(*), OPTIONAL :: ERRMSG
 !
 ! Local declarations
 !       
@@ -73,10 +73,10 @@ CONTAINS
 !   
 !  local action
 !
-       IF(.NOT.PRESENT(ACTION))THEN
+       IF(.NOT.PRESENT(ERRMSG))THEN
          LOC_ERRMSG='ALL'
        ELSE
-         LOC_ERRMSG = ACTION
+         LOC_ERRMSG = ERRMSG
        END IF
        
        PNEW => NULL()

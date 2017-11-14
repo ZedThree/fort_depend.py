@@ -34,7 +34,7 @@ MODULE FLL_CP_M
 !
 
 CONTAINS
-   FUNCTION FLL_CP(PWHAT,PWHERE,FPAR,ACTION) RESULT(PNEW)
+   FUNCTION FLL_CP(PWHAT,PWHERE,FPAR,ERRMSG) RESULT(PNEW)
 !
 ! Description: Module copies PWHAT pointer to PWHERE pointer
 !              If PWHERE pointer == NULL, PWHAT is a duplicate 
@@ -69,16 +69,16 @@ CONTAINS
        TYPE(DNODE), POINTER  :: PWHAT,PWHERE
        TYPE(FUNC_DATA_SET) :: FPAR
        TYPE(DNODE), POINTER  :: PNEW
-       CHARACTER(*), OPTIONAL :: ACTION
+       CHARACTER(*), OPTIONAL :: ERRMSG
 
        CHARACTER(LEN=10) :: LOC_ERRMSG
 !   
 !  local action
 !
-       IF(.NOT.PRESENT(ACTION))THEN
+       IF(.NOT.PRESENT(ERRMSG))THEN
          LOC_ERRMSG='ALL'
        ELSE
-         LOC_ERRMSG = ACTION
+         LOC_ERRMSG = ERRMSG
        END IF
 !
 !  initialize PNEW pointer and check that PWHAT is not NULL

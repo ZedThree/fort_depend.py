@@ -30,7 +30,7 @@ MODULE FLL_STICH_M
 ! External Modules used
 !
 CONTAINS
-   SUBROUTINE FLL_STICH(PNODE,FPAR, ACTION)
+   SUBROUTINE FLL_STICH(PNODE,FPAR, ERRMSG)
 !
 ! Description: subroutine stiches list after PNODE
 !              is taken away
@@ -56,7 +56,7 @@ CONTAINS
 !
     TYPE(DNODE), POINTER  :: PNODE
     TYPE(FUNC_DATA_SET) :: FPAR
-    CHARACTER(*), OPTIONAL :: ACTION
+    CHARACTER(*), OPTIONAL :: ERRMSG
 !
 ! Local declarations
 !
@@ -65,10 +65,10 @@ CONTAINS
 !   
 !  local action
 !
-    IF(.NOT.PRESENT(ACTION))THEN
+    IF(.NOT.PRESENT(ERRMSG))THEN
       LOC_ERRMSG='ALL'
     ELSE
-      LOC_ERRMSG = ACTION
+      LOC_ERRMSG = ERRMSG
     END IF
 !   
 !   BODY OF SUBROUTINE

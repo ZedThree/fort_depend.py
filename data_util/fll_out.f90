@@ -35,7 +35,7 @@ MODULE FLL_OUT_M
 !
 
 CONTAINS
-  SUBROUTINE FLL_OUT(ACTION,FPAR)
+  SUBROUTINE FLL_OUT(ERRMSG,FPAR)
 !
 ! Description: Contains subroutine pritning errmessage from FPAR structure
 !
@@ -55,7 +55,7 @@ CONTAINS
 !
 ! Arguments description
 ! Name         In/Out     Function
-! ACTION          In       determines what to do
+! ERRMSG          In       determines what to do
 ! FPAR         In/Out     structure containing function specific data
 !
 ! Arguments declaration
@@ -64,7 +64,7 @@ CONTAINS
 !
 !     ARGUMENTS:
 !
-    CHARACTER(*) :: ACTION
+    CHARACTER(*) :: ERRMSG
     TYPE(FUNC_DATA_SET) :: FPAR
     CHARACTER(LEN=72) :: STRMES ='LOGFILE'
 !
@@ -73,7 +73,7 @@ CONTAINS
 !
 !  Select here to print
 !
-    SELECT CASE(ACTION)
+    SELECT CASE(ERRMSG)
 
     CASE('NONE')
       RETURN
@@ -110,11 +110,11 @@ CONTAINS
 
     CASE DEFAULT
       WRITE(STDOUT,*)&
-           'Error: wrong action in fll_out, action: "'//ACTION//'" not defined.'
+           'Error: wrong action in fll_out, action: "'//ERRMSG//'" not defined.'
       WRITE(STDOUT,*)FPAR%MESG
       FLUSH(STDOUT)
       WRITE(IOLOGFILE,*)&
-           'Error: wrong action in fll_out, action: "'//ACTION//'" not defined.'
+           'Error: wrong action in fll_out, action: "'//ERRMSG//'" not defined.'
       WRITE(IOLOGFILE,*)FPAR%MESG
       FLUSH(IOLOGFILE)
 
