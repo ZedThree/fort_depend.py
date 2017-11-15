@@ -32,7 +32,7 @@ MODULE FLL_MPI_READ_M
 !
 CONTAINS
 
-  FUNCTION FLL_MPI_READ(FILE,IOUNIT,ROOT_RANK, RANK, COMMUNICATOR, OPTION, FPAR) RESULT(PNODE)
+  FUNCTION FLL_MPI_READ(FILE,IOUNIT,ROOT_RANK, RANK, COMMUNICATOR, OPTION, FPAR, ERRMSG) RESULT(PNODE)
 !
 ! Description: contains subroutine readig file in paralell mode
 !
@@ -104,6 +104,7 @@ CONTAINS
    TYPE(FUNC_DATA_SET) :: FPAR
    INTEGER :: IOUNIT,RANK, ROOT_RANK, COMMUNICATOR
    CHARACTER :: OPTION
+   CHARACTER(*), OPTIONAL :: ERRMSG
 !
 ! local declarations
 !
@@ -111,6 +112,15 @@ CONTAINS
    INTEGER :: ISTAT,IERR
    INTEGER(LINT), POINTER :: DISPL(:)
    INTEGER(LINT) :: POS
+   CHARACTER(LEN=10) :: LOC_ERRMSG
+!   
+!  local action
+!
+   IF(.NOT.PRESENT(ERRMSG))THEN
+     LOC_ERRMSG='ALL'
+   ELSE
+     LOC_ERRMSG = ERRMSG
+   END IF
 !
 !  if not in group, return
 !
@@ -126,7 +136,7 @@ CONTAINS
 
    IF(ISTAT/=0) THEN
     WRITE(FPAR%MESG,'(A,A)')' Write error opening file ',TRIM(FILE)
-    CALL FLL_OUT('ALL',FPAR)
+    CALL FLL_OUT(LOC_ERRMSG,FPAR)
     FPAR%SUCCESS = .FALSE.
     RETURN
    END IF
@@ -137,7 +147,7 @@ CONTAINS
 !  get positions for each subset, ie. each process solution
 !
    IF(RANK == ROOT_RANK)THEN
-    PTMP => FLL_RPART_FILE_HEADER(IOUNIT, FPAR) 
+    PTMP => FLL_RPART_FILE_HEADER(IOUNIT, FPAR, LOC_ERRMSG) 
    END IF
 !
 !  distribute that info to all processes
@@ -163,7 +173,7 @@ CONTAINS
    CLOSE(IOUNIT)
    IF(.NOT.ASSOCIATED(PNODE))THEN
      WRITE(FPAR%MESG,'(A,A)')' Read  - error reading file ',TRIM(FILE)
-     CALL FLL_OUT('ALL',FPAR)
+     CALL FLL_OUT(LOC_ERRMSG,FPAR)
      FPAR%SUCCESS = .FALSE.
      RETURN
    END IF
@@ -179,7 +189,7 @@ CONTAINS
   END FUNCTION FLL_MPI_READ
 
 
-  FUNCTION FLL_RPART_FILE_HEADER(IOUNIT, FPAR) RESULT(PNEW)
+  FUNCTION FLL_RPART_FILE_HEADER(IOUNIT, FPAR, LOC_ERRMSG) RESULT(PNEW)
 !
 ! Description: Reads header of partitioned file containing
 !              positions of each record in the file
@@ -215,13 +225,14 @@ CONTAINS
    CHARACTER(LEN=NAME_LENGTH) :: NAME
    CHARACTER(LEN=TYPE_LENGTH) :: TYPE
    INTEGER(LINT) :: NDIM,NSIZE,I
+   CHARACTER(*) :: LOC_ERRMSG
 !
 !  read name, type, ndim, nsize 
 !  create node, read valus of record positions and return
 !
    READ(IOUNIT)NAME,TYPE,NDIM,NSIZE
    READ(IOUNIT)NAME,TYPE,NDIM,NSIZE
-   PNEW => FLL_MK(NAME,TYPE,NDIM,NSIZE,FPAR)
+   PNEW => FLL_MK(NAME,TYPE,NDIM,NSIZE,FPAR,ERRMSG=LOC_ERRMSG)
    READ(IOUNIT)(PNEW%L1(I), I=1,NDIM)
 
    RETURN 

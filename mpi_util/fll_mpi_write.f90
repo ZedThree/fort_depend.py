@@ -32,7 +32,7 @@ MODULE FLL_MPI_WRITE_M
 !
 CONTAINS
 
-  FUNCTION FLL_MPI_WRITE(PNODE,FILE,IOUNIT,ROOT_RANK, RANK, COMMUNICATOR, OPTION, FPAR) RESULT(OK)
+  FUNCTION FLL_MPI_WRITE(PNODE,FILE,IOUNIT,ROOT_RANK, RANK, COMMUNICATOR, OPTION, FPAR, ERRMSG) RESULT(OK)
 !
 ! Description: contains subroutine writing file in paralell mode
 !
@@ -104,12 +104,22 @@ CONTAINS
    INTEGER :: IOUNIT,RANK, ROOT_RANK, COMMUNICATOR
    CHARACTER :: OPTION
    LOGICAL OK
+   CHARACTER(*), OPTIONAL :: ERRMSG
 !
 ! local declarations
 !
    INTEGER :: ISTAT,IERR,NPROC
    INTEGER(LINT), ALLOCATABLE :: POS(:),DISPL(:)
    INTEGER(LINT) :: POS1,I,PART_NUM,LOC_DISPL
+   CHARACTER(LEN=10) :: LOC_ERRMSG
+!   
+!  local action
+!
+   IF(.NOT.PRESENT(ERRMSG))THEN
+     LOC_ERRMSG='ALL'
+   ELSE
+     LOC_ERRMSG = ERRMSG
+   END IF
 !
 !  if not in group, return
 !
@@ -129,7 +139,7 @@ CONTAINS
 
    IF(ISTAT/=0) THEN
     WRITE(FPAR%MESG,'(A,A)')' Write error opening file ',TRIM(FILE)
-    CALL FLL_OUT('ALL',FPAR)
+    CALL FLL_OUT(LOC_ERRMSG,FPAR)
     FPAR%SUCCESS = .FALSE.
     OK = .FALSE.
     RETURN
@@ -150,7 +160,7 @@ CONTAINS
 !  get length of each data subset of actual data
 !
    POS = 0
-   POS(RANK+2) = FLL_GETNBYTES(PNODE,FPAR)
+   POS(RANK+2) = FLL_GETNBYTES(PNODE,FPAR,ERRMSG=LOC_ERRMSG)
 !
 !  the first subset is a header
 !  header = 16 + 4 + 8 + 8 (name, type, ndim, nsize)
@@ -167,7 +177,7 @@ CONTAINS
 !
 !  Calculate displacement, ie where each subset starts
 !
-   PART_NUM = FLL_GETNDATA_L0(PNODE, 'process_number',1_LINT, FPAR)
+   PART_NUM = FLL_GETNDATA_L0(PNODE, 'process_number',1_LINT, FPAR,ERRMSG=LOC_ERRMSG)
 !
 !  the first subset will start always at position 1
 !  ie. beginning of the file
@@ -200,14 +210,14 @@ CONTAINS
 !
 !  Write data set
 ! 
-   CALL FLL_WRITE_LIST(PNODE,IOUNIT,'B',FPAR)
+   CALL FLL_WRITE_LIST(PNODE,IOUNIT,'B',FPAR,LOC_ERRMSG)
 !
 !  close file and sync with barrier
 !
    CLOSE(IOUNIT)
    IF(.NOT.ASSOCIATED(PNODE))THEN
      WRITE(FPAR%MESG,'(A,A)')' Read  - error reading file ',TRIM(FILE)
-     CALL FLL_OUT('ALL',FPAR)
+     CALL FLL_OUT(LOC_ERRMSG,FPAR)
      FPAR%SUCCESS = .FALSE.
      OK = .FALSE.
      RETURN

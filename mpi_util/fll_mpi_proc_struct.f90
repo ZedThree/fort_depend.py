@@ -57,7 +57,7 @@ MODULE FLL_MPI_PROC_STRUCT_M
 !
 CONTAINS
 
-  FUNCTION  FLL_MPI_PROC_STRUCT(FPAR) RESULT(PNODE)
+  FUNCTION  FLL_MPI_PROC_STRUCT(FPAR,ERRMSG) RESULT(PNODE)
 !
 ! Description: Creates structure with header for MPI process definition
 ! 
@@ -82,16 +82,23 @@ CONTAINS
 ! Arguments declaration
 !
   TYPE(DNODE), POINTER  :: PNODE
+  CHARACTER(*), OPTIONAL :: ERRMSG
 !
 !   Local declarations
 !
   TYPE(DNODE), POINTER  :: PTMP,PSUBPROC
   TYPE(FUNC_DATA_SET) :: FPAR
-
   INTEGER :: WORLD_GROUP_ID, IERR, NPROC
-
   LOGICAL :: OK
-
+  CHARACTER(LEN=10) :: LOC_ERRMSG
+!   
+!  local action
+!
+  IF(.NOT.PRESENT(ERRMSG))THEN
+    LOC_ERRMSG='ALL'
+  ELSE
+    LOC_ERRMSG = ERRMSG
+  END IF
 !
 !  Main pointer
 !
@@ -120,7 +127,7 @@ CONTAINS
   PSUBPROC  => FLL_MKDIR('Subprocs',FPAR)
   IF(.NOT.FLL_MV(PSUBPROC, PNODE, FPAR))THEN
     WRITE(FPAR%MESG,'(A)')' FLL_MPI_PROC_STRUCT: Error moving Subprocs'
-    CALL FLL_OUT('ALL',FPAR)
+    CALL FLL_OUT(LOC_ERRMSG,FPAR)
     FPAR%SUCCESS = .FALSE.
     RETURN
    END IF
@@ -131,7 +138,7 @@ CONTAINS
 
 
 
-  SUBROUTINE  FLL_NMIO_STRUCT(PNODE,NAME_OF_FILE,EXTENSION,NFILES,FPAR)
+  SUBROUTINE  FLL_NMIO_STRUCT(PNODE,NAME_OF_FILE,EXTENSION,NFILES,FPAR,ERRMSG)
 !
 ! Description: Contains function prepiring MPI I/O structure for NM model
 !              It splits all world_processes to NFILES groups 
@@ -174,6 +181,7 @@ CONTAINS
     TYPE(FUNC_DATA_SET) :: FPAR
     CHARACTER(LEN=*) :: NAME_OF_FILE,EXTENSION
     INTEGER(LINT) :: NFILES
+    CHARACTER(*), OPTIONAL :: ERRMSG
 !
 !   Local declarations
 !
@@ -183,6 +191,15 @@ CONTAINS
     CHARACTER(LEN=NAME_LENGTH) :: FILENAME
     CHARACTER(LEN=5) :: STR
     INTEGER, ALLOCATABLE :: EVEN_RANK(:)
+    CHARACTER(LEN=10) :: LOC_ERRMSG
+!   
+!  local action
+!
+    IF(.NOT.PRESENT(ERRMSG))THEN
+      LOC_ERRMSG='ALL'
+    ELSE
+      LOC_ERRMSG = ERRMSG
+    END IF
 !
 ! get number of processors and world group
 !
@@ -192,7 +209,7 @@ CONTAINS
     IF(MOD(NPROC,NFILES) /= 0)THEN
       FPAR%SUCCESS = .FALSE.
       WRITE(FPAR%MESG,'(A)')' FLL_SNMIO_STRUCT  - NPROC is not multiplication of NFILES'
-      CALL FLL_OUT('ALL',FPAR)
+      CALL FLL_OUT(LOC_ERRMSG,FPAR)
       RETURN
     END IF
 !
@@ -205,7 +222,7 @@ CONTAINS
     PIOSTR  => FLL_MKDIR('IO-NM_struct',FPAR)
     IF(.NOT.FLL_MV(PIOSTR, PSUBPROC, FPAR))THEN
       WRITE(FPAR%MESG,'(A)')' FLL_MPI_PROC_STRUCT: Error moving IO-NM_struct'
-      CALL FLL_OUT('ALL',FPAR)
+      CALL FLL_OUT(LOC_ERRMSG,FPAR)
       FPAR%SUCCESS = .FALSE.
       RETURN
      END IF
@@ -222,7 +239,7 @@ CONTAINS
     IF(NFILES == NPROC)THEN
       FPAR%SUCCESS = .FALSE.
       WRITE(FPAR%MESG,'(A)')' FLL_NMIO_STRUCT  - error witing files, nfiles == npart  '
-      CALL FLL_OUT('ALL',FPAR)
+      CALL FLL_OUT(LOC_ERRMSG,FPAR)
       RETURN
     END IF
 
@@ -333,7 +350,7 @@ CONTAINS
 
 
 
-  SUBROUTINE  FLL_SNMIO_STRUCT(PNODE,NAME_OF_FILE,EXTENSION,NFILES,MODE,FPAR)
+  SUBROUTINE  FLL_SNMIO_STRUCT(PNODE,NAME_OF_FILE,EXTENSION,NFILES,MODE,FPAR,ERRMSG)
 !
 ! Description: Contains function prepiring MPI I/O structure for NM model
 !              It splits all world_processes to NFILES groups 
@@ -389,6 +406,7 @@ CONTAINS
     CHARACTER(LEN=*) :: NAME_OF_FILE,EXTENSION
     INTEGER(LINT) :: NFILES
     CHARACTER :: MODE
+    CHARACTER(*), OPTIONAL :: ERRMSG
 !
 !   Local declarations
 !
@@ -398,6 +416,15 @@ CONTAINS
     CHARACTER(LEN=NAME_LENGTH) :: FILENAME
     CHARACTER(LEN=5) :: STR
     INTEGER, ALLOCATABLE :: EVEN_RANK(:)
+    CHARACTER(LEN=10) :: LOC_ERRMSG
+!   
+!  local action
+!
+    IF(.NOT.PRESENT(ERRMSG))THEN
+      LOC_ERRMSG='ALL'
+    ELSE
+      LOC_ERRMSG = ERRMSG
+    END IF
 !
 ! get number of processors and world group
 !
@@ -407,7 +434,7 @@ CONTAINS
     IF(MOD(NPROC,NFILES) /= 0)THEN
       FPAR%SUCCESS = .FALSE.
       WRITE(FPAR%MESG,'(A)')' FLL_SNMIO_STRUCT  - NPROC is not multiplication of NFILES'
-      CALL FLL_OUT('ALL',FPAR)
+      CALL FLL_OUT(LOC_ERRMSG,FPAR)
       RETURN
     END IF
 !
@@ -417,7 +444,7 @@ CONTAINS
     PIOSTR  => FLL_MKDIR('IO-SNM_struct',FPAR)
     IF(.NOT.FLL_MV(PIOSTR, PSUBPROC, FPAR))THEN
       WRITE(FPAR%MESG,'(A)')' FLL_MPI_PROC_STRUCT: Error moving IO-NM_struct'
-      CALL FLL_OUT('ALL',FPAR)
+      CALL FLL_OUT(LOC_ERRMSG,FPAR)
       FPAR%SUCCESS = .FALSE.
       RETURN
      END IF
@@ -434,7 +461,7 @@ CONTAINS
     IF(NFILES == NPROC)THEN
       FPAR%SUCCESS = .FALSE.
       WRITE(FPAR%MESG,'(A)')' FLL_SNMIO_STRUCT  - error witing files, nfiles == npart  '
-      CALL FLL_OUT('ALL',FPAR)
+      CALL FLL_OUT(LOC_ERRMSG,FPAR)
       RETURN
     END IF
 

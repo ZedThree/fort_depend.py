@@ -33,7 +33,7 @@ MODULE FLL_MPI_CP_ALL_M
 ! External Modules used
 !
 CONTAINS
-   FUNCTION FLL_MPI_CP_ALL(PNODE,COMMUNICATOR,SENDPART,FPAR) RESULT(PNEW)
+   FUNCTION FLL_MPI_CP_ALL(PNODE,COMMUNICATOR,SENDPART,FPAR,ERRMSG) RESULT(PNEW)
 !
 ! Description: Broadcasts FLL subset to all processes in comunicator
 !              if process ID == sending proceess ID, do not create
@@ -71,11 +71,21 @@ CONTAINS
    TYPE(DNODE), POINTER  :: PNODE,PNEW
    TYPE(FUNC_DATA_SET) :: FPAR
    INTEGER :: COMMUNICATOR,SENDPART
+   CHARACTER(*), OPTIONAL :: ERRMSG
 !
 !  Local declarations
 !
    TYPE(DNODE), POINTER :: PCHILD
    INTEGER :: RANK, IERR
+   CHARACTER(LEN=10) :: LOC_ERRMSG
+!   
+!  local action
+!
+   IF(.NOT.PRESENT(ERRMSG))THEN
+     LOC_ERRMSG='ALL'
+   ELSE
+     LOC_ERRMSG = ERRMSG
+   END IF
 !
 !  if not in group, return
 !
@@ -120,7 +130,7 @@ CONTAINS
 !
      IF(.NOT.ASSOCIATED(PNODE))THEN
        WRITE(FPAR%MESG,'(A)')' DUPLICATE - null node '
-       CALL FLL_OUT('ALL',FPAR)
+       CALL FLL_OUT(LOC_ERRMSG,FPAR)
        FPAR%SUCCESS = .FALSE.
        RETURN
      END IF
@@ -320,7 +330,7 @@ CONTAINS
    CALL MPI_BCAST(PNODE%LNAME, NAME_LENGTH, MPI_CHARACTER, SENDPART,COMMUNICATOR, IERR)
 !   IF(IERR /= 0)THEN
 !       WRITE(FPAR%MESG,'(A)')' GET_NCODE- null node '
-!       CALL FLL_OUT('ALL',FPAR)
+!       CALL FLL_OUT(LOC_ERRMSG,FPAR)
 !       FPAR%SUCCESS = .FALSE.
 !       CODE = -1
 !       RETURN
