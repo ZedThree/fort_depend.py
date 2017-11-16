@@ -80,7 +80,7 @@ CONTAINS
    END IF
 
    IF(.NOT.PRESENT(COLOR))THEN
-     COL_LOC='Y'
+     COL_LOC='N'
    ELSE
      COL_LOC = COLOR
    END IF

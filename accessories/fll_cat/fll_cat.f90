@@ -62,7 +62,7 @@
    CHARACTER(LEN=FILE_NAME_LENGTH) FILE
    TYPE(DNODE), POINTER  :: PNODE
    TYPE(FUNC_DATA_SET) :: FPAR
-   CHARACTER :: FMT, SCAN, DIR
+   CHARACTER :: FMT, SCAN, DIR, COLOR
    CHARACTER(LEN=3) :: EFMT
 !
 !  read a file and print on screen
@@ -72,6 +72,7 @@
     READ(*,'(A3)')EFMT 
     READ(*,*)SCAN 
     READ(*,*)DIR 
+    READ(*,*)COLOR 
 
     SELECT CASE(EFMT)
      CASE('fll')
@@ -83,9 +84,9 @@
 !  print node on the screen
 !
    IF(DIR == 'Y')THEN
-     CALL FLL_CAT(PNODE, 6, .TRUE.,FPAR,SCAN = SCAN, SDIR = DIR)
+     CALL FLL_CAT(PNODE, 6, .TRUE.,FPAR,SCAN = SCAN, SDIR = DIR, COLOR=COLOR)
    ELSE
-     CALL FLL_CAT(PNODE, 6, .TRUE.,FPAR,SCAN = SCAN)
+     CALL FLL_CAT(PNODE, 6, .TRUE.,FPAR,SCAN = SCAN,COLOR=COLOR)
    END IF
    WRITE(*,*)
    CALL FLL_RM(PNODE,FPAR)
