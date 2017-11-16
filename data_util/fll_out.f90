@@ -35,7 +35,7 @@ MODULE FLL_OUT_M
 !
 
 CONTAINS
-  SUBROUTINE FLL_OUT(ERRMSG,FPAR)
+  SUBROUTINE FLL_OUT(ACT_ERRMSG,FPAR)
 !
 ! Description: Contains subroutine pritning errmessage from FPAR structure
 !
@@ -55,7 +55,7 @@ CONTAINS
 !
 ! Arguments description
 ! Name         In/Out     Function
-! ERRMSG          In       determines what to do
+! ACT_ERRMSG          In       determines what to do
 ! FPAR         In/Out     structure containing function specific data
 !
 ! Arguments declaration
@@ -64,57 +64,76 @@ CONTAINS
 !
 !     ARGUMENTS:
 !
-    CHARACTER(*) :: ERRMSG
+    CHARACTER(*) :: ACT_ERRMSG
     TYPE(FUNC_DATA_SET) :: FPAR
-    CHARACTER(LEN=72) :: STRMES ='LOGFILE'
+    CHARACTER(LEN=72) :: STRMES  ='LOGFILE'
+    CHARACTER(LEN=72) :: STRSTAT ='STATFILE'
 !
 !   Local declarations
 !
 !
 !  Select here to print
 !
-    SELECT CASE(ERRMSG)
+    SELECT CASE(ACT_ERRMSG)
 
     CASE('NONE')
       RETURN
 
-    CASE('OPEN')
+    CASE('OPEN_LOG')
       OPEN(UNIT=IOLOGFILE,STATUS='UNKNOWN',FILE=STRMES,FORM='FORMATTED')
+      WRITE(IOLOGFILE,'(A)')'Begining of LOG file ...'
 
     CASE('OPEN_STAT')
-      OPEN(UNIT=IOSTATFILE,STATUS='UNKNOWN',FILE=STRMES,FORM='FORMATTED')
-      WRITE(IOSTATFILE,'(A)')'Process running ...'
+      OPEN(UNIT=IOSTATFILE,STATUS='UNKNOWN',FILE=STRSTAT,FORM='FORMATTED')
+      WRITE(IOLOGFILE,'(A)')'Begining of STAT file ...'
       CLOSE(IOSTATFILE)
 
-    CASE('CLOSE')
+    CASE('CLOSE_LOG')
+      WRITE(IOLOGFILE,'(A)')'Process finished ...'
       CLOSE(IOLOGFILE)
 
     CASE('CLOSE_STAT')
-      OPEN(UNIT=IOSTATFILE,STATUS='UNKNOWN',FILE=STRMES,FORM='FORMATTED')
-      WRITE(IOSTATFILE,'(A)')'Finished'
+      WRITE(IOSTATFILE,'(A)')'Process finished ...'
       CLOSE(IOSTATFILE)
-
+!
+!  print to log file
+!
     CASE('LOG')
       WRITE(IOLOGFILE,'(A)')FPAR%MESG
       FLUSH(IOLOGFILE)
-
+!
+!  print on stdoutput
+!
     CASE('OUT')
       WRITE(STDOUT,'(A)')FPAR%MESG
       FLUSH(STDOUT)
-
+!
+!  print on stodoutput and to log file
+!
     CASE('ALL')
       WRITE(IOLOGFILE,'(A)')FPAR%MESG
       FLUSH(IOLOGFILE)
       WRITE(STDOUT,'(A)')FPAR%MESG
       FLUSH(STDOUT)
+!
+!  print on stodoutput and to log file and terminate
+!
+    CASE('STOP')
+      WRITE(IOLOGFILE,'(A)')FPAR%MESG
+      FLUSH(IOLOGFILE)
+      WRITE(STDOUT,'(A)')FPAR%MESG
+      FLUSH(STDOUT)
+      WRITE(IOLOGFILE,'(A)')'Process finished ...'
+      CLOSE(IOLOGFILE)
+      STOP 'Terminating ...'
 
     CASE DEFAULT
       WRITE(STDOUT,*)&
-           'Error: wrong action in fll_out, action: "'//ERRMSG//'" not defined.'
+           'Error: wrong action in fll_out, action: "'//ACT_ERRMSG//'" not defined.'
       WRITE(STDOUT,*)FPAR%MESG
       FLUSH(STDOUT)
       WRITE(IOLOGFILE,*)&
-           'Error: wrong action in fll_out, action: "'//ERRMSG//'" not defined.'
+           'Error: wrong action in fll_out, action: "'//ACT_ERRMSG//'" not defined.'
       WRITE(IOLOGFILE,*)FPAR%MESG
       FLUSH(IOLOGFILE)
 
