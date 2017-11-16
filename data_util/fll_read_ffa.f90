@@ -247,7 +247,9 @@ CONTAINS
       STOP
       RETURN
     END IF
-    
+!
+!  save original ffa type node if FTYPE variable
+!
     PNODE%FTYPE = FTYPE
 
     IF(TRIM(LTYPE) == 'DIR' .OR. TRIM(LTYPE) == 'N')THEN
@@ -523,6 +525,9 @@ CONTAINS
        INQUIRE(UNIT = IOUNIT, POS=POS)
       
        LTYPE(2:) = ' '
+!
+!  save original ffa file type
+!
        FTYPE = LTYPE
        NSIZEO = NSIZE
        NDIMO = NDIM
