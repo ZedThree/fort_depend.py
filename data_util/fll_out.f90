@@ -48,14 +48,13 @@ CONTAINS
 !
 ! External Modules used
 !
-
    USE FLL_TYPE_M
 !
 ! Declarations
 !
 ! Arguments description
 ! Name         In/Out     Function
-! ACT_ERRMSG          In       determines what to do
+! ACT_ERRMSG   In         determines what to do
 ! FPAR         In/Out     structure containing function specific data
 !
 ! Arguments declaration
@@ -66,11 +65,11 @@ CONTAINS
 !
     CHARACTER(*) :: ACT_ERRMSG
     TYPE(FUNC_DATA_SET) :: FPAR
-    CHARACTER(LEN=72) :: STRMES  ='LOGFILE'
-    CHARACTER(LEN=72) :: STRSTAT ='STATFILE'
 !
 !   Local declarations
 !
+    CHARACTER(LEN=72) :: STRMES  ='LOGFILE'
+    CHARACTER(LEN=72) :: STRSTAT ='STATFILE'
 !
 !  Select here to print
 !

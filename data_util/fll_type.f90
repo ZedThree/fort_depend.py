@@ -116,8 +116,8 @@ use, intrinsic :: iso_fortran_env, only : stdin=>input_unit, &
     REAL(RDOUBLE)   , POINTER, CONTIGUOUS :: D1(:) =>NULL(), D2(:,:) => NULL()  ! double arrays
     INTEGER(SINT)   , POINTER, CONTIGUOUS :: I1(:) =>NULL(), I2(:,:) => NULL()  ! integer arrays
     INTEGER(LINT)   , POINTER, CONTIGUOUS :: L1(:) =>NULL(), L2(:,:) => NULL()  ! long integer arrays
-    CHARACTER(LEN=LSTRING_LENGTH), POINTER, CONTIGUOUS  :: S1(:)  => NULL()        ! 1D array of strings
-    CHARACTER(LEN=LSTRING_LENGTH), POINTER, CONTIGUOUS  :: S2(:,:)=> NULL()      ! 2D array of strings
+    CHARACTER(LEN=LSTRING_LENGTH), POINTER, CONTIGUOUS  :: S1(:)  => NULL()     ! 1D array of strings
+    CHARACTER(LEN=LSTRING_LENGTH), POINTER, CONTIGUOUS  :: S2(:,:)=> NULL()     ! 2D array of strings
 #else
     REAL(RSINGLE)   , POINTER :: R1(:) =>NULL(), R2(:,:) => NULL()
     REAL(RDOUBLE)   , POINTER :: D1(:) =>NULL(), D2(:,:) => NULL()
