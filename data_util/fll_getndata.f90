@@ -768,6 +768,7 @@ CONTAINS
       FPAR%SUCCESS = .FALSE.
       WRITE(FPAR%MESG,'(A,A,A,A)')'FLL_GETNDATA_L0 - Node ',&
             TRIM(PNODE%LNAME),' does not contain specified data ',NAME
+      CALL FLL_OUT(LOC_ERRMSG,FPAR)
       RETURN
    END IF
 
