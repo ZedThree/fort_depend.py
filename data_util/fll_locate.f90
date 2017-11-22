@@ -122,7 +122,7 @@ CONTAINS
 !
 !   LOOK FOR NODE
 !
-     IF( (TRIM(PCURR%LNAME) == TRIM(NAME) .OR.TRIM(PCURR%LNAME) == '*')  .AND.  &
+     IF( (TRIM(PCURR%LNAME) == TRIM(NAME) .OR.TRIM(NAME) == '*')  .AND.  &
           (TRIM(TLTYPE) == TRIM(PCURR%LTYPE)   .OR.  TLTYPE(1:1) == '*' ) )THEN
 
         NDIM  = PCURR%NDIM
