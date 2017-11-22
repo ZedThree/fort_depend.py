@@ -45,6 +45,7 @@ CONTAINS
 !  
     USE FLL_TYPE_M
     USE FLL_OUT_M
+    USE FLL_LOCATE_M
     USE FLL_MATCH_PATTERN_M
 
     IMPLICIT NONE
@@ -108,27 +109,35 @@ CONTAINS
 !
 !  start loop
 !
+!  if PFIND == NULL get the first child
+!
    IF(.NOT.ASSOCIATED(PFIND))THEN
-     IF(ASSOCIATED(PNODE%PCHILD))THEN
-       PFIND => PNODE%PCHILD
-     ELSE
-       PFIND => PNODE
-     END IF
-   ELSE 
-     PFIND => PFIND%PNEXT
-   END IF
+      PFIND => FLL_LOCATE(PNODE,NAME,TLTYPE,DIM,1_LINT,.FALSE. ,FPAR)
+      IF(ASSOCIATED(PFIND))THEN
+       OK = .TRUE.
+      ELSE
+      END IF
+      RETURN
+   ELSE
           
-   DO WHILE(ASSOCIATED(PFIND))
-   
-     IF(FLL_MATCH_PATTERN(PFIND,NAME,LTYPE,DIM,FPAR))THEN
-       OK =.TRUE.
-       RETURN
-     END IF
-     
-     PFIND => PFIND%PNEXT
-     
-   END DO
+     DO WHILE(ASSOCIATED(PFIND))
 
+       PFIND => PFIND%PNEXT
+       IF(ASSOCIATED(PFIND))THEN
+   
+         IF(FLL_MATCH_PATTERN(PFIND,NAME,LTYPE,DIM,FPAR))THEN
+           OK =.TRUE.
+           RETURN
+         END IF
+       ELSE
+         OK =.FALSE.
+         RETURN
+       END IF
+     
+     END DO
+   END IF
+   
+   OK =.FALSE.
    RETURN
    END FUNCTION FLL_SWEEP
 
