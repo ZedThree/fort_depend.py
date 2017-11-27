@@ -34,13 +34,13 @@
 SUBDIRS= \
 data_util\
 accessories\
-mpi_util\
-examples\
-miscellaneous\
 
 ifneq ($(strip $(MPI_FC)),)
   SUBDIRS+= mpi_util
 endif
+
+SUBDIRS+= examples\
+miscellaneous\
 
 SUBCLEAN=$(SUBDIRS)
 
