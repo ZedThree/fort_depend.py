@@ -244,7 +244,7 @@ CONTAINS
     END IF
 
     ALLOCATE(EVEN_RANK(NSTEP), STAT = IERR)
-     IF(IERR /= 0)STOP' ERROR ALLOCATING MEMORY ==> fll_mpi_proc_struct ERR:230 '
+     IF(IERR /= 0)STOP' ERROR ALLOCATING MEMORY ==> fll_mpi_proc_struct ERR:247 '
 !
 !  loop over number of separate files, define which process is going to be
 !  saving in what file (defined by EVEN_RANK array
@@ -340,7 +340,7 @@ CONTAINS
 !  free memory
 !
     DEALLOCATE(EVEN_RANK, STAT = IERR)
-     IF(IERR /= 0)STOP' ERROR ALLOCATING MEMORY ==> fll_mpi_proc_struct ERR:326 '
+     IF(IERR /= 0)STOP' ERROR ALLOCATING MEMORY ==> fll_mpi_proc_struct ERR:343 '
 
     RETURN
 
@@ -466,7 +466,7 @@ CONTAINS
     END IF
 
     ALLOCATE(EVEN_RANK(NSTEP), STAT = IERR)
-     IF(IERR /= 0)STOP' ERROR ALLOCATING MEMORY ==> fll_mpi_proc_struct ERR:442 '
+     IF(IERR /= 0)STOP' ERROR ALLOCATING MEMORY ==> fll_mpi_proc_struct ERR:469 '
 !
 !  loop over number of separate files, define which process is going to be
 !  saving in what file (defined by EVEN_RANK array
@@ -562,7 +562,7 @@ CONTAINS
 !  free memory
 !
     DEALLOCATE(EVEN_RANK, STAT = IERR)
-     IF(IERR /= 0)STOP' ERROR ALLOCATING MEMORY ==> fll_mpi_proc_struct ERR:538 '
+     IF(IERR /= 0)STOP' ERROR ALLOCATING MEMORY ==> fll_mpi_proc_struct ERR:565 '
 
     RETURN
 
