@@ -31,12 +31,16 @@
 -include src_dir_path.mk
 -include config.mk
 
+MPIF = $(shell command -v mpif90)
+
 SUBDIRS= \
 data_util\
 accessories\
 
-ifneq ($(strip $(MPI_FC)),)
+ifneq ($(MPI_FC),)
+ifneq ($(MPIF),)
   SUBDIRS+= mpi_util
+endif
 endif
 
 SUBDIRS+= examples\

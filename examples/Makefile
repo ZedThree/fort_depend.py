@@ -36,16 +36,19 @@ include ../config.mk
 
 DEP_FILE=depend.mk
 
+MPIF = $(shell command -v mpif90)
+
 #SUBDIRS= $(dir $(wildcard $(srcdir)/*))
 SUBDIRS= \
 	Simple_data_operation \
 	Read_Record\
 
-#ifneq ($(strip $(MPI_FC)),)
+#ifneq ($(and $(MPI_FC), $(command -v mpif90)),)
 ifneq ($(MPI_FC),)
-  SUBDIRS+= Example_MPI-IO
+ifneq ($(MPIF),)
+   SUBDIRS+= Example_MPI-IO
 endif
-
+endif
 
 
 
