@@ -22,14 +22,32 @@
 #SOFTWARE.
 # 
 #
-#  this is a modification of the original script of D Dickinson @https://github.com/ZedThree/fort_depend.py
+#  This is a modification of the original script of D Dickinson @https://github.com/ZedThree/fort_depend.py
 #  done by Adam Jirasek
-#  the modified version can be found @https://github.com/libm3l/fort_depend.py
+#  The modified version can be found @https://github.com/libm3l/fort_depend.py
 #
-#  this is a script which maked fortran project dependecies
-#  it is executed in each directory separately and creates a project.dep file with fortran dependencies
-#  if fortran source uses module from other directory the script will add the module too
-#  the project root directory is specified as an input parameter with an option -r  
+#  This is a script which makes fortran project dependecies
+#  Fortran project can have source files located in diffrent subdirectories
+#  where the common directory (project root directory)is specified as an input parameter with an option -r
+#  The script is executed in each directory separately and creates a project.dep file with fortran dependencies
+#  however, while searching modules it will loop over all subdirectories in project root directory
+#
+#  If user wants to specify the search for modules to selected set of subdirectories, 
+#  he/she can use --dep_dir followed by list of selected directories
+#
+#  If -r not specified, the script will use the current working directory and it will search
+#  for modules in this directory only.
+#
+#  List of all options is:
+#   -f --files Files to process
+#   -o --output Output file
+#   -v -vv -vvv Different level of verbosity contained in standard output
+#   -w --overwrite Overwrite output file without warning
+#   -r --root_dir Project root directory
+#   -d --dep_dir List of selected dependecy directories
+#
+#  For example of how the fortran dependency scritp can be used for larger project see
+#  FLL linked list utility at https://github.com/libm3l/fll
 #
 #
 import os
