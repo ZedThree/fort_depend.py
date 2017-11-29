@@ -22,7 +22,6 @@
 #SOFTWARE.
 # 
 #
-#
 #  This is a modification of the original script of D Dickinson @https://github.com/ZedThree/fort_depend.py
 #  done by Adam Jirasek
 #  The modified version can be found @https://github.com/libm3l/fort_depend.py
@@ -50,6 +49,13 @@
 #  For example of how the fortran dependency scritp can be used for larger project see
 #  FLL linked list utility at https://github.com/libm3l/fll
 #
+# History:
+# Version   Date       Author        Patch number  CLA  Comment
+# -------   --------   --------      ------------  ---  -------
+# 1.1       01/09/17   Adam Jirasek                     Rewrite original version
+#
+#
+#
 #
 import os
 import re
@@ -57,8 +63,7 @@ import glob
 import fnmatch
 import os
 import sys
-from time import gmtime, strftime
-import getpass
+
 
 #Definitions
 
@@ -138,14 +143,6 @@ def write_depend(verbose,path,cwd,outfile="makefile.dep",dep=[],overwrite=False,
       print("  ")
     f=open(outfile,'w')
     f.write('# This file is generated automatically by fort_depend.py. DO NOT EDIT!\n')
-#
-#  header 
-#
-    username = getpass.getuser()
-    f.write("#\n")
-    f.write("#  Created by: "+username+"\n")
-    f.write("#  Date: "+strftime("%Y-%m-%d %H:%M:%S", gmtime()) + "\n")
-    f.write("#\n")
 
     for i in dep.keys():
         tmp,fil=os.path.split(i)
