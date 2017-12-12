@@ -315,6 +315,11 @@ def check_if_there(use,file):
             if "module" in line.lower():
                 extrline = line.lower()
                 extrline = extrline.replace("module", "",1)
+#
+#  check that module name on line line (extrline) 
+#  is the same as module name which we are looking fore (defined in USE)
+#  if yes, we found module, return
+#
                 if use.lower().strip() == extrline.strip():
                     f.close()
                     return 1
@@ -325,6 +330,11 @@ def check_if_there(use,file):
               if "module" in line.lower():
                 extrline = line.lower()
                 extrline = extrline.replace("module", "",1)
+#
+#  check that module name on line line (extrline) 
+#  is the same as module name which we are looking fore (defined in USE)
+#  if yes, we found module, return
+#
                 if use.lower().strip() == extrline.strip():
                     f.close()
                     return 1
@@ -470,7 +480,7 @@ def get_depends(ignore,verbose,cwd,fob=[],m2f=[], ffiles=[]):
                 istat = 1
             except KeyError:
 #
-#  module is not, loop through all other files specified in ffiles
+#  module is not located in the same directory, loop through all other files specified in ffiles
 #  these are files found in function get_all_files
 #
                 for k in ffiles:
