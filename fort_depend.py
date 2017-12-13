@@ -65,6 +65,7 @@ import os
 import sys
 from time import gmtime, strftime
 import getpass
+from datetime import datetime
 
 #Definitions
 
@@ -150,7 +151,8 @@ def write_depend(verbose,path,cwd,outfile="makefile.dep",dep=[],overwrite=False,
     username = getpass.getuser()
     f.write("#\n")
     f.write("#  Created by: "+username+"\n")
-    f.write("#  Date: "+strftime("%Y-%m-%d %H:%M:%S", gmtime()) + "\n")
+#    f.write("#  Date: "+strftime("%Y-%m-%d %H:%M:%S", gmtime()) + "\n")
+    f.write("#  Date: "+ datetime.now().strftime('%Y-%m-%d %H:%M:%S') + "\n")
     f.write("#\n")
 
     for i in dep.keys():
@@ -309,11 +311,20 @@ def check_if_there(use,file):
 #   "return if you see module name"
 #    make routine to consider version of python installation
 #
+    list = ['use', 'program', 'end']
+
     if sys.version_info < (3,0):
       with open(file) as f:
         for line in f:
             if "module" in line.lower():
                 extrline = line.lower()
+#
+#  if line with module contains any of the list word
+#  do not cinsider this line
+#
+                if any(word in extrline for word in list):
+                    continue
+
                 extrline = extrline.replace("module", "",1)
 #
 #  check that module name on line line (extrline) 
@@ -329,6 +340,13 @@ def check_if_there(use,file):
             for line in f:
               if "module" in line.lower():
                 extrline = line.lower()
+#
+#  if line with module contains any of the list word
+#  do not cinsider this line
+#
+                if any(word in extrline for word in list):
+                    continue
+
                 extrline = extrline.replace("module", "",1)
 #
 #  check that module name on line line (extrline) 
