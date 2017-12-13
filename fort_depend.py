@@ -66,6 +66,7 @@ import sys
 from time import gmtime, strftime
 import getpass
 from datetime import datetime
+import time, sys
 
 #Definitions
 
@@ -85,6 +86,8 @@ def run(path,dep=None,ignore=None,files=None,verbose=None,overwrite=None,output=
       print("  ")
       print("\033[031m Making dependencies in \033[032m"+cwd+"\033[039m directory")
       print("  ")
+    else:
+      print("  ")
 #
 #  get files where to look for modules
 #  if list of preferred directories is specified in dep
@@ -94,7 +97,7 @@ def run(path,dep=None,ignore=None,files=None,verbose=None,overwrite=None,output=
 #  files paths is relative to projet root directory path so that if the compillation is done in different directory then
 #  where the source files are located, there are no any prolems with it
 #
-    ff=get_all_files(path=path, dep=dep) 
+    ff=get_all_files(path=path, dep=dep)
     
     if int(verbose) > 2:
       print(" ")
@@ -240,8 +243,12 @@ def get_all_files(path,dep):
 #
 #  list only files located in those
 #
+    files = 0
+
+
     if not(dep == None):
        dep.append(currdirr)
+
        for i in dep:
 #
 #   use basolute path to preferred directories ie.: os.path.abspath(i) 
@@ -252,6 +259,9 @@ def get_all_files(path,dep):
 #
                 for filename in filenames:
                     if filename.endswith(('.f', '.f90', '.F', '.F90')):
+#                       files = files + 1
+#                       status(files)
+
 ##                   matches.append(os.path.join(root, filename))
 ##
 ##    add specified dependency directory location (i) rather then aboslute path
@@ -286,6 +296,10 @@ def get_all_files(path,dep):
        
          for filename in filenames:
              if filename.endswith(('.f', '.f90', '.F', '.F90')):
+
+#                 files = files + 1
+#                 status(files)
+
  #                matches.append(os.path.join(root, filename))
  
                  if(root == currdirr):
@@ -374,7 +388,7 @@ def create_file_objs(verbose, files=None,  macros={}):
       print("\033[031m Searching modules for files:\033[039m")
       print(" ")
 
-
+    
     for i in files:
         source_file = file_obj()
 
@@ -482,10 +496,15 @@ def file_objs_to_mod_dict(file_objs=[]):
 def get_depends(ignore,verbose,cwd,fob=[],m2f=[], ffiles=[]):
     deps={}
     istat = 0
+    files = 0
 
     for i in fob:
         if int(verbose) > 1 :
           print("\033[031m Checking dependency for file: \033[032m"+i.file_name+"\033[039m")
+
+        else:
+          files = files + 1
+          status(files)
           
         tmp=[]
         for j in i.uses:
@@ -565,6 +584,14 @@ def get_relative_path_name(file,path,cwd):
         fil = "../"+fil
 
     return fil
+
+def status(i):
+     width = i
+     sys.stdout.write(u"\u001b[1000D") # Move left
+     if(status > 1):
+       sys.stdout.write(u"\u001b[" + str(0) + "A") # Move up
+
+     print "[" + "#" * width + " " * (25 - width) + "]"
 
 
 class file_obj:
