@@ -155,3 +155,10 @@ class TestReadFortranFile:
                                macros={'modA': 'foo'})
         assert testfile.uses == ['foo']
 
+    def test_conditional_include(self):
+        testfile = FortranFile(filename="preprocessor.f90", readfile=True,
+                               macros=["FOO"])
+        assert testfile.uses == ['foo']
+
+        testfile2 = FortranFile(filename="preprocessor.f90", readfile=True)
+        assert testfile2.uses == ['bar']
