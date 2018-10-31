@@ -2,11 +2,11 @@ import re
 
 from .smartopen import smart_open
 
-UNIT_REGEX = re.compile("^\s*(?P<unit_type>module(?!\s+procedure)|program)\s*(?P<modname>\w*)",
+UNIT_REGEX = re.compile(r"^\s*(?P<unit_type>module(?!\s+procedure)|program)\s*(?P<modname>\w*)",
                         re.IGNORECASE)
-END_REGEX = re.compile("^\s*end\s*(?P<unit_type>module|program)\s*(?P<modname>\w*)?",
+END_REGEX = re.compile(r"^\s*end\s*(?P<unit_type>module|program)\s*(?P<modname>\w*)?",
                        re.IGNORECASE)
-USE_REGEX = re.compile("""^\s*use
+USE_REGEX = re.compile(r"""^\s*use
 (\s*,\s*intrinsic\s*)?(\s*::\s*|\s+)  # Valid separators between "use" and module name
 (?P<moduse>\w*)                       # The module name
 \s*(, )?\s*(only)?\s*(:)?.*?$         # Stuff that might follow the name
