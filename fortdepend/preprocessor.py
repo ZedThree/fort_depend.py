@@ -4,7 +4,7 @@ import pcpp
 
 class FortranPreprocessor(pcpp.Preprocessor):
     def __init__(self):
-        super(FortranPreprocessor, self).__init__()
+        super().__init__()
 
     def parse_to_string_lines(self, text):
         with io.StringIO() as f:
