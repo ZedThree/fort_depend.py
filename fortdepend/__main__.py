@@ -11,8 +11,8 @@ def main(args=None):
     # Add command line arguments
     parser = argparse.ArgumentParser(description='Generate Fortran dependencies')
     parser.add_argument('-f', '--files', nargs='+', help='Files to process')
-    parser.add_argument('-D', nargs='+', action='append', metavar='NAME=DESCRIPTION',
-                        help="The macro NAME is replaced by DEFINITION in 'use' statements")
+    parser.add_argument('-D', nargs='+', action='append', metavar='NAME[=DESCRIPTION]',
+                        help="Preprocessor define statements")
     parser.add_argument('-b', '--build', nargs=1, default='',
                         help='Build Directory (prepended to all files in output)')
     parser.add_argument('-o', '--output', nargs=1, help='Output file')
@@ -37,8 +37,11 @@ def main(args=None):
     if args.D:
         for arg in args.D:
             for var in arg:
-                temp = var.split('=')
-            macros[temp[0]] = temp[1]
+                if '=' not in var:
+                    macros[var] = ''
+                else:
+                    temp = var.split('=')
+                    macros[temp[0]] = temp[1]
 
     output = args.output[0] if args.output else None
     build = args.build[0] if args.build else ''
@@ -56,6 +59,7 @@ def main(args=None):
 
     if args.graph:
         project.make_graph()
+
 
 # Script
 if __name__ == "__main__":
