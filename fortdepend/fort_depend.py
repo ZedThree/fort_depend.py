@@ -2,7 +2,6 @@ from __future__ import print_function
 
 import os
 import sys
-import warnings
 
 # Terminal colours
 from colorama import Fore
@@ -10,13 +9,6 @@ from colorama import Fore
 from .smartopen import smart_open
 from .units import FortranFile, FortranModule
 from .graph import Graph
-
-# If graphviz is not installed, graphs can't be produced
-try:
-    import graphviz as gv
-    has_graphviz = True
-except ImportError:
-    has_graphviz = False
 
 # Python 2/3 compatibility
 try:
@@ -193,10 +185,6 @@ class FortranProject:
             format: Image format
             view: Immediately display the graph [True]
         """
-        if not has_graphviz:
-            warnings.warn("graphviz not installed: can't make graph",
-                          RuntimeWarning)
-            return
 
         if filename is None:
             filename = self.name + ".dot"
