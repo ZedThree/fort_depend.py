@@ -1,5 +1,6 @@
 from fortdepend import FortranProject
 import pytest
+import re
 
 
 @pytest.mark.usefixtures("datadir")
@@ -130,3 +131,31 @@ class TestFortranProject:
             assert key in depends_by_file_repr
             reprs = set([repr(foo) for foo in depends_by_file_repr[key]])
             assert reprs == set(value)
+
+    def test_write_depends(self, datadir):
+        expected_contents = [
+            "# This file is generated automatically. DO NOT EDIT!",
+            "moduleA.o :",
+            "moduleB.o : moduleA.o",
+            "moduleC.o : moduleA.o moduleB.o",
+            "moduleD.o :",
+            "moduleE.o :",
+            "multiple_modules.o :",
+            "programTest.o : moduleC.o moduleD.o",
+        ]
+
+        testproject = FortranProject()
+        testproject.write_depends()
+
+        with open(datadir.join("makefile.dep"), 'r') as f:
+            contents = f.read()
+
+        # A little manipulation to remove extraneous whitespace is
+        # required in order for a clean comparison
+        contents = contents.replace('\\\n\t', ' ')
+        contents = re.sub(r' +', ' ', contents)
+        contents = [line.lstrip().rstrip(" \t\n") for line in contents.splitlines() if line != '']
+
+        print(contents)
+        print(expected_contents)
+        assert sorted(expected_contents) == sorted(contents)
