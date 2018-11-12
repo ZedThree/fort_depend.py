@@ -1,4 +1,5 @@
 from fortdepend import FortranProject
+from fortdepend.fort_depend import DEPFILE_HEADER
 import pytest
 import re
 
@@ -161,7 +162,7 @@ class TestFortranProject:
 
     def test_write_depends(self, datadir):
         expected_contents = [
-            "# This file is generated automatically. DO NOT EDIT!",
+            DEPFILE_HEADER,
             "moduleA.o :",
             "moduleB.o : moduleA.o",
             "moduleC.o : moduleA.o moduleB.o",
@@ -187,7 +188,7 @@ class TestFortranProject:
 
     def test_write_depends_overwrite(self, datadir):
         expected_contents = [
-            "# This file is generated automatically. DO NOT EDIT!",
+            DEPFILE_HEADER,
             "moduleA.o :",
             "moduleB.o : moduleA.o",
             "moduleC.o : moduleA.o moduleB.o",
@@ -213,7 +214,7 @@ class TestFortranProject:
 
     def test_write_depends_build(self, datadir):
         expected_contents = [
-            "# This file is generated automatically. DO NOT EDIT!",
+            DEPFILE_HEADER,
             "testdir/moduleA.o :",
             "testdir/moduleB.o : testdir/moduleA.o",
             "testdir/moduleC.o : testdir/moduleA.o testdir/moduleB.o",

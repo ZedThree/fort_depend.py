@@ -16,6 +16,8 @@ try:
 except NameError:
     pass
 
+DEPFILE_HEADER = "# This file is generated automatically. DO NOT EDIT!"
+
 
 class FortranProject:
     def __init__(self, name=None, exclude_files=None, files=None, ignore_modules=None,
@@ -206,7 +208,7 @@ class FortranProject:
                     return
 
         with smart_open(filename, 'w') as f:
-            f.write('# This file is generated automatically. DO NOT EDIT!\n')
+            f.write(DEPFILE_HEADER + "\n")
             alpha_list = sorted(self.depends_by_file.keys(),
                                 key=lambda f: f.filename)
             for file_ in alpha_list:
