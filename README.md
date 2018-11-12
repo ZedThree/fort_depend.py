@@ -6,7 +6,7 @@ fortdepend
 A python script to automatically generate Fortran dependencies.
 
 Given a set of files, `fortdepend` automatically constructs the
-dependency graph for the files and modules and can write a dependency
+dependency graph for the programs and files and can write a dependency
 file suitable for Makefiles. `fortdepend` now uses [`pcpp`][pcpp], a
 preprocessor written in Python, so it can determine which modules will
 actually be used when you compile.
@@ -37,11 +37,48 @@ Usage
 =====
 
 Basic usage:
+------------
 
     fortdepend -o Makefile.dep
 
 This will look for all files ending in `.f90` or `.F90` in the current
-directory and write to `Makefile.dep`.
+directory and write the output to `Makefile.dep`. The output will
+something like this:
+
+    test :  \
+            moduleA.o \
+            moduleB.o \
+            moduleC.o \
+            moduleD.o \
+            programTest.o
+
+    moduleA.o :
+
+    moduleB.o :  \
+            moduleA.o
+
+    moduleC.o :  \
+            moduleA.o \
+            moduleB.o
+
+    moduleD.o :  \
+            moduleC.o
+
+You could then get a basic makefile working by putting the following
+in `Makefile`:
+
+    .f90.o:
+        gfortran -c $<
+
+    test:
+        gfortran $^ -o $@
+
+    include Makefile.dep
+
+And `make test` will magically build everything in the correct order!
+
+Move advanced use
+-----------------
 
 You can specify preprocessor macros with `-D`:
 
@@ -79,9 +116,10 @@ Full command line arguments:
                             Files to exclude
       -i IGNORE_MODULES [IGNORE_MODULES ...], --ignore-modules IGNORE_MODULES [IGNORE_MODULES ...]
                             Modules to ignore
+      --skip-programs       Don't include programs in the output file
 
-
-Here's an example of how to use `fortdepend` in your makefiles:
+Here's a slightly more advanced example of how to use `fortdepend` in
+your makefiles:
 
     # Script to generate the dependencies
     MAKEDEPEND=/path/to/fortdepend
@@ -108,6 +146,9 @@ Here's an example of how to use `fortdepend` in your makefiles:
 
     include $(DEP_FILE)
 
+This will automatically rebuild the dependency file if any of the
+source files change. You might not like to do this if you have a lot
+of files and need to preprocess them!
 
 [pcpp]: https://github.com/ned14/pcpp
 [graphviz]: https://github.com/xflr6/graphviz
