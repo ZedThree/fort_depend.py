@@ -49,6 +49,8 @@ class FortranProject:
         self.files = {filename: FortranFile(filename, macros)
                       for filename in files}
         self.modules = self.get_modules()
+        self.programs = {k: v for k, v in self.modules.items()
+                         if v.unit_type == "program"}
 
         if ignore_modules is None:
             ignore_modules = ["iso_c_binding", "iso_fortran_env"]
