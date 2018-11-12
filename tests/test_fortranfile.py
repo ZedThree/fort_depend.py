@@ -150,10 +150,21 @@ class TestReadFortranFile:
         testfile = FortranFile(filename="multiple_modules.f90", readfile=True)
         assert set(testfile.uses) == set(['modA', 'modB', 'modC', 'iso_c_binding'])
 
-    def test_macro_replacement(self):
-        testfile = FortranFile(filename="moduleB.f90", readfile=True,
-                               macros={'modA': 'foo'})
-        assert testfile.uses == ['foo']
+    def test_macro_replacement_dict(self):
+        testfile = FortranFile(filename="moduleC.f90", readfile=True,
+                               macros={"modA": "module_A",
+                                       "modB": "module_B"})
+        assert sorted(testfile.uses) == sorted(["module_A", "module_B"])
+
+    def test_macro_replacement_list(self):
+        testfile = FortranFile(filename="moduleC.f90", readfile=True,
+                               macros=["modA=module_A", "modB=module_B"])
+        assert sorted(testfile.uses) == sorted(["module_A", "module_B"])
+
+    def test_macro_replacement_single_value(self):
+        testfile = FortranFile(filename="moduleC.f90", readfile=True,
+                               macros="modA=module_A")
+        assert sorted(testfile.uses) == sorted(["module_A", "modB"])
 
     def test_conditional_include(self):
         testfile = FortranFile(filename="preprocessor.f90", readfile=True,

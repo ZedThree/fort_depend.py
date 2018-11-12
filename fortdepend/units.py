@@ -39,11 +39,15 @@ class FortranFile:
                 if isinstance(macros, dict):
                     for k, v in macros.items():
                         preprocessor.define("{} {}".format(k, v))
-                elif isinstance(macros, list):
-                    for macro in macros:
-                        preprocessor.define(macro)
                 else:
-                    preprocessor.define(macros)
+                    if not isinstance(macros, list):
+                        macros = [macros]
+                    for macro in macros:
+                        if '=' in macro:
+                            temp = macro.split('=')
+                            preprocessor.define("{} {}".format(*temp))
+                        else:
+                            preprocessor.define(macro)
 
             contents = preprocessor.parse_to_string(contents, source=self.filename)
 
