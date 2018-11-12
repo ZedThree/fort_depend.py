@@ -1,3 +1,4 @@
+from .preprocessor import FortranPreprocessor
 import re
 
 from .smartopen import smart_open
@@ -30,9 +31,27 @@ class FortranFile:
 
         if readfile:
             with smart_open(self.filename, 'r') as f:
-                contents = f.readlines()
+                contents = f.read()
 
-            self.modules = self.get_modules(contents, macros)
+            preprocessor = FortranPreprocessor()
+
+            if macros:
+                if isinstance(macros, dict):
+                    for k, v in macros.items():
+                        preprocessor.define("{} {}".format(k, v))
+                else:
+                    if not isinstance(macros, list):
+                        macros = [macros]
+                    for macro in macros:
+                        if '=' in macro:
+                            temp = macro.split('=')
+                            preprocessor.define("{} {}".format(*temp))
+                        else:
+                            preprocessor.define(macro)
+
+            contents = preprocessor.parse_to_string(contents, source=self.filename)
+
+            self.modules = self.get_modules(contents.splitlines())
             self.uses = self.get_uses()
 
     def __str__(self):
