@@ -31,7 +31,7 @@ class FortranFile:
 
         if readfile:
             with smart_open(self.filename, 'r') as f:
-                contents = f.readlines()
+                contents = f.read()
 
             preprocessor = FortranPreprocessor()
 
@@ -44,9 +44,10 @@ class FortranFile:
                         preprocessor.define(macro)
                 else:
                     preprocessor.define(macros)
-            contents = preprocessor.parse_to_string_lines(''.join(contents), source=self.filename)
 
-            self.modules = self.get_modules(contents)
+            contents = preprocessor.parse_to_string(contents, source=self.filename)
+
+            self.modules = self.get_modules(contents.splitlines())
             self.uses = self.get_uses()
 
     def __str__(self):

@@ -7,10 +7,8 @@ class FortranPreprocessor(pcpp.Preprocessor):
         super().__init__()
         self.add_path('.')
 
-    def parse_to_string_lines(self, text, source):
+    def parse_to_string(self, text, source):
         with io.StringIO() as f:
             self.parse(text, source=source)
             self.write(f)
-            f.seek(0)
-            result = f.readlines()
-        return result
+            return f.getvalue()
