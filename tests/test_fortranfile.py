@@ -172,4 +172,4 @@ class TestReadFortranFile:
         assert testfile.uses == ['foo']
 
         testfile2 = FortranFile(filename="preprocessor.f90", readfile=True)
-        assert testfile2.uses == ['bar']
+        assert sorted(testfile2.uses) == sorted(['bar', 'rawr'])
