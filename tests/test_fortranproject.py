@@ -156,6 +156,56 @@ class TestFortranProject:
         contents = re.sub(r' +', ' ', contents)
         contents = [line.lstrip().rstrip(" \t\n") for line in contents.splitlines() if line != '']
 
-        print(contents)
-        print(expected_contents)
+        assert sorted(expected_contents) == sorted(contents)
+
+    def test_write_depends_overwrite(self, datadir):
+        expected_contents = [
+            "# This file is generated automatically. DO NOT EDIT!",
+            "moduleA.o :",
+            "moduleB.o : moduleA.o",
+            "moduleC.o : moduleA.o moduleB.o",
+            "moduleD.o :",
+            "moduleE.o :",
+            "programTest.o : moduleC.o moduleD.o",
+        ]
+
+        FortranProject().write_depends()
+        testproject = FortranProject(exclude_files="multiple_modules.f90")
+        testproject.write_depends(overwrite=True)
+
+        with open(datadir.join("makefile.dep"), 'r') as f:
+            contents = f.read()
+
+        # A little manipulation to remove extraneous whitespace is
+        # required in order for a clean comparison
+        contents = contents.replace('\\\n\t', ' ')
+        contents = re.sub(r' +', ' ', contents)
+        contents = [line.lstrip().rstrip(" \t\n") for line in contents.splitlines() if line != '']
+
+        assert sorted(expected_contents) == sorted(contents)
+
+    def test_write_depends_build(self, datadir):
+        expected_contents = [
+            "# This file is generated automatically. DO NOT EDIT!",
+            "testdir/moduleA.o :",
+            "testdir/moduleB.o : testdir/moduleA.o",
+            "testdir/moduleC.o : testdir/moduleA.o testdir/moduleB.o",
+            "testdir/moduleD.o :",
+            "testdir/moduleE.o :",
+            "testdir/multiple_modules.o :",
+            "testdir/programTest.o : testdir/moduleC.o testdir/moduleD.o",
+        ]
+
+        testproject = FortranProject()
+        testproject.write_depends(build="testdir")
+
+        with open(datadir.join("makefile.dep"), 'r') as f:
+            contents = f.read()
+
+        # A little manipulation to remove extraneous whitespace is
+        # required in order for a clean comparison
+        contents = contents.replace('\\\n\t', ' ')
+        contents = re.sub(r' +', ' ', contents)
+        contents = [line.lstrip().rstrip(" \t\n") for line in contents.splitlines() if line != '']
+
         assert sorted(expected_contents) == sorted(contents)
