@@ -188,13 +188,15 @@ class FortranProject:
 
         return sorted(set(state))
 
-    def write_depends(self, filename="makefile.dep", overwrite=False, build=''):
+    def write_depends(self, filename="makefile.dep", overwrite=False, build='',
+                      skip_programs=False):
         """Write the dependencies to file
 
         Args:
             filename: Name of the output file
             overwrite: Overwrite existing dependency file [False]
             build: Directory to prepend to filenames
+            skip_programs: Don't write dependencies for programs
         """
 
         def _format_dependencies(target, target_extension, dep_list):
@@ -221,6 +223,12 @@ class FortranProject:
 
         with smart_open(filename, 'w') as f:
             f.write(DEPFILE_HEADER + "\n")
+
+            if not skip_programs:
+                for program in self.programs.keys():
+                    program_deps = self.get_all_used_files(program)
+                    listing = _format_dependencies(program, "", program_deps)
+                    f.write(listing)
 
             for file_ in sorted(self.depends_by_file.keys(), key=lambda f: f.filename):
                 dep_list = [dep.filename for dep in self.depends_by_file[file_]]
