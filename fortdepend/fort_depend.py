@@ -26,7 +26,7 @@ class FortranProject:
             name: Name of the project (default: name of current directory)
             exclude_files: List of files to exclude
             files: List of files to include (default: all in current directory)
-            ignore_modules: List of module names to ignore_mod
+            ignore_modules: List of module names to ignore_mod (default: iso_c_binding and iso_fortran_env)
             macros: Dictionary of module names and replacement values
             verbose: Print more messages (default: False)
         """
@@ -50,6 +50,8 @@ class FortranProject:
                       for filename in files}
         self.modules = self.get_modules()
 
+        if ignore_modules is None:
+            ignore_modules = ["iso_c_binding", "iso_fortran_env"]
         self.remove_ignored_modules(ignore_modules)
 
         self.depends_by_module = self.get_depends_by_module(verbose)
