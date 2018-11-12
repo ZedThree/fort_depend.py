@@ -3,7 +3,16 @@ fortdepend
 
 [![Build Status](https://travis-ci.org/ZedThree/fort_depend.py.svg?branch=master)](https://travis-ci.org/ZedThree/fort_depend.py)
 
-A python script to automatically generate Fortran dependencies
+A python script to automatically generate Fortran dependencies.
+
+Given a set of files, `fortdepend` automatically constructs the
+dependency graph for the files and modules and can write a dependency
+file suitable for Makefiles. `fortdepend` now uses [`pcpp`][pcpp], a
+preprocessor written in Python, so it can determine which modules will
+actually be used when you compile.
+
+You can even use `fortdepend` to draw the graph of the module
+dependencies (requires [`graphviz`][graphviz])!
 
 Original script by D. Dickinson
 
@@ -12,10 +21,65 @@ Installation
 
 You can install fortdepend with pip:
 
-    pip install --user fortdepend
+    pip3 install --user fortdepend
+
+Limitations
+===========
+
+`fortdepend` requires Python 3.
+
+`fortdepend` works by looking for matching pairs of `program
+<name>/end program <name>` and `module <name>/end module <name>`, and
+so will not work on Fortran 77-style files that just use `end` without
+the appropriate label.
 
 Usage
 =====
+
+Basic usage:
+
+    fortdepend -o Makefile.dep
+
+This will look for all files ending in `.f90` or `.F90` in the current
+directory and write to `Makefile.dep`.
+
+You can specify preprocessor macros with `-D`:
+
+    fortdepend -DMACRO=42 -o Makefile.dep
+
+will replace instances of `MACRO` with `42` according to the usual C99
+preprocessor rules. This can be used to conditionally `use` some
+modules or change which module is `use`d at compile time.
+
+Full command line arguments:
+
+    $ fortdepend --help
+    usage: fortdepend [-h] [-f FILES [FILES ...]] [-D NAME[=DESCRIPTION]
+                      [NAME[=DESCRIPTION] ...]] [-b BUILD] [-o OUTPUT] [-g] [-v]
+                      [-w] [-c] [-e EXCLUDE_FILES [EXCLUDE_FILES ...]]
+                      [-i IGNORE_MODULES [IGNORE_MODULES ...]]
+
+    Generate Fortran dependencies
+
+    optional arguments:
+      -h, --help            show this help message and exit
+      -f FILES [FILES ...], --files FILES [FILES ...]
+                            Files to process
+      -D NAME[=DESCRIPTION] [NAME[=DESCRIPTION] ...]
+                            Preprocessor define statements
+      -b BUILD, --build BUILD
+                            Build Directory (prepended to all files in output)
+      -o OUTPUT, --output OUTPUT
+                            Output file
+      -g, --graph           Make a graph of the project
+      -v, --verbose         explain what is done
+      -w, --overwrite       Overwrite output file without warning
+      -c, --colour          Print in colour
+      -e EXCLUDE_FILES [EXCLUDE_FILES ...], --exclude-files EXCLUDE_FILES [EXCLUDE_FILES ...]
+                            Files to exclude
+      -i IGNORE_MODULES [IGNORE_MODULES ...], --ignore-modules IGNORE_MODULES [IGNORE_MODULES ...]
+                            Modules to ignore
+
 
 Here's an example of how to use `fortdepend` in your makefiles:
 
@@ -41,5 +105,9 @@ Here's an example of how to use `fortdepend` in your makefiles:
     $(DEP_FILE): $(OBJECTS)
         @echo "Making dependencies!"
         cd $(SRCPATH) && $(MAKEDEPEND) -w -o /path/to/$(DEP_FILE) -f $(OBJECTS)
-        
+
     include $(DEP_FILE)
+
+
+[pcpp]: https://github.com/ned14/pcpp
+[graphviz]: https://github.com/xflr6/graphviz
