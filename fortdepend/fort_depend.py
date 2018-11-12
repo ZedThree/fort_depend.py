@@ -196,6 +196,18 @@ class FortranProject:
             overwrite: Overwrite existing dependency file [False]
             build: Directory to prepend to filenames
         """
+
+        def _format_dependencies(target, target_extension, dep_list):
+            _, filename = os.path.split(target)
+            target_name = os.path.splitext(filename)[0] + target_extension
+            listing = "\n{} : ".format(os.path.join(build, target_name))
+            for dep in dep_list:
+                _, depfilename = os.path.split(dep)
+                depobjectname = os.path.splitext(depfilename)[0] + ".o"
+                listing += " \\\n\t{}".format(os.path.join(build, depobjectname))
+            listing += "\n"
+            return listing
+
         # Test file doesn't exist
         if os.path.exists(filename):
             if not(overwrite):
@@ -209,17 +221,10 @@ class FortranProject:
 
         with smart_open(filename, 'w') as f:
             f.write(DEPFILE_HEADER + "\n")
-            alpha_list = sorted(self.depends_by_file.keys(),
-                                key=lambda f: f.filename)
-            for file_ in alpha_list:
-                _, filename = os.path.split(file_.filename)
-                objectname = os.path.splitext(filename)[0] + ".o"
-                listing = "\n{} : ".format(os.path.join(build, objectname))
-                for dep in self.depends_by_file[file_]:
-                    _, depfilename = os.path.split(dep.filename)
-                    depobjectname = os.path.splitext(depfilename)[0] + ".o"
-                    listing += " \\\n\t{}".format(os.path.join(build, depobjectname))
-                listing += "\n"
+
+            for file_ in sorted(self.depends_by_file.keys(), key=lambda f: f.filename):
+                dep_list = [dep.filename for dep in self.depends_by_file[file_]]
+                listing = _format_dependencies(file_.filename, ".o", dep_list)
                 f.write(listing)
 
     def make_graph(self, filename=None, format='svg', view=True):
