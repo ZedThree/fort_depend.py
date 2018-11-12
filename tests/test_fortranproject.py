@@ -54,10 +54,11 @@ class TestFortranProject:
 
     def test_ignore_modules(self):
         testproject = FortranProject(files="multiple_modules.f90",
-                                     ignore_modules="modA")
-        assert "modA" not in testproject.modules
-        assert "modA" not in testproject.modules["modB"].uses
-        assert "modA" not in testproject.files["multiple_modules.f90"].uses
+                                     ignore_modules="modF")
+        assert sorted(["modG", "modH", "progA"]) == sorted(testproject.modules.keys())
+        assert [] == testproject.modules["modG"].uses
+        assert (sorted(["modG", "modH", "iso_c_binding"])
+                == sorted(testproject.files["multiple_modules.f90"].uses))
 
     def test_depends_by_module(self):
         """This one is a little complicated...

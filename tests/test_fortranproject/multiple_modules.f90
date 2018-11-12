@@ -1,18 +1,18 @@
-program progA
-  use modA
-  use modB
-  use modC
-end program progA
-
-module modA
+module modF
   use, intrinsic :: iso_c_binding
-end module modA
+end module modF
 
-module modB
-  use modA
-end module modB
+module modG
+  use modF
+end module modG
 
-module modC
-  use modA
-  use::modB
-end module modC
+module modH
+  use modF
+  use::modG
+end module modH
+
+program progA
+  use modF
+  use modG
+  use modH
+end program progA
