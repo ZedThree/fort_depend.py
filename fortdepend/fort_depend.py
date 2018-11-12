@@ -147,6 +147,45 @@ class FortranProject:
 
         return depends
 
+    def get_all_used_files(self, module_name):
+        """Get the complete set of files that module_name requires, either
+        directly or indirectly
+
+        """
+        used_modules = self._get_all_used_modules(module_name, state=[])
+        used_files = [self.modules[module].source_file.filename for module in used_modules]
+
+        module_filename = self.modules[module_name].source_file.filename
+
+        return sorted(set(used_files + [module_filename]))
+
+    def get_all_used_modules(self, module_name):
+        """Get the complete set of modules that module_name requires, either
+        directly or indirectly
+
+        """
+        return self._get_all_used_modules(module_name, state=[])
+
+    def _get_all_used_modules(self, module_name, state):
+        """Implementation for get_all_used_modules and
+        get_all_used_files. Needs to keep track of some additional
+        state which doesn't need to be exposed to users
+
+        """
+        for module in self.modules[module_name].uses:
+            try:
+                if module in state:
+                    continue
+                state.append(module)
+                if self.modules[module].uses:
+                    state.extend(self._get_all_used_modules(module, state))
+            except KeyError:
+                print(Fore.RED + "Error" + Fore.RESET + " module " + Fore.GREEN +
+                      module + Fore.RESET + " not defined in any files. Skipping...",
+                      file=sys.stderr)
+
+        return sorted(set(state))
+
     def write_depends(self, filename="makefile.dep", overwrite=False, build=''):
         """Write the dependencies to file
 

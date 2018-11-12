@@ -236,3 +236,35 @@ class TestFortranProject:
         contents = [line.lstrip().rstrip(" \t\n") for line in contents.splitlines() if line != '']
 
         assert sorted(expected_contents) == sorted(contents)
+
+    def test_get_all_used_modules(self):
+        expected_used = {
+            "progA": sorted(["modF", "modG", "modH"]),
+            "test": sorted(["modA", "modB", "modC", "modD"]),
+        }
+
+        testproject = FortranProject()
+        used_by_program = {}
+        for program in testproject.programs.keys():
+            used_by_program[program] = testproject.get_all_used_modules(program)
+
+        assert expected_used == used_by_program
+
+    def test_get_all_used_files(self):
+        expected_used = {
+            "progA": sorted(["multiple_modules.f90"]),
+            "test": sorted([
+                "moduleA.f90",
+                "moduleB.f90",
+                "moduleC.f90",
+                "moduleD.f90",
+                "programTest.f90",
+            ]),
+        }
+
+        testproject = FortranProject()
+        used_by_program = {}
+        for program in testproject.programs.keys():
+            used_by_program[program] = testproject.get_all_used_files(program)
+
+        assert expected_used == used_by_program
