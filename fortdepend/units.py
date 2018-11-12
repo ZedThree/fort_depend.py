@@ -44,7 +44,7 @@ class FortranFile:
                         preprocessor.define(macro)
                 else:
                     preprocessor.define(macros)
-            contents = preprocessor.parse_to_string_lines(''.join(contents))
+            contents = preprocessor.parse_to_string_lines(''.join(contents), source=self.filename)
 
             self.modules = self.get_modules(contents)
             self.uses = self.get_uses()
