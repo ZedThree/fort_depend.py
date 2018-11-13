@@ -19,7 +19,17 @@ setup(name='fortdepend',
           'Programming Language :: Fortran',
       ],
       packages=['fortdepend'],
-      install_requires=['colorama', 'pcpp'],
+      install_requires=[
+          'colorama >= 0.3.9',
+          'pcpp >= 1.1.0'
+      ],
+      extras_require={
+          'tests': ['pytest >= 3.3.0'],
+          'docs': [
+              'sphinx >= 1.4',
+              'sphinx-argparse >= 0.2.3'
+          ],
+      },
       keywords=['build', 'dependencies', 'fortran'],
       entry_points={
           'console_scripts': [

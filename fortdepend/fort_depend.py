@@ -20,18 +20,33 @@ DEPFILE_HEADER = "# This file is generated automatically. DO NOT EDIT!"
 
 
 class FortranProject:
+    """Read a set of Fortran source files and produce a set of
+    `FortranFile`, `FortranModule` and the dependencies between them
+
+    Example:
+
+        This is the main class for interacting with a Fortran project. The
+        minimal "useful" thing is:
+
+        >>> import fortdepend
+        >>> my_project = fortdepend.FortranProject()
+        >>> my_project.write_depends()
+
+        This will read all the .f90 and .F90 files in the current
+        directory and write the dependencies to "makefile.dep"
+
+    Args:
+        name (str): Name of the project (default: name of current directory)
+        exclude_files (list of str): List of files to exclude
+        files (list of str): List of files to include (default: all in current directory)
+        ignore_modules (list of str): List of module names to ignore_mod (default: iso_c_binding and iso_fortran_env)
+        macros (dict, list or str): Preprocessor macro definitions
+        verbose (bool): Print more messages (default: False)
+
+    """
+
     def __init__(self, name=None, exclude_files=None, files=None, ignore_modules=None,
                  macros=None, verbose=False):
-        """Create a list of FortranFile objects
-
-        Args:
-            name: Name of the project (default: name of current directory)
-            exclude_files: List of files to exclude
-            files: List of files to include (default: all in current directory)
-            ignore_modules: List of module names to ignore_mod (default: iso_c_binding and iso_fortran_env)
-            macros: Dictionary of module names and replacement values
-            verbose: Print more messages (default: False)
-        """
 
         if name is None:
             self.name = os.path.basename(os.getcwd())
@@ -62,8 +77,10 @@ class FortranProject:
         self.depends_by_file = self.get_depends_by_file(verbose)
 
     def get_source(self, extensions=None):
-        """Return all files ending with any of extensions (defaults to
-        [".f90", ".F90"])
+        """Return a list of filenames ending with any of extensions
+
+        Args:
+            extensions: List of file extensions (defaults to [".f90", ".F90"])
         """
 
         if extensions is None:
@@ -79,7 +96,14 @@ class FortranProject:
         return files
 
     def get_modules(self):
-        """Merge dicts of FortranModules from list of FortranFiles
+        """Return a dict of all the modules found in the project
+
+        Works by iterating over the list of `FortranFile` and merging
+        their dicts of `FortranModule`
+
+        Returns:
+            dict of module name (str) and `FortranModule` objects
+
         """
 
         mod_dict = {}
@@ -88,7 +112,14 @@ class FortranProject:
         return mod_dict
 
     def get_depends_by_module(self, verbose=False):
-        """Get the dependencies of each file in file_list
+        """Return the set of which modules each module directly depends on
+
+        Args:
+            verbose: Print progress messages
+
+        Returns:
+            dict of `FortranModule` and a list of `FortranModule`
+
         """
         depends = {}
         for module in self.modules.values():
@@ -120,7 +151,14 @@ class FortranProject:
         return depends
 
     def get_depends_by_file(self, verbose=False):
-        """Get the dependencies of each file in file_list
+        """Return the set of which files each file directly depends on
+
+        Args:
+            verbose: Print progress messages
+
+        Returns:
+            dict of `FortranFile` and a list of `FortranFile`
+
         """
         depends = {}
         for source_file in self.files.values():
@@ -150,8 +188,14 @@ class FortranProject:
         return depends
 
     def get_all_used_files(self, module_name):
-        """Get the complete set of files that module_name requires, either
+        """Get the complete set of files that a module requires, either
         directly or indirectly
+
+        Args:
+            module_name (str): A module name
+
+        Returns:
+            list of filenames (str)
 
         """
         used_modules = self._get_all_used_modules(module_name, state=[])
@@ -164,6 +208,12 @@ class FortranProject:
     def get_all_used_modules(self, module_name):
         """Get the complete set of modules that module_name requires, either
         directly or indirectly
+
+        Args:
+            module_name (str): A module name
+
+        Returns:
+            list of module names (str)
 
         """
         return self._get_all_used_modules(module_name, state=[])
@@ -193,10 +243,10 @@ class FortranProject:
         """Write the dependencies to file
 
         Args:
-            filename: Name of the output file
-            overwrite: Overwrite existing dependency file [False]
-            build: Directory to prepend to filenames
-            skip_programs: Don't write dependencies for programs
+            filename (str): Name of the output file
+            overwrite (bool): Overwrite existing dependency file [False]
+            build (str): Directory to prepend to filenames
+            skip_programs (bool): Don't write dependencies for programs
         """
 
         def _format_dependencies(target, target_extension, dep_list):
@@ -239,9 +289,10 @@ class FortranProject:
         """Draw a graph of the project using graphviz
 
         Args:
-            filename: Name of the output file
-            format: Image format
-            view: Immediately display the graph [True]
+            filename (str): Name of the output file
+            format (str): Image format (default: 'svg')
+            view (bool): Immediately display the graph [True]
+
         """
 
         if filename is None:
@@ -252,8 +303,11 @@ class FortranProject:
         graph.draw()
 
     def remove_ignored_modules(self, ignore_modules=None):
-        """Remove the modules in iterable ignore_modules from
-        all dependencies
+        """Remove the modules in iterable ignore_modules from all dependencies
+
+        Args:
+            ignore_modules (iterable of str): module names to ignore
+
         """
         if ignore_modules is None:
             return

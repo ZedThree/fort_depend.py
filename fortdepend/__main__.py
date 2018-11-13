@@ -4,8 +4,8 @@ import colorama
 from fortdepend import FortranProject
 
 
-def main(args=None):
-    """Run the module as a script
+def create_argument_parser():
+    """Create the parser for the command line arguments
 
     """
     # Add command line arguments
@@ -31,6 +31,15 @@ def main(args=None):
     parser.add_argument('--skip-programs', action='store_true',
                         help="Don't include programs in the output file")
 
+    return parser
+
+
+def main(args=None):
+    """Run the module as a script
+
+    """
+
+    parser = create_argument_parser()
     # Parse the command line arguments
     args = parser.parse_args()
 

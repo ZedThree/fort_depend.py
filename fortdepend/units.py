@@ -19,9 +19,10 @@ class FortranFile:
     """The modules and dependencies of a Fortran source file
 
     Args:
-        filename: Source file
-        macros: Dict of preprocessor macros to be expanded
-        readfile: Read and process the file [True]
+        filename (str): Source file
+        macros (iterable): Dict of preprocessor macros to be expanded
+        readfile (bool): Read and process the file [True]
+
     """
     def __init__(self, filename=None, macros=None, readfile=True):
         self.filename = filename
@@ -64,7 +65,7 @@ class FortranFile:
         """Return all the modules or programs that are in the file
 
         Args:
-            contents: Contents of the source file
+            contents (str): Contents of the source file
         """
 
         contains = {}
@@ -99,6 +100,7 @@ class FortranFile:
 
     def get_uses(self):
         """Return a sorted list of the modules this file USEs
+
         """
 
         if self.modules is None:
@@ -112,11 +114,13 @@ class FortranFile:
 class FortranModule:
     """A Fortran Module or Program
 
-    unit_type: 'module' or 'program'
-    name: Name of the module/program
-    source_file: Name of the file containing the module/program
-    text: Tuple containing source_file contents, and start and end lines of the module
-    macros: Any defined macros
+    Args:
+        unit_type (str): 'module' or 'program'
+        name (str): Name of the module/program
+        source_file (str): Name of the file containing the module/program
+        text (tuple): Tuple containing source_file contents, and start and end lines of the module
+        macros (dict): Any defined macros
+
     """
     def __init__(self, unit_type, name, source_file=None, text=None, macros=None):
         self.unit_type = unit_type.strip().lower()
@@ -143,8 +147,9 @@ class FortranModule:
         """Return which modules are used in the file after expanding macros
 
         Args:
-            contents: Contents of the source file
-            macros: Dict of preprocessor macros to be expanded
+            contents (str): Contents of the source file
+            macros (dict): Dict of preprocessor macros to be expanded
+
         """
 
         uses = []
