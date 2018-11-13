@@ -2,6 +2,7 @@
 import argparse
 import colorama
 from fortdepend import FortranProject
+from ._version import __version__
 
 
 def create_argument_parser():
@@ -34,6 +35,8 @@ def create_argument_parser():
                         help="Don't include programs in the output file")
     parser.add_argument('-n', '--no-preprocessor', action='store_true',
                         help="Don't use the preprocessor")
+    parser.add_argument('--version', action='version',
+                        version="%(prog)s {version}".format(version=__version__))
 
     return parser
 
