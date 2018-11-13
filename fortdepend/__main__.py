@@ -2,6 +2,7 @@
 import argparse
 import colorama
 from fortdepend import FortranProject
+from ._version import __version__
 
 
 def create_argument_parser():
@@ -30,6 +31,8 @@ def create_argument_parser():
                         help='Modules to ignore')
     parser.add_argument('--skip-programs', action='store_true',
                         help="Don't include programs in the output file")
+    parser.add_argument('--version', action='version',
+                        version="%(prog)s {version}".format(version=__version__))
 
     return parser
 

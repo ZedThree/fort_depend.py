@@ -3,8 +3,12 @@ from setuptools import setup
 with open("README.md", 'r') as f:
     long_description = f.read()
 
+version = {}
+with open("fortdepend/_version.py") as f:
+    exec(f.read(), version)
+
 setup(name='fortdepend',
-      version='2.0.0',
+      version=version['__version__'],
       description='Automatically generate Fortran dependencies',
       long_description=long_description,
       long_description_content_type="test/markdown",
