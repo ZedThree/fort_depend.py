@@ -1,8 +1,13 @@
 from setuptools import setup
 
+with open("README.md", 'r') as f:
+    long_description = f.read()
+
 setup(name='fortdepend',
       version='0.1.0',
       description='Automatically generate Fortran dependencies',
+      long_description=long_description,
+      long_description_content_type="test/markdown",
       author='Peter Hill',
       author_email='peter@fusionplasma.co.uk',
       url='https://github.com/ZedThree/fort_depend.py/',
