@@ -1,5 +1,5 @@
-Advanced use
-============
+Advanced usage
+==============
 
 You can specify preprocessor macros with ``-D``:
 
@@ -9,7 +9,7 @@ You can specify preprocessor macros with ``-D``:
 
 will replace instances of ``MACRO`` with ``42`` according to the usual
 C99 preprocessor rules. This can be used to conditionally ``use`` some
-modules or change which module is `use`d at compile time.
+modules or change which module is used at compile time.
 
 Full command line arguments:
 
