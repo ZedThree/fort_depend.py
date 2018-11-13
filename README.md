@@ -2,6 +2,7 @@ fortdepend
 ==========
 
 [![Build Status](https://travis-ci.org/ZedThree/fort_depend.py.svg?branch=master)](https://travis-ci.org/ZedThree/fort_depend.py)
+[![codecov](https://codecov.io/gh/ZedThree/fort_depend.py/branch/master/graph/badge.svg)](https://codecov.io/gh/ZedThree/fort_depend.py)
 
 A python script to automatically generate Fortran dependencies.
 
