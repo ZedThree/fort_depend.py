@@ -14,6 +14,8 @@ actually be used when you compile.
 You can even use `fortdepend` to draw the graph of the module
 dependencies (requires [`graphviz`][graphviz])!
 
+Complete documentation is available [on ReadTheDocs][docs].
+
 Original script by D. Dickinson
 
 Installation
@@ -152,3 +154,4 @@ of files and need to preprocess them!
 
 [pcpp]: https://github.com/ned14/pcpp
 [graphviz]: https://github.com/xflr6/graphviz
+[docs]: https://fortdepend.readthedocs.io/en/latest/
