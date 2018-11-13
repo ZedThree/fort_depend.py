@@ -6,16 +6,16 @@
 fortdepend: A Fortran Dependency Generator
 ==========================================
 
-`fortdepend` is a python package to automatically generate Fortran
-dependencies.
+:py:mod:`fortdepend` is a python package to automatically generate
+Fortran dependencies.
 
-Given a set of files, `fortdepend` automatically constructs the
-dependency graph for the programs and files and can write a dependency
-file suitable for Makefiles. `fortdepend` now uses pcpp_, a
-preprocessor written in Python, so it can determine which modules will
-actually be used when you compile.
+Given a set of files, :py:mod:`fortdepend` automatically constructs
+the dependency graph for the programs and files and can write a
+dependency file suitable for Makefiles. :py:mod:`fortdepend` now uses
+pcpp_, a preprocessor written in Python, so it can determine which
+modules will actually be used when you compile.
 
-You can even use `fortdepend` to draw the graph of the module
+You can even use :py:mod:`fortdepend` to draw the graph of the module
 dependencies (requires graphviz_)!
 
 Original script by D. Dickinson
@@ -29,17 +29,17 @@ Original script by D. Dickinson
    fortdepend
 
 Limitations
-===========
+-----------
 
-- `fortdepend` requires Python 3.
+- :py:mod:`fortdepend` requires Python 3.
 
-- `fortdepend` works by looking for matching pairs of ``program
-  <name>/end program <name>`` and ``module <name>/end module <name>``,
-  and so will not work on Fortran 77-style files that just use ``end``
-  without the appropriate label.
+- :py:mod:`fortdepend` works by looking for matching pairs of
+  ``program <name>/end program <name>`` and ``module <name>/end module
+  <name>``, and so will not work on Fortran 77-style files that just
+  use ``end`` without the appropriate label.
 
 Indices and tables
-==================
+------------------
 
 * :ref:`genindex`
 * :ref:`modindex`

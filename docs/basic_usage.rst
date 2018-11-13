@@ -16,9 +16,9 @@ The quickest way to run `fortdepend` is like so:
 
     fortdepend -o Makefile.dep
 
-This will look for all files ending in `.f90` or `.F90` in the current
-directory and write the output to `Makefile.dep`. The output will
-something like this:
+This will look for all files ending in ``.f90`` or ``.F90`` in the
+current directory and write the output to ``Makefile.dep``. The output
+will something like this:
 
 .. code-block:: make
 
@@ -42,7 +42,7 @@ something like this:
             moduleC.o
 
 You could then get a basic makefile working by putting the following
-in `Makefile`:
+in ``Makefile``:
 
 .. code-block:: make
 

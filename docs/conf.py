@@ -43,6 +43,7 @@ release = 'v1.0'
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.coverage',
+    'sphinx.ext.napoleon',
     'sphinx.ext.viewcode',
     'sphinxarg.ext',
 ]
@@ -74,6 +75,7 @@ exclude_patterns = []
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
 
+default_role = 'any'
 
 # -- Options for HTML output -------------------------------------------------
 

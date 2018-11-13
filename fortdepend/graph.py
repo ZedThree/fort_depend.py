@@ -9,18 +9,17 @@ except ImportError:
 
 
 class Graph:
-    """Draw a graph of a dependency tree
+    """Draw a graph of the project using graphviz
+
+    Args:
+        filename (str): Name of the output file
+        format (str): Image format
+        view (bool): Immediately display the graph [True]
 
     """
 
     def __init__(self, tree, filename=None, format='svg', view=True):
-        """Draw a graph of the project using graphviz
 
-        Args:
-            filename: Name of the output file
-            format: Image format
-            view: Immediately display the graph [True]
-        """
         if not has_graphviz:
             warnings.warn("graphviz not installed: can't make graph",
                           RuntimeWarning)
@@ -38,6 +37,7 @@ class Graph:
 
     def draw(self):
         """Render the graph to an image
+
         """
         if not has_graphviz:
             warnings.warn("graphviz not installed: can't make graph",
