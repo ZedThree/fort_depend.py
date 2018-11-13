@@ -20,7 +20,20 @@ DEPFILE_HEADER = "# This file is generated automatically. DO NOT EDIT!"
 
 
 class FortranProject:
-    """Create a list of FortranFile objects
+    """Read a set of Fortran source files and produce a set of
+    `FortranFile`, `FortranModule` and the dependencies between them
+
+    Example:
+
+        This is the main class for interacting with a Fortran project. The
+        minimal "useful" thing is:
+
+        >>> import fortdepend
+        >>> my_project = fortdepend.FortranProject()
+        >>> my_project.write_depends()
+
+        This will read all the .f90 and .F90 files in the current
+        directory and write the dependencies to "makefile.dep"
 
     Args:
         name (str): Name of the project (default: name of current directory)
@@ -29,6 +42,7 @@ class FortranProject:
         ignore_modules (list of str): List of module names to ignore_mod (default: iso_c_binding and iso_fortran_env)
         macros (dict, list or str): Preprocessor macro definitions
         verbose (bool): Print more messages (default: False)
+
     """
 
     def __init__(self, name=None, exclude_files=None, files=None, ignore_modules=None,
