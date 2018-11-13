@@ -21,7 +21,7 @@ setup(name='fortdepend',
       packages=['fortdepend'],
       install_requires=[
           'colorama >= 0.3.9',
-          'pcpp >= 1.1.1'
+          'pcpp >= 1.1.0'
       ],
       extras_requires={
           'tests': ['pytest >= 3.3.0'],
