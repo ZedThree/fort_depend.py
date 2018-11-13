@@ -177,7 +177,7 @@ class TestFortranProject:
         testproject = FortranProject()
         testproject.write_depends()
 
-        with open(datadir.join("makefile.dep"), 'r') as f:
+        with open(str(datadir.join("makefile.dep")), 'r') as f:
             contents = f.read()
 
         # A little manipulation to remove extraneous whitespace is
@@ -204,7 +204,7 @@ class TestFortranProject:
         testproject = FortranProject(exclude_files="multiple_modules.f90")
         testproject.write_depends(overwrite=True)
 
-        with open(datadir.join("makefile.dep"), 'r') as f:
+        with open(str(datadir.join("makefile.dep")), 'r') as f:
             contents = f.read()
 
         # A little manipulation to remove extraneous whitespace is
@@ -233,7 +233,7 @@ class TestFortranProject:
         testproject = FortranProject()
         testproject.write_depends(build="testdir")
 
-        with open(datadir.join("makefile.dep"), 'r') as f:
+        with open(str(datadir.join("makefile.dep")), 'r') as f:
             contents = f.read()
 
         # A little manipulation to remove extraneous whitespace is
@@ -259,7 +259,7 @@ class TestFortranProject:
         testproject = FortranProject()
         testproject.write_depends(skip_programs=True)
 
-        with open(datadir.join("makefile.dep"), 'r') as f:
+        with open(str(datadir.join("makefile.dep")), 'r') as f:
             contents = f.read()
 
         # A little manipulation to remove extraneous whitespace is
