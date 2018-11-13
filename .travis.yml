@@ -4,7 +4,10 @@ python:
   - "3.5"
   - "3.6"
 install:
-  - pip install --upgrade setuptools pip pytest
+  - pip install --upgrade setuptools pip pytest pytest-cov coverage codecov
   - pip install .
 # command to run tests
-script: python -m pytest -v
+script:
+  - pytest -v --cov=fortdepend
+after_success:
+  - codecov
