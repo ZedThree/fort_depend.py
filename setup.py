@@ -23,7 +23,7 @@ setup(name='fortdepend',
           'colorama >= 0.3.9',
           'pcpp >= 1.1.0'
       ],
-      extras_requires={
+      extras_require={
           'tests': ['pytest >= 3.3.0'],
           'docs': [
               'sphinx >= 1.4',
