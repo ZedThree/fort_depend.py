@@ -4,7 +4,7 @@ python:
   - "3.5"
   - "3.6"
 install:
+  - pip install --upgrade setuptools pip pytest
   - pip install .
-  - pip install --upgrade pytest
 # command to run tests
 script: python -m pytest -v

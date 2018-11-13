@@ -28,6 +28,8 @@ def main(args=None):
                         help='Files to exclude')
     parser.add_argument('-i', '--ignore-modules', nargs='+', default=None,
                         help='Modules to ignore')
+    parser.add_argument('--skip-programs', action='store_true',
+                        help="Don't include programs in the output file")
 
     # Parse the command line arguments
     args = parser.parse_args()
@@ -55,7 +57,8 @@ def main(args=None):
                              macros=macros, verbose=args.verbose)
 
     if output is not None:
-        project.write_depends(filename=output, overwrite=args.overwrite, build=build)
+        project.write_depends(filename=output, overwrite=args.overwrite, build=build,
+                              skip_programs=args.skip_programs)
 
     if args.graph:
         project.make_graph()

@@ -3,7 +3,7 @@ import pytest
 import os
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="function")
 def datadir(tmpdir_factory, request):
     """
     Fixture responsible for searching a folder with the same name of test
