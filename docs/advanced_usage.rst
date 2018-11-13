@@ -18,8 +18,8 @@ Full command line arguments:
    :func: create_argument_parser
    :prog: fortdepend
 
-Here's a slightly more advanced example of how to use `fortdepend` in
-your makefiles:
+Here's a slightly more advanced example of how to use
+:py:mod:`fortdepend` in your makefiles:
 
 .. code-block:: make
 

@@ -10,7 +10,7 @@ You can install fortdepend with pip:
 Basic usage
 ===========
 
-The quickest way to run `fortdepend` is like so:
+The quickest way to run :py:mod:`fortdepend` is like so:
 
 .. code-block:: bash
 
