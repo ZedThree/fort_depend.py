@@ -17,6 +17,7 @@ except NameError:
     pass
 
 DEPFILE_HEADER = "# This file is generated automatically. DO NOT EDIT!"
+DEFAULT_IGNORED_MODULES = ["iso_c_binding", "iso_fortran_env"]
 
 
 class FortranProject:
@@ -39,7 +40,8 @@ class FortranProject:
         name (str): Name of the project (default: name of current directory)
         exclude_files (list of str): List of files to exclude
         files (list of str): List of files to include (default: all in current directory)
-        ignore_modules (list of str): List of module names to ignore_mod (default: iso_c_binding and iso_fortran_env)
+        ignore_modules (list of str): List of module names to ignore_mod
+                                      (default: iso_c_binding and iso_fortran_env)
         macros (dict, list or str): Preprocessor macro definitions
         cpp_includes (list of str): List of directories to add to preprocessor search path
         use_preprocessor (bool): Use the preprocessor (default: True)
@@ -73,8 +75,6 @@ class FortranProject:
         self.programs = {k: v for k, v in self.modules.items()
                          if v.unit_type == "program"}
 
-        if ignore_modules is None:
-            ignore_modules = ["iso_c_binding", "iso_fortran_env"]
         self.remove_ignored_modules(ignore_modules)
 
         self.depends_by_module = self.get_depends_by_module(verbose)
@@ -311,15 +311,18 @@ class FortranProject:
 
         Args:
             ignore_modules (iterable of str): module names to ignore
+                                              (default: iso_c_binding and iso_fortran_env)
 
         """
         if ignore_modules is None:
-            return
+            ignore_modules = []
         elif not isinstance(ignore_modules, list):
             ignore_modules = [ignore_modules]
 
+        ignored_modules = ignore_modules + DEFAULT_IGNORED_MODULES
+
         # Remove from module dict
-        for ignore_mod in ignore_modules:
+        for ignore_mod in ignored_modules:
             self.modules.pop(ignore_mod, None)
             # Remove from 'used' modules
             for module in self.modules.values():

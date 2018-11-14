@@ -85,7 +85,7 @@ class TestFortranProject:
                                      ignore_modules="modF")
         assert sorted(["modG", "modH", "progA"]) == sorted(testproject.modules.keys())
         assert [] == testproject.modules["modG"].uses
-        assert (sorted(["modG", "modH", "iso_c_binding"])
+        assert (sorted(["modG", "modH"])
                 == sorted(testproject.files["multiple_modules.f90"].uses))
 
     def test_depends_by_module(self):
