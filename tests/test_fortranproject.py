@@ -1,7 +1,9 @@
+import builtins
 from fortdepend import FortranProject
 from fortdepend.fort_depend import DEPFILE_HEADER
 import pytest
 import re
+from unittest import mock
 
 
 @pytest.mark.usefixtures("datadir")
@@ -14,7 +16,7 @@ class TestFortranProject:
         testproject = FortranProject(files="moduleA.f90")
         expected_files = ["moduleA.f90"]
 
-        assert set(testproject.files) == set(expected_files)
+        assert sorted(testproject.files) == sorted(expected_files)
 
     def test_get_multiple_files(self):
         testproject = FortranProject(files=["moduleA.f90",
@@ -22,7 +24,7 @@ class TestFortranProject:
         expected_files = ["moduleA.f90",
                           "moduleB.f90"]
 
-        assert set(testproject.files) == set(expected_files)
+        assert sorted(testproject.files) == sorted(expected_files)
 
     def test_get_all_files(self):
         testproject = FortranProject()
@@ -34,7 +36,7 @@ class TestFortranProject:
                           "multiple_modules.f90",
                           "programTest.f90"]
 
-        assert set(testproject.files) == set(expected_files)
+        assert sorted(testproject.files) == sorted(expected_files)
 
     def test_get_all_modules(self):
         testproject = FortranProject()
@@ -51,7 +53,7 @@ class TestFortranProject:
             "test",
         ]
 
-        assert set(testproject.modules) == set(expected_modules)
+        assert sorted(testproject.modules) == sorted(expected_modules)
 
     def test_get_all_programs(self):
         testproject = FortranProject()
@@ -60,14 +62,14 @@ class TestFortranProject:
             "test",
         ]
 
-        assert set(testproject.programs) == set(expected_programs)
+        assert sorted(testproject.programs) == sorted(expected_programs)
 
     def test_get_files_with_different_extension(self):
         testproject = FortranProject()
         files = testproject.get_source(extensions=".f08")
         expected_files = ["different_ext.f08"]
 
-        assert set(files) == set(expected_files)
+        assert sorted(files) == sorted(expected_files)
 
     def test_exclude_files(self):
         testproject = FortranProject(exclude_files="multiple_modules.f90")
@@ -78,14 +80,14 @@ class TestFortranProject:
                           "moduleE.f90",
                           "programTest.f90"]
 
-        assert set(testproject.files) == set(expected_files)
+        assert sorted(testproject.files) == sorted(expected_files)
 
     def test_ignore_modules(self):
         testproject = FortranProject(files="multiple_modules.f90",
                                      ignore_modules="modF")
         assert sorted(["modG", "modH", "progA"]) == sorted(testproject.modules.keys())
         assert [] == testproject.modules["modG"].uses
-        assert (sorted(["modG", "modH", "iso_c_binding"])
+        assert (sorted(["modG", "modH"])
                 == sorted(testproject.files["multiple_modules.f90"].uses))
 
     def test_depends_by_module(self):
@@ -104,6 +106,7 @@ class TestFortranProject:
             "modC": "FortranModule(module, 'modc', 'moduleC.f90')",
             "modD": "FortranModule(module, 'modd', 'moduleD.f90')",
             "modE": "FortranModule(module, 'mode', 'moduleE.f90')",
+            "mpi": "FortranModule(module, 'mpi', 'empty')",
             "test": "FortranModule(program, 'test', 'programTest.f90')",
         }
 
@@ -112,7 +115,7 @@ class TestFortranProject:
             reprs["modB"]: [reprs["modA"]],
             reprs["modC"]: [reprs["modA"], reprs["modB"]],
             reprs["modD"]: [reprs["modC"]],
-            reprs["modE"]: [],
+            reprs["modE"]: [reprs["mpi"]],
             reprs["test"]: [reprs["modC"], reprs["modD"]],
         }
 
@@ -122,8 +125,8 @@ class TestFortranProject:
 
         for key, value in expected.items():
             assert key in depends_by_module_repr
-            reprs = set([repr(foo) for foo in depends_by_module_repr[key]])
-            assert reprs == set(value)
+            reprs = sorted([repr(foo) for foo in depends_by_module_repr[key]])
+            assert reprs == sorted(value)
 
     def test_depends_by_file(self):
         """This one is a little complicated...
@@ -157,8 +160,8 @@ class TestFortranProject:
 
         for key, value in expected.items():
             assert key in depends_by_file_repr
-            reprs = set([repr(foo) for foo in depends_by_file_repr[key]])
-            assert reprs == set(value)
+            reprs = sorted([repr(foo) for foo in depends_by_file_repr[key]])
+            assert reprs == sorted(value)
 
     def test_write_depends(self, datadir):
         expected_contents = [
@@ -203,6 +206,37 @@ class TestFortranProject:
         FortranProject().write_depends()
         testproject = FortranProject(exclude_files="multiple_modules.f90")
         testproject.write_depends(overwrite=True)
+
+        with open(str(datadir.join("makefile.dep")), 'r') as f:
+            contents = f.read()
+
+        # A little manipulation to remove extraneous whitespace is
+        # required in order for a clean comparison
+        contents = contents.replace('\\\n\t', ' ')
+        contents = re.sub(r' +', ' ', contents)
+        contents = [line.lstrip().rstrip(" \t\n") for line in contents.splitlines() if line != '']
+
+        assert sorted(expected_contents) == sorted(contents)
+
+    def test_write_depends_no_overwrite(self, datadir):
+        expected_contents = [
+            DEPFILE_HEADER,
+            "moduleA.o :",
+            "moduleB.o : moduleA.o",
+            "moduleC.o : moduleA.o moduleB.o",
+            "moduleD.o : moduleC.o",
+            "moduleE.o :",
+            "multiple_modules.o :",
+            "programTest.o : moduleC.o moduleD.o",
+            "progA : multiple_modules.o",
+            "test : moduleA.o moduleB.o moduleC.o moduleD.o programTest.o",
+        ]
+
+        FortranProject().write_depends()
+        testproject = FortranProject(exclude_files="multiple_modules.f90")
+
+        with mock.patch.object(builtins, 'input', lambda x: 'N'):
+            testproject.write_depends(overwrite=False)
 
         with open(str(datadir.join("makefile.dep")), 'r') as f:
             contents = f.read()

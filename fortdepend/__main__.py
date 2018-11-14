@@ -13,6 +13,8 @@ def create_argument_parser():
     parser.add_argument('-f', '--files', nargs='+', help='Files to process')
     parser.add_argument('-D', nargs='+', action='append', metavar='NAME[=DESCRIPTION]',
                         help="Preprocessor define statements")
+    parser.add_argument('-I', action='append', metavar='dir',
+                        help="Add dir to the preprocessor search path")
     parser.add_argument('-b', '--build', nargs=1, default='',
                         help='Build Directory (prepended to all files in output)')
     parser.add_argument('-o', '--output', nargs=1, help='Output file')
@@ -28,8 +30,10 @@ def create_argument_parser():
                         help='Files to exclude')
     parser.add_argument('-i', '--ignore-modules', nargs='+', default=None,
                         help='Modules to ignore')
-    parser.add_argument('--skip-programs', action='store_true',
+    parser.add_argument('-s', '--skip-programs', action='store_true',
                         help="Don't include programs in the output file")
+    parser.add_argument('-n', '--no-preprocessor', action='store_true',
+                        help="Don't use the preprocessor")
 
     return parser
 
@@ -63,7 +67,9 @@ def main(args=None):
 
     project = FortranProject(files=args.files, exclude_files=args.exclude_files,
                              ignore_modules=args.ignore_modules,
-                             macros=macros, verbose=args.verbose)
+                             macros=macros, cpp_includes=args.I,
+                             verbose=args.verbose,
+                             use_preprocessor=not args.no_preprocessor)
 
     if output is not None:
         project.write_depends(filename=output, overwrite=args.overwrite, build=build,
