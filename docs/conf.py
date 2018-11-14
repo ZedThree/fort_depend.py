@@ -21,14 +21,16 @@ on_rtd = os.environ.get('READTHEDOCS') == 'True'
 
 # -- Project information -----------------------------------------------------
 
+import fortdepend
+
 project = 'fortdepend'
 copyright = '2018, Peter Hill, David Dickinson'
 author = 'Peter Hill, David Dickinson'
 
 # The short X.Y version
-version = ''
+version = fortdepend.__version__
 # The full version, including alpha/beta/rc tags
-release = 'v1.0'
+release = fortdepend.__version__
 
 
 # -- General configuration ---------------------------------------------------
