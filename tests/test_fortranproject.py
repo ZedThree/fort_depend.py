@@ -1,7 +1,9 @@
+import builtins
 from fortdepend import FortranProject
 from fortdepend.fort_depend import DEPFILE_HEADER
 import pytest
 import re
+from unittest import mock
 
 
 @pytest.mark.usefixtures("datadir")
@@ -204,6 +206,37 @@ class TestFortranProject:
         FortranProject().write_depends()
         testproject = FortranProject(exclude_files="multiple_modules.f90")
         testproject.write_depends(overwrite=True)
+
+        with open(str(datadir.join("makefile.dep")), 'r') as f:
+            contents = f.read()
+
+        # A little manipulation to remove extraneous whitespace is
+        # required in order for a clean comparison
+        contents = contents.replace('\\\n\t', ' ')
+        contents = re.sub(r' +', ' ', contents)
+        contents = [line.lstrip().rstrip(" \t\n") for line in contents.splitlines() if line != '']
+
+        assert sorted(expected_contents) == sorted(contents)
+
+    def test_write_depends_no_overwrite(self, datadir):
+        expected_contents = [
+            DEPFILE_HEADER,
+            "moduleA.o :",
+            "moduleB.o : moduleA.o",
+            "moduleC.o : moduleA.o moduleB.o",
+            "moduleD.o : moduleC.o",
+            "moduleE.o :",
+            "multiple_modules.o :",
+            "programTest.o : moduleC.o moduleD.o",
+            "progA : multiple_modules.o",
+            "test : moduleA.o moduleB.o moduleC.o moduleD.o programTest.o",
+        ]
+
+        FortranProject().write_depends()
+        testproject = FortranProject(exclude_files="multiple_modules.f90")
+
+        with mock.patch.object(builtins, 'input', lambda x: 'N'):
+            testproject.write_depends(overwrite=False)
 
         with open(str(datadir.join("makefile.dep")), 'r') as f:
             contents = f.read()
