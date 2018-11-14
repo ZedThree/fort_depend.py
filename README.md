@@ -107,6 +107,7 @@ Full command line arguments:
                             Files to process
       -D NAME[=DESCRIPTION] [NAME[=DESCRIPTION] ...]
                             Preprocessor define statements
+      -I dir                Add dir to the preprocessor search path
       -b BUILD, --build BUILD
                             Build Directory (prepended to all files in output)
       -o OUTPUT, --output OUTPUT
@@ -120,6 +121,8 @@ Full command line arguments:
       -i IGNORE_MODULES [IGNORE_MODULES ...], --ignore-modules IGNORE_MODULES [IGNORE_MODULES ...]
                             Modules to ignore
       --skip-programs       Don't include programs in the output file
+      -n, --no-preprocessor
+                            Don't use the preprocessor
 
 Here's a slightly more advanced example of how to use `fortdepend` in
 your makefiles:
