@@ -42,12 +42,13 @@ class FortranProject:
         ignore_modules (list of str): List of module names to ignore_mod (default: iso_c_binding and iso_fortran_env)
         macros (dict, list or str): Preprocessor macro definitions
         cpp_includes (list of str): List of directories to add to preprocessor search path
+        use_preprocessor (bool): Use the preprocessor (default: True)
         verbose (bool): Print more messages (default: False)
 
     """
 
     def __init__(self, name=None, exclude_files=None, files=None, ignore_modules=None,
-                 macros=None, cpp_includes=None, verbose=False):
+                 macros=None, cpp_includes=None, use_preprocessor=True, verbose=False):
 
         if name is None:
             self.name = os.path.basename(os.getcwd())
@@ -65,7 +66,8 @@ class FortranProject:
             files = set(files) - set(exclude_files)
 
         self.files = {filename: FortranFile(filename=filename, macros=macros, readfile=True,
-                                            cpp_includes=cpp_includes)
+                                            cpp_includes=cpp_includes,
+                                            use_preprocessor=use_preprocessor)
                       for filename in files}
         self.modules = self.get_modules()
         self.programs = {k: v for k, v in self.modules.items()

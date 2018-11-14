@@ -32,6 +32,8 @@ def create_argument_parser():
                         help='Modules to ignore')
     parser.add_argument('--skip-programs', action='store_true',
                         help="Don't include programs in the output file")
+    parser.add_argument('-n', '--no-preprocessor', action='store_true',
+                        help="Don't use the preprocessor")
 
     return parser
 
@@ -66,7 +68,8 @@ def main(args=None):
     project = FortranProject(files=args.files, exclude_files=args.exclude_files,
                              ignore_modules=args.ignore_modules,
                              macros=macros, cpp_includes=args.I,
-                             verbose=args.verbose)
+                             verbose=args.verbose,
+                             use_preprocessor=not args.no_preprocessor)
 
     if output is not None:
         project.write_depends(filename=output, overwrite=args.overwrite, build=build,
