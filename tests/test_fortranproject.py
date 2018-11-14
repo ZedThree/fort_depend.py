@@ -104,6 +104,7 @@ class TestFortranProject:
             "modC": "FortranModule(module, 'modc', 'moduleC.f90')",
             "modD": "FortranModule(module, 'modd', 'moduleD.f90')",
             "modE": "FortranModule(module, 'mode', 'moduleE.f90')",
+            "mpi": "FortranModule(module, 'mpi', 'empty')",
             "test": "FortranModule(program, 'test', 'programTest.f90')",
         }
 
@@ -112,7 +113,7 @@ class TestFortranProject:
             reprs["modB"]: [reprs["modA"]],
             reprs["modC"]: [reprs["modA"], reprs["modB"]],
             reprs["modD"]: [reprs["modC"]],
-            reprs["modE"]: [],
+            reprs["modE"]: [reprs["mpi"]],
             reprs["test"]: [reprs["modC"], reprs["modD"]],
         }
 
