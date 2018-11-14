@@ -22,9 +22,10 @@ class FortranFile:
         filename (str): Source file
         macros (iterable): Dict of preprocessor macros to be expanded
         readfile (bool): Read and process the file [True]
+        cpp_includes (list of str): List of directories to add to preprocessor search path
 
     """
-    def __init__(self, filename=None, macros=None, readfile=True):
+    def __init__(self, filename=None, macros=None, readfile=True, cpp_includes=None):
         self.filename = filename
         self.uses = None
         self.modules = None
@@ -49,6 +50,12 @@ class FortranFile:
                             preprocessor.define("{} {}".format(*temp))
                         else:
                             preprocessor.define(macro)
+
+            if cpp_includes:
+                if not isinstance(cpp_includes, list):
+                    cpp_includes = [cpp_includes]
+                for include_dir in cpp_includes:
+                    preprocessor.add_path(include_dir)
 
             contents = preprocessor.parse_to_string(contents, source=self.filename)
 

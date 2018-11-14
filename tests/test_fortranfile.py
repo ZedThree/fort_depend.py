@@ -173,3 +173,11 @@ class TestReadFortranFile:
 
         testfile2 = FortranFile(filename="preprocessor.f90", readfile=True)
         assert sorted(testfile2.uses) == sorted(['bar', 'rawr'])
+
+    def test_include_file(self):
+        testfile = FortranFile(filename="preprocessor_include_file.F90", readfile=True,
+                               macros=["CAT"], cpp_includes="some_include_dir")
+        assert testfile.uses == ['cat']
+
+        testfile2 = FortranFile(filename="preprocessor_include_file.F90", readfile=True)
+        assert sorted(testfile2.uses) == sorted(['dog', 'goat'])
