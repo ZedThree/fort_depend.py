@@ -83,9 +83,9 @@ And `make test` will magically build everything in the correct order!
 Move advanced use
 -----------------
 
-You can specify preprocessor macros with `-D`:
+You can specify preprocessor macros with `-D` and search paths with `-I`:
 
-    fortdepend -DMACRO=42 -o Makefile.dep
+    fortdepend -DMACRO=42 -Isome/include/dir -o Makefile.dep
 
 will replace instances of `MACRO` with `42` according to the usual C99
 preprocessor rules. This can be used to conditionally `use` some
