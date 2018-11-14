@@ -30,7 +30,7 @@ def create_argument_parser():
                         help='Files to exclude')
     parser.add_argument('-i', '--ignore-modules', nargs='+', default=None,
                         help='Modules to ignore')
-    parser.add_argument('--skip-programs', action='store_true',
+    parser.add_argument('-s', '--skip-programs', action='store_true',
                         help="Don't include programs in the output file")
     parser.add_argument('-n', '--no-preprocessor', action='store_true',
                         help="Don't use the preprocessor")
