@@ -14,7 +14,7 @@ class TestFortranProject:
         testproject = FortranProject(files="moduleA.f90")
         expected_files = ["moduleA.f90"]
 
-        assert set(testproject.files) == set(expected_files)
+        assert sorted(testproject.files) == sorted(expected_files)
 
     def test_get_multiple_files(self):
         testproject = FortranProject(files=["moduleA.f90",
@@ -22,7 +22,7 @@ class TestFortranProject:
         expected_files = ["moduleA.f90",
                           "moduleB.f90"]
 
-        assert set(testproject.files) == set(expected_files)
+        assert sorted(testproject.files) == sorted(expected_files)
 
     def test_get_all_files(self):
         testproject = FortranProject()
@@ -34,7 +34,7 @@ class TestFortranProject:
                           "multiple_modules.f90",
                           "programTest.f90"]
 
-        assert set(testproject.files) == set(expected_files)
+        assert sorted(testproject.files) == sorted(expected_files)
 
     def test_get_all_modules(self):
         testproject = FortranProject()
@@ -51,7 +51,7 @@ class TestFortranProject:
             "test",
         ]
 
-        assert set(testproject.modules) == set(expected_modules)
+        assert sorted(testproject.modules) == sorted(expected_modules)
 
     def test_get_all_programs(self):
         testproject = FortranProject()
@@ -60,14 +60,14 @@ class TestFortranProject:
             "test",
         ]
 
-        assert set(testproject.programs) == set(expected_programs)
+        assert sorted(testproject.programs) == sorted(expected_programs)
 
     def test_get_files_with_different_extension(self):
         testproject = FortranProject()
         files = testproject.get_source(extensions=".f08")
         expected_files = ["different_ext.f08"]
 
-        assert set(files) == set(expected_files)
+        assert sorted(files) == sorted(expected_files)
 
     def test_exclude_files(self):
         testproject = FortranProject(exclude_files="multiple_modules.f90")
@@ -78,7 +78,7 @@ class TestFortranProject:
                           "moduleE.f90",
                           "programTest.f90"]
 
-        assert set(testproject.files) == set(expected_files)
+        assert sorted(testproject.files) == sorted(expected_files)
 
     def test_ignore_modules(self):
         testproject = FortranProject(files="multiple_modules.f90",
@@ -123,8 +123,8 @@ class TestFortranProject:
 
         for key, value in expected.items():
             assert key in depends_by_module_repr
-            reprs = set([repr(foo) for foo in depends_by_module_repr[key]])
-            assert reprs == set(value)
+            reprs = sorted([repr(foo) for foo in depends_by_module_repr[key]])
+            assert reprs == sorted(value)
 
     def test_depends_by_file(self):
         """This one is a little complicated...
@@ -158,8 +158,8 @@ class TestFortranProject:
 
         for key, value in expected.items():
             assert key in depends_by_file_repr
-            reprs = set([repr(foo) for foo in depends_by_file_repr[key]])
-            assert reprs == set(value)
+            reprs = sorted([repr(foo) for foo in depends_by_file_repr[key]])
+            assert reprs == sorted(value)
 
     def test_write_depends(self, datadir):
         expected_contents = [
