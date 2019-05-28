@@ -536,9 +536,8 @@ def get_depends(ignore,verbose,cwd,fob=[],m2f=[], ffiles=[]):
                           tmp.append(name.lower())
 
                           if int(verbose) > 2 :
-                            print ("\033[031m   Note: \033[039m module \033[032m"+j+"\033[039m not defined in any file in this directory")
-                            print ("\033[031m         \033[039m module found in \033[032m"+name+"\033[039m file")
-                            print ("\033[031m         \033[039m adding the module to dependency file, not checking its dependency further \033[032m\033[039m")
+                            print ("\033[031m   Note: \033[039m module \033[032m"+j+"\033[039m found in \033[032m"+name+"\033[039m file")
+                            print ("\033[031m         \033[039m adding this module to the dependency tree \033[032m\033[039m")
                           break    #break loop, dependency declared
                 
                 if istat== 0 and (j != ""):
@@ -591,7 +590,7 @@ def status(i):
      if(status > 1):
        sys.stdout.write(u"\u001b[" + str(0) + "A") # Move up
 
-     print "[" + "#" * width + " " * (25 - width) + "]"
+#     print "[" + "#" * width + " " * (25 - width) + "]"
 
 
 class file_obj:
