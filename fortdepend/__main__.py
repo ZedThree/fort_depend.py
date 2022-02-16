@@ -2,7 +2,7 @@
 import argparse
 import colorama
 from fortdepend import FortranProject
-from ._version import __version__
+from fortdepend import __version__
 
 
 def create_argument_parser():
