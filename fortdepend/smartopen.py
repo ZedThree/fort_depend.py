@@ -23,5 +23,5 @@ def smart_open(filename, mode="Ur"):
     try:
         yield fh
     finally:
-        if filename is not "-":
+        if filename != "-":
             fh.close()
