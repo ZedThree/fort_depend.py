@@ -3,9 +3,9 @@ import re
 
 from .smartopen import smart_open
 
-UNIT_REGEX = re.compile(r"^\s*(?P<unit_type>module(?!\s+procedure)|program)\s*(?P<modname>\w*)",
+UNIT_REGEX = re.compile(r"^\s*(?P<unit_type>module(?!\s+procedure)|program)\s+(?P<modname>\w*)",
                         re.IGNORECASE)
-END_REGEX = re.compile(r"^\s*end\s*(?P<unit_type>module|program)\s*(?P<modname>\w*)?",
+END_REGEX = re.compile(r"^\s*end\s*(?P<unit_type>module|program)\s+(?P<modname>\w*)?",
                        re.IGNORECASE)
 USE_REGEX = re.compile(r"""^\s*use
 (\s*,\s*intrinsic\s*)?(\s*::\s*|\s+)  # Valid separators between "use" and module name

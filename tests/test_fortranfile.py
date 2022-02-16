@@ -132,6 +132,7 @@ class TestReadFortranFile:
         expected = {"modA": "FortranModule(module, 'moda', 'multiple_modules.f90')",
                     "modB": "FortranModule(module, 'modb', 'multiple_modules.f90')",
                     "modC": "FortranModule(module, 'modc', 'multiple_modules.f90')",
+                    "modD": "FortranModule(module, 'modd', 'multiple_modules.f90')",
                     "progA": "FortranModule(program, 'proga', 'multiple_modules.f90')"}
 
         for key, value in expected.items():
@@ -148,7 +149,7 @@ class TestReadFortranFile:
 
     def test_multiple_uses_in_multiple_units(self):
         testfile = FortranFile(filename="multiple_modules.f90", readfile=True)
-        assert set(testfile.uses) == set(['modA', 'modB', 'modC', 'iso_c_binding'])
+        assert set(testfile.uses) == set(['modA', 'modB', 'modC', 'modD', 'iso_c_binding'])
 
     def test_macro_replacement_dict(self):
         testfile = FortranFile(filename="moduleC.f90", readfile=True,
