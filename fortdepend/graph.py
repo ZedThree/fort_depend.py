@@ -3,6 +3,7 @@ import warnings
 # If graphviz is not installed, graphs can't be produced
 try:
     import graphviz as gv
+
     has_graphviz = True
 except ImportError:
     has_graphviz = False
@@ -18,11 +19,10 @@ class Graph:
 
     """
 
-    def __init__(self, tree, filename=None, format='svg', view=True):
+    def __init__(self, tree, filename=None, format="svg", view=True):
 
         if not has_graphviz:
-            warnings.warn("graphviz not installed: can't make graph",
-                          RuntimeWarning)
+            warnings.warn("graphviz not installed: can't make graph", RuntimeWarning)
             return
 
         if filename is None:
@@ -36,12 +36,9 @@ class Graph:
         self.tree = tree
 
     def draw(self):
-        """Render the graph to an image
-
-        """
+        """Render the graph to an image"""
         if not has_graphviz:
-            warnings.warn("graphviz not installed: can't make graph",
-                          RuntimeWarning)
+            warnings.warn("graphviz not installed: can't make graph", RuntimeWarning)
             return
 
         for parent in self.tree:

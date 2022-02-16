@@ -49,8 +49,17 @@ class FortranProject:
 
     """
 
-    def __init__(self, name=None, exclude_files=None, files=None, ignore_modules=None,
-                 macros=None, cpp_includes=None, use_preprocessor=True, verbose=False):
+    def __init__(
+        self,
+        name=None,
+        exclude_files=None,
+        files=None,
+        ignore_modules=None,
+        macros=None,
+        cpp_includes=None,
+        use_preprocessor=True,
+        verbose=False,
+    ):
 
         if name is None:
             self.name = os.path.basename(os.getcwd())
@@ -67,13 +76,20 @@ class FortranProject:
                 exclude_files = [exclude_files]
             files = set(files) - set(exclude_files)
 
-        self.files = {filename: FortranFile(filename=filename, macros=macros, readfile=True,
-                                            cpp_includes=cpp_includes,
-                                            use_preprocessor=use_preprocessor)
-                      for filename in files}
+        self.files = {
+            filename: FortranFile(
+                filename=filename,
+                macros=macros,
+                readfile=True,
+                cpp_includes=cpp_includes,
+                use_preprocessor=use_preprocessor,
+            )
+            for filename in files
+        }
         self.modules = self.get_modules()
-        self.programs = {k: v for k, v in self.modules.items()
-                         if v.unit_type == "program"}
+        self.programs = {
+            k: v for k, v in self.modules.items() if v.unit_type == "program"
+        }
 
         self.remove_ignored_modules(ignore_modules)
 
@@ -132,22 +148,28 @@ class FortranProject:
                 try:
                     graph.append(self.modules[used_mod])
                 except KeyError:
-                    new_module = FortranModule(unit_type='module',
-                                               name=used_mod)
+                    new_module = FortranModule(unit_type="module", name=used_mod)
                     graph.append(new_module)
 
-                    print(Fore.RED + "Error" + Fore.RESET + " module " +
-                          Fore.GREEN + used_mod + Fore.RESET +
-                          " not defined in any files. Creating empty ",
-                          file=sys.stderr)
+                    print(
+                        Fore.RED
+                        + "Error"
+                        + Fore.RESET
+                        + " module "
+                        + Fore.GREEN
+                        + used_mod
+                        + Fore.RESET
+                        + " not defined in any files. Creating empty ",
+                        file=sys.stderr,
+                    )
 
-            depends[module] = sorted(graph,
-                                     key=lambda f: f.source_file.filename)
+            depends[module] = sorted(graph, key=lambda f: f.source_file.filename)
 
         if verbose:
             for module_ in sorted(depends.keys(), key=lambda f: f.source_file.filename):
-                print(Fore.GREEN + module_.name + Fore.RESET +
-                      " depends on :" + Fore.BLUE)
+                print(
+                    Fore.GREEN + module_.name + Fore.RESET + " depends on :" + Fore.BLUE
+                )
                 for dep in depends[module_]:
                     print("\t" + dep.name)
                 print(Fore.RESET)
@@ -175,16 +197,28 @@ class FortranProject:
                         continue
                     graph.append(mod_file)
                 except KeyError:
-                    print(Fore.RED + "Error" + Fore.RESET + " module " + Fore.GREEN +
-                          mod + Fore.RESET + " not defined in any files. Skipping...",
-                          file=sys.stderr)
-            depends[source_file] = sorted(graph,
-                                          key=lambda f: f.filename)
+                    print(
+                        Fore.RED
+                        + "Error"
+                        + Fore.RESET
+                        + " module "
+                        + Fore.GREEN
+                        + mod
+                        + Fore.RESET
+                        + " not defined in any files. Skipping...",
+                        file=sys.stderr,
+                    )
+            depends[source_file] = sorted(graph, key=lambda f: f.filename)
 
         if verbose:
             for file_ in sorted(depends.keys(), key=lambda f: f.filename):
-                print(Fore.GREEN + file_.filename + Fore.RESET +
-                      " depends on :" + Fore.BLUE)
+                print(
+                    Fore.GREEN
+                    + file_.filename
+                    + Fore.RESET
+                    + " depends on :"
+                    + Fore.BLUE
+                )
                 for dep in depends[file_]:
                     print("\t" + dep.filename)
                 print(Fore.RESET)
@@ -203,7 +237,9 @@ class FortranProject:
 
         """
         used_modules = self._get_all_used_modules(module_name, state=[])
-        used_files = [self.modules[module].source_file.filename for module in used_modules]
+        used_files = [
+            self.modules[module].source_file.filename for module in used_modules
+        ]
 
         module_filename = self.modules[module_name].source_file.filename
 
@@ -236,14 +272,23 @@ class FortranProject:
                 if self.modules[module].uses:
                     state.extend(self._get_all_used_modules(module, state))
             except KeyError:
-                print(Fore.RED + "Error" + Fore.RESET + " module " + Fore.GREEN +
-                      module + Fore.RESET + " not defined in any files. Skipping...",
-                      file=sys.stderr)
+                print(
+                    Fore.RED
+                    + "Error"
+                    + Fore.RESET
+                    + " module "
+                    + Fore.GREEN
+                    + module
+                    + Fore.RESET
+                    + " not defined in any files. Skipping...",
+                    file=sys.stderr,
+                )
 
         return sorted(set(state))
 
-    def write_depends(self, filename="makefile.dep", overwrite=False, build='',
-                      skip_programs=False):
+    def write_depends(
+        self, filename="makefile.dep", overwrite=False, build="", skip_programs=False
+    ):
         """Write the dependencies to file
 
         Args:
@@ -266,16 +311,19 @@ class FortranProject:
 
         # Test file doesn't exist
         if os.path.exists(filename):
-            if not(overwrite):
-                print(Fore.RED + "Warning: file '{}' exists.".format(filename) +
-                      Fore.RESET)
+            if not (overwrite):
+                print(
+                    Fore.RED
+                    + "Warning: file '{}' exists.".format(filename)
+                    + Fore.RESET
+                )
                 opt = input("Overwrite? Y... for yes.")
                 if opt.lower().startswith("y"):
                     pass
                 else:
                     return
 
-        with smart_open(filename, 'w') as f:
+        with smart_open(filename, "w") as f:
             f.write(DEPFILE_HEADER + "\n")
 
             if not skip_programs:
@@ -289,7 +337,7 @@ class FortranProject:
                 listing = _format_dependencies(file_.filename, ".o", dep_list)
                 f.write(listing)
 
-    def make_graph(self, filename=None, format='svg', view=True):
+    def make_graph(self, filename=None, format="svg", view=True):
         """Draw a graph of the project using graphviz
 
         Args:
@@ -302,8 +350,9 @@ class FortranProject:
         if filename is None:
             filename = self.name + ".dot"
 
-        graph = Graph(self.depends_by_module, filename=filename,
-                      format=format, view=view)
+        graph = Graph(
+            self.depends_by_module, filename=filename, format=format, view=view
+        )
         graph.draw()
 
     def remove_ignored_modules(self, ignore_modules=None):

@@ -19,22 +19,22 @@ class TestFortranProject:
         assert sorted(testproject.files) == sorted(expected_files)
 
     def test_get_multiple_files(self):
-        testproject = FortranProject(files=["moduleA.f90",
-                                            "moduleB.f90"])
-        expected_files = ["moduleA.f90",
-                          "moduleB.f90"]
+        testproject = FortranProject(files=["moduleA.f90", "moduleB.f90"])
+        expected_files = ["moduleA.f90", "moduleB.f90"]
 
         assert sorted(testproject.files) == sorted(expected_files)
 
     def test_get_all_files(self):
         testproject = FortranProject()
-        expected_files = ["moduleA.f90",
-                          "moduleB.f90",
-                          "moduleC.f90",
-                          "moduleD.f90",
-                          "moduleE.f90",
-                          "multiple_modules.f90",
-                          "programTest.f90"]
+        expected_files = [
+            "moduleA.f90",
+            "moduleB.f90",
+            "moduleC.f90",
+            "moduleD.f90",
+            "moduleE.f90",
+            "multiple_modules.f90",
+            "programTest.f90",
+        ]
 
         assert sorted(testproject.files) == sorted(expected_files)
 
@@ -73,22 +73,26 @@ class TestFortranProject:
 
     def test_exclude_files(self):
         testproject = FortranProject(exclude_files="multiple_modules.f90")
-        expected_files = ["moduleA.f90",
-                          "moduleB.f90",
-                          "moduleC.f90",
-                          "moduleD.f90",
-                          "moduleE.f90",
-                          "programTest.f90"]
+        expected_files = [
+            "moduleA.f90",
+            "moduleB.f90",
+            "moduleC.f90",
+            "moduleD.f90",
+            "moduleE.f90",
+            "programTest.f90",
+        ]
 
         assert sorted(testproject.files) == sorted(expected_files)
 
     def test_ignore_modules(self):
-        testproject = FortranProject(files="multiple_modules.f90",
-                                     ignore_modules="modF")
+        testproject = FortranProject(
+            files="multiple_modules.f90", ignore_modules="modF"
+        )
         assert sorted(["modG", "modH", "progA"]) == sorted(testproject.modules.keys())
         assert [] == testproject.modules["modG"].uses
-        assert (sorted(["modG", "modH"])
-                == sorted(testproject.files["multiple_modules.f90"].uses))
+        assert sorted(["modG", "modH"]) == sorted(
+            testproject.files["multiple_modules.f90"].uses
+        )
 
     def test_depends_by_module(self):
         """This one is a little complicated...
@@ -138,21 +142,23 @@ class TestFortranProject:
         sets of strings.
         """
         testproject = FortranProject(exclude_files="multiple_modules.f90")
-        reprs = {"modA": "FortranFile('moduleA.f90')",
-                 "modB": "FortranFile('moduleB.f90')",
-                 "modC": "FortranFile('moduleC.f90')",
-                 "modD": "FortranFile('moduleD.f90')",
-                 "modE": "FortranFile('moduleE.f90')",
-                 "test": "FortranFile('programTest.f90')",
-                 }
+        reprs = {
+            "modA": "FortranFile('moduleA.f90')",
+            "modB": "FortranFile('moduleB.f90')",
+            "modC": "FortranFile('moduleC.f90')",
+            "modD": "FortranFile('moduleD.f90')",
+            "modE": "FortranFile('moduleE.f90')",
+            "test": "FortranFile('programTest.f90')",
+        }
 
-        expected = {reprs["modA"]: [],
-                    reprs["modB"]: [reprs["modA"]],
-                    reprs["modC"]: [reprs["modA"], reprs["modB"]],
-                    reprs["modD"]: [reprs["modC"]],
-                    reprs["modE"]: [],
-                    reprs["test"]: [reprs["modC"], reprs["modD"]],
-                    }
+        expected = {
+            reprs["modA"]: [],
+            reprs["modB"]: [reprs["modA"]],
+            reprs["modC"]: [reprs["modA"], reprs["modB"]],
+            reprs["modD"]: [reprs["modC"]],
+            reprs["modE"]: [],
+            reprs["test"]: [reprs["modC"], reprs["modD"]],
+        }
 
         depends_by_file_repr = {}
         for key, value in testproject.depends_by_file.items():
@@ -180,14 +186,18 @@ class TestFortranProject:
         testproject = FortranProject()
         testproject.write_depends()
 
-        with open(str(datadir.join("makefile.dep")), 'r') as f:
+        with open(str(datadir.join("makefile.dep")), "r") as f:
             contents = f.read()
 
         # A little manipulation to remove extraneous whitespace is
         # required in order for a clean comparison
-        contents = contents.replace('\\\n\t', ' ')
-        contents = re.sub(r' +', ' ', contents)
-        contents = [line.lstrip().rstrip(" \t\n") for line in contents.splitlines() if line != '']
+        contents = contents.replace("\\\n\t", " ")
+        contents = re.sub(r" +", " ", contents)
+        contents = [
+            line.lstrip().rstrip(" \t\n")
+            for line in contents.splitlines()
+            if line != ""
+        ]
 
         assert sorted(expected_contents) == sorted(contents)
 
@@ -207,14 +217,18 @@ class TestFortranProject:
         testproject = FortranProject(exclude_files="multiple_modules.f90")
         testproject.write_depends(overwrite=True)
 
-        with open(str(datadir.join("makefile.dep")), 'r') as f:
+        with open(str(datadir.join("makefile.dep")), "r") as f:
             contents = f.read()
 
         # A little manipulation to remove extraneous whitespace is
         # required in order for a clean comparison
-        contents = contents.replace('\\\n\t', ' ')
-        contents = re.sub(r' +', ' ', contents)
-        contents = [line.lstrip().rstrip(" \t\n") for line in contents.splitlines() if line != '']
+        contents = contents.replace("\\\n\t", " ")
+        contents = re.sub(r" +", " ", contents)
+        contents = [
+            line.lstrip().rstrip(" \t\n")
+            for line in contents.splitlines()
+            if line != ""
+        ]
 
         assert sorted(expected_contents) == sorted(contents)
 
@@ -235,17 +249,21 @@ class TestFortranProject:
         FortranProject().write_depends()
         testproject = FortranProject(exclude_files="multiple_modules.f90")
 
-        with mock.patch.object(builtins, 'input', lambda x: 'N'):
+        with mock.patch.object(builtins, "input", lambda x: "N"):
             testproject.write_depends(overwrite=False)
 
-        with open(str(datadir.join("makefile.dep")), 'r') as f:
+        with open(str(datadir.join("makefile.dep")), "r") as f:
             contents = f.read()
 
         # A little manipulation to remove extraneous whitespace is
         # required in order for a clean comparison
-        contents = contents.replace('\\\n\t', ' ')
-        contents = re.sub(r' +', ' ', contents)
-        contents = [line.lstrip().rstrip(" \t\n") for line in contents.splitlines() if line != '']
+        contents = contents.replace("\\\n\t", " ")
+        contents = re.sub(r" +", " ", contents)
+        contents = [
+            line.lstrip().rstrip(" \t\n")
+            for line in contents.splitlines()
+            if line != ""
+        ]
 
         assert sorted(expected_contents) == sorted(contents)
 
@@ -260,21 +278,27 @@ class TestFortranProject:
             "testdir/multiple_modules.o :",
             "testdir/programTest.o : testdir/moduleC.o testdir/moduleD.o",
             "testdir/progA : testdir/multiple_modules.o",
-            ("testdir/test : testdir/moduleA.o testdir/moduleB.o "  # long line
-             + "testdir/moduleC.o testdir/moduleD.o testdir/programTest.o"),
+            (
+                "testdir/test : testdir/moduleA.o testdir/moduleB.o "  # long line
+                + "testdir/moduleC.o testdir/moduleD.o testdir/programTest.o"
+            ),
         ]
 
         testproject = FortranProject()
         testproject.write_depends(build="testdir")
 
-        with open(str(datadir.join("makefile.dep")), 'r') as f:
+        with open(str(datadir.join("makefile.dep")), "r") as f:
             contents = f.read()
 
         # A little manipulation to remove extraneous whitespace is
         # required in order for a clean comparison
-        contents = contents.replace('\\\n\t', ' ')
-        contents = re.sub(r' +', ' ', contents)
-        contents = [line.lstrip().rstrip(" \t\n") for line in contents.splitlines() if line != '']
+        contents = contents.replace("\\\n\t", " ")
+        contents = re.sub(r" +", " ", contents)
+        contents = [
+            line.lstrip().rstrip(" \t\n")
+            for line in contents.splitlines()
+            if line != ""
+        ]
 
         assert sorted(expected_contents) == sorted(contents)
 
@@ -293,14 +317,18 @@ class TestFortranProject:
         testproject = FortranProject()
         testproject.write_depends(skip_programs=True)
 
-        with open(str(datadir.join("makefile.dep")), 'r') as f:
+        with open(str(datadir.join("makefile.dep")), "r") as f:
             contents = f.read()
 
         # A little manipulation to remove extraneous whitespace is
         # required in order for a clean comparison
-        contents = contents.replace('\\\n\t', ' ')
-        contents = re.sub(r' +', ' ', contents)
-        contents = [line.lstrip().rstrip(" \t\n") for line in contents.splitlines() if line != '']
+        contents = contents.replace("\\\n\t", " ")
+        contents = re.sub(r" +", " ", contents)
+        contents = [
+            line.lstrip().rstrip(" \t\n")
+            for line in contents.splitlines()
+            if line != ""
+        ]
 
         assert sorted(expected_contents) == sorted(contents)
 
@@ -320,13 +348,15 @@ class TestFortranProject:
     def test_get_all_used_files(self):
         expected_used = {
             "progA": sorted(["multiple_modules.f90"]),
-            "test": sorted([
-                "moduleA.f90",
-                "moduleB.f90",
-                "moduleC.f90",
-                "moduleD.f90",
-                "programTest.f90",
-            ]),
+            "test": sorted(
+                [
+                    "moduleA.f90",
+                    "moduleB.f90",
+                    "moduleC.f90",
+                    "moduleD.f90",
+                    "programTest.f90",
+                ]
+            ),
         }
 
         testproject = FortranProject()
