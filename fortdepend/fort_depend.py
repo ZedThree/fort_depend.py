@@ -1,5 +1,3 @@
-from __future__ import print_function
-
 import os
 import sys
 
@@ -9,12 +7,6 @@ from colorama import Fore
 from .smartopen import smart_open
 from .units import FortranFile, FortranModule
 from .graph import Graph
-
-# Python 2/3 compatibility
-try:
-    input = raw_input
-except NameError:
-    pass
 
 DEPFILE_HEADER = "# This file is generated automatically. DO NOT EDIT!"
 DEFAULT_IGNORED_MODULES = ["iso_c_binding", "iso_fortran_env"]
