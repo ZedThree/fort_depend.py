@@ -1,12 +1,14 @@
+"""Utilities for making graphs of dependencies"""
+
 import warnings
 
 # If graphviz is not installed, graphs can't be produced
 try:
     import graphviz as gv
 
-    has_graphviz = True
+    HAS_GRAPHVIZ = True
 except ImportError:
-    has_graphviz = False
+    HAS_GRAPHVIZ = False
 
 
 class Graph:
@@ -20,7 +22,7 @@ class Graph:
     """
 
     def __init__(self, tree, filename=None, format="svg", view=True):
-        if not has_graphviz:
+        if not HAS_GRAPHVIZ:
             warnings.warn("graphviz not installed: can't make graph", RuntimeWarning)
             return
 
@@ -36,7 +38,7 @@ class Graph:
 
     def draw(self):
         """Render the graph to an image"""
-        if not has_graphviz:
+        if not HAS_GRAPHVIZ:
             warnings.warn("graphviz not installed: can't make graph", RuntimeWarning)
             return
 
