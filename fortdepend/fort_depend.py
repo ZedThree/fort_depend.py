@@ -300,22 +300,18 @@ class FortranProject:
         def _format_dependencies(target, target_extension, dep_list):
             _, filename = os.path.split(target)
             target_name = os.path.splitext(filename)[0] + target_extension
-            listing = "\n{} : ".format(os.path.join(build, target_name))
+            listing = f"\n{os.path.join(build, target_name)} : "
             for dep in dep_list:
                 _, depfilename = os.path.split(dep)
                 depobjectname = os.path.splitext(depfilename)[0] + ".o"
-                listing += " \\\n\t{}".format(os.path.join(build, depobjectname))
+                listing += f" \\\n\t{os.path.join(build, depobjectname)}"
             listing += "\n"
             return listing
 
         # Test file doesn't exist
         if os.path.exists(filename):
-            if not (overwrite):
-                print(
-                    Fore.RED
-                    + "Warning: file '{}' exists.".format(filename)
-                    + Fore.RESET
-                )
+            if not overwrite:
+                print(f"{Fore.RED}Warning: file '{filename}' exists.{Fore.RESET}")
                 opt = input("Overwrite? Y... for yes.")
                 if opt.lower().startswith("y"):
                     pass

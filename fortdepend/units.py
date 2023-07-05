@@ -54,14 +54,14 @@ class FortranFile:
             if macros:
                 if isinstance(macros, dict):
                     for k, v in macros.items():
-                        preprocessor.define("{} {}".format(k, v))
+                        preprocessor.define(f"{k} {v}")
                 else:
                     if not isinstance(macros, list):
                         macros = [macros]
                     for macro in macros:
                         if "=" in macro:
-                            temp = macro.split("=")
-                            preprocessor.define("{} {}".format(*temp))
+                            key, value = macro.split("=")
+                            preprocessor.define(f"{key} {value}")
                         else:
                             preprocessor.define(macro)
 
@@ -81,7 +81,7 @@ class FortranFile:
         return self.filename
 
     def __repr__(self):
-        return "FortranFile('{}')".format(self.filename)
+        return f"FortranFile('{self.filename}')"
 
     def get_modules(self, contents, macros=None):
         """Return all the modules or programs that are in the file
@@ -107,9 +107,7 @@ class FortranFile:
         if found_units:
             if (len(found_units) != len(starts)) or (len(starts) != len(ends)):
                 error_string = (
-                    "Unmatched start/end of modules in {} ({} begins/{} ends)".format(
-                        self.filename, len(starts), len(ends)
-                    )
+                    f"Unmatched start/end of modules in {self.filename} ({len(starts)} begins/{len(ends)} ends)"
                 )
                 raise ValueError(error_string)
             for unit, start, end in zip(found_units, starts, ends):
@@ -167,9 +165,7 @@ class FortranModule:
         return self.name
 
     def __repr__(self):
-        return "FortranModule({}, '{}', '{}')".format(
-            self.unit_type, self.name, self.source_file.filename
-        )
+        return f"FortranModule({self.unit_type}, '{self.name}', '{self.source_file.filename}')"
 
     def get_uses(self, contents, macros=None):
         """Return which modules are used in the file after expanding macros

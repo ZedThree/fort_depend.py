@@ -63,9 +63,7 @@ def create_argument_parser():
         help="Don't use the preprocessor",
     )
     parser.add_argument(
-        "--version",
-        action="version",
-        version="%(prog)s {version}".format(version=__version__),
+        "--version", action="version", version=f"%(prog)s {__version__}"
     )
 
     return parser
