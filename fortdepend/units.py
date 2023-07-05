@@ -50,20 +50,20 @@ class FortranFile:
                 contents = f.read()
 
             preprocessor = FortranPreprocessor()
+            macros = macros or {}
 
-            if macros:
-                if isinstance(macros, dict):
-                    for k, v in macros.items():
-                        preprocessor.define(f"{k} {v}")
-                else:
-                    if not isinstance(macros, list):
-                        macros = [macros]
-                    for macro in macros:
-                        if "=" in macro:
-                            key, value = macro.split("=")
-                            preprocessor.define(f"{key} {value}")
-                        else:
-                            preprocessor.define(macro)
+            if isinstance(macros, dict):
+                for k, v in macros.items():
+                    preprocessor.define(f"{k} {v}")
+            else:
+                if not isinstance(macros, list):
+                    macros = [macros]
+                for macro in macros:
+                    if "=" in macro:
+                        key, value = macro.split("=")
+                        preprocessor.define(f"{key} {value}")
+                    else:
+                        preprocessor.define(macro)
 
             if cpp_includes:
                 if not isinstance(cpp_includes, list):
@@ -104,8 +104,9 @@ class FortranFile:
 
         if found_units:
             if (len(found_units) != len(starts)) or (len(starts) != len(ends)):
-                error_string = f"Unmatched start/end of modules in {self.filename} ({len(starts)} begins/{len(ends)} ends)"
-                raise ValueError(error_string)
+                raise ValueError(
+                    f"Unmatched start/end of modules in {self.filename} ({len(starts)} begins/{len(ends)} ends)"
+                )
             for unit, start, end in zip(found_units, starts, ends):
                 name = unit.group("modname")
                 mod = FortranModule(
