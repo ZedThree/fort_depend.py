@@ -20,7 +20,6 @@ class Graph:
     """
 
     def __init__(self, tree, filename=None, format="svg", view=True):
-
         if not has_graphviz:
             warnings.warn("graphviz not installed: can't make graph", RuntimeWarning)
             return

@@ -60,7 +60,6 @@ class FortranProject:
         use_preprocessor=True,
         verbose=False,
     ):
-
         if name is None:
             self.name = os.path.basename(os.getcwd())
         else:
