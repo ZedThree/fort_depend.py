@@ -1,11 +1,56 @@
 [build-system]
 requires = [
-    "setuptools >= 48",
-    "setuptools_scm[toml] >= 4, <6",
+    "setuptools >= 65",
+    "setuptools_scm[toml] >= 6.2",
     "setuptools_scm_git_archive",
     "wheel >= 0.29.0",
 ]
 build-backend = "setuptools.build_meta"
 
+[project]
+name = "fortdepend"
+description = "Automatically generate Fortran dependencies"
+readme = "README.md"
+authors = [{name = "Peter Hill", email = "peter.hill@york.ac.uk"}]
+license = {text = "MIT"}
+classifiers = [
+    "Development Status :: 5 - Production/stable",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Fortran",
+]
+keywords = ["build", "dependencies", "fortran"]
+requires-python = ">=3.8"
+dependencies = [
+    "colorama >= 0.3.9",
+    "pcpp >= 1.1.0",
+]
+dynamic = ["version"]
+
+[project.optional-dependencies]
+tests = ["pytest >= 3.3.0"]
+docs = [
+    "sphinx >= 1.4",
+    "sphinx-argparse >= 0.2.3",
+]
+
+[project.scripts]
+fortdepend = "fortdepend.__main__:main"
+
+[project.urls]
+Source = "https://github.com/ZedThree/fort_depend.py"
+Tracker = "https://github.com/ZedThree/fort_depend.py/issues"
+
+[tool.pytest.ini_options]
+norecursedirs = ["bin", "include", "lib", "lib64", "*egg-info"]
+
 [tool.setuptools_scm]
 git_describe_command = "git describe --dirty --tags --long --match v* --first-parent"
+
+[tool.ruff]
+line-length = 88
+ignore = ["E501"]
