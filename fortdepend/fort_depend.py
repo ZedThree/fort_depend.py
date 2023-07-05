@@ -1,5 +1,6 @@
 import sys
 from pathlib import Path
+from contextlib import suppress
 
 # Terminal colours
 from colorama import Fore
@@ -363,13 +364,10 @@ class FortranProject:
             self.modules.pop(ignore_mod, None)
             # Remove from 'used' modules
             for module in self.modules.values():
-                try:
+                with suppress(ValueError):
                     module.uses.remove(ignore_mod)
-                except ValueError:
-                    pass
+
             # Remove from 'used' files
             for source_file in self.files.values():
-                try:
+                with suppress(ValueError):
                     source_file.uses.remove(ignore_mod)
-                except ValueError:
-                    pass
