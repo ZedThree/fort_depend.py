@@ -46,8 +46,8 @@ class FortranFile:
         self.depends_on = None
 
         if readfile:
-            with smart_open(self.filename, "r") as f:
-                contents = f.read()
+            with smart_open(self.filename, "r", encoding="utf-8") as f:
+                contents = f.read().lower()
 
             preprocessor = FortranPreprocessor()
 
