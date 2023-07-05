@@ -47,7 +47,7 @@ class FortranFile:
 
         if readfile:
             with smart_open(self.filename, "r", encoding="utf-8") as f:
-                contents = f.read().lower()
+                contents = f.read()
 
             preprocessor = FortranPreprocessor()
 
@@ -114,13 +114,14 @@ class FortranFile:
                 raise ValueError(error_string)
             for unit, start, end in zip(found_units, starts, ends):
                 name = unit.group("modname")
-                contains[name] = FortranModule(
+                mod = FortranModule(
                     unit_type=unit.group("unit_type"),
                     name=name,
                     source_file=self,
                     text=(contents, start, end),
                     macros=macros,
                 )
+                contains[mod.name] = mod
 
         # Remove duplicates before returning
         return contains
@@ -151,7 +152,7 @@ class FortranModule:
 
     def __init__(self, unit_type, name, source_file=None, text=None, macros=None):
         self.unit_type = unit_type.strip().lower()
-        self.name = name.strip().lower()
+        self.name = name.strip().lower() if self.unit_type == "module" else name.strip()
 
         if source_file is not None:
             self.source_file = source_file
@@ -184,7 +185,7 @@ class FortranModule:
         for line in contents[self.defined_at : self.end]:
             found = re.match(USE_REGEX, line)
             if found:
-                uses.append(found.group("moduse").strip())
+                uses.append(found.group("moduse").strip().lower())
 
         # Remove duplicates
         uniq_mods = list(set(uses))

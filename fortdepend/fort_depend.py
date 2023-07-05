@@ -370,7 +370,7 @@ class FortranProject:
         ignored_modules = ignore_modules + DEFAULT_IGNORED_MODULES
 
         # Remove from module dict
-        for ignore_mod in ignored_modules:
+        for ignore_mod in map(str.lower, ignored_modules):
             self.modules.pop(ignore_mod, None)
             # Remove from 'used' modules
             for module in self.modules.values():

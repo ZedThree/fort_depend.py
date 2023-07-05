@@ -41,14 +41,14 @@ class TestFortranProject:
     def test_get_all_modules(self):
         testproject = FortranProject()
         expected_modules = [
-            "modA",
-            "modB",
-            "modC",
-            "modD",
-            "modE",
-            "modF",
-            "modG",
-            "modH",
+            "moda",
+            "modb",
+            "modc",
+            "modd",
+            "mode",
+            "modf",
+            "modg",
+            "modh",
             "progA",
             "test",
         ]
@@ -86,11 +86,11 @@ class TestFortranProject:
 
     def test_ignore_modules(self):
         testproject = FortranProject(
-            files="multiple_modules.f90", ignore_modules="modF"
+            files="multiple_modules.f90", ignore_modules=["modF", "modg"]
         )
-        assert sorted(["modG", "modH", "progA"]) == sorted(testproject.modules.keys())
-        assert [] == testproject.modules["modG"].uses
-        assert sorted(["modG", "modH"]) == sorted(
+        assert sorted(["modh", "progA"]) == sorted(testproject.modules.keys())
+        assert [] == testproject.modules["modh"].uses
+        assert sorted(["modh"]) == sorted(
             testproject.files["multiple_modules.f90"].uses
         )
 
@@ -334,8 +334,8 @@ class TestFortranProject:
 
     def test_get_all_used_modules(self):
         expected_used = {
-            "progA": sorted(["modF", "modG", "modH"]),
-            "test": sorted(["modA", "modB", "modC", "modD"]),
+            "progA": sorted(["modf", "modg", "modh"]),
+            "test": sorted(["moda", "modb", "modc", "modd"]),
         }
 
         testproject = FortranProject()

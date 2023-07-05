@@ -33,7 +33,7 @@ class TestSimpleFortranFile:
 
     def test_get_single_module(self):
         contents = ["module modA", "end module modA"]
-        expected = {"modA": "FortranModule(module, 'moda', 'file.f90')"}
+        expected = {"moda": "FortranModule(module, 'moda', 'file.f90')"}
 
         assert self.testfile.modules is None
         module_list = self.testfile.get_modules(contents)
@@ -45,8 +45,8 @@ class TestSimpleFortranFile:
     def test_get_multiple_modules(self):
         contents = ["module modA", "end module modA", "module modB", "end module modB"]
         expected = {
-            "modA": "FortranModule(module, 'moda', 'file.f90')",
-            "modB": "FortranModule(module, 'modb', 'file.f90')",
+            "moda": "FortranModule(module, 'moda', 'file.f90')",
+            "modb": "FortranModule(module, 'modb', 'file.f90')",
         }
 
         assert self.testfile.modules is None
@@ -58,7 +58,7 @@ class TestSimpleFortranFile:
 
     def test_module_with_module_procedure(self):
         contents = ["module modA", "module procedure foo", "end module modA"]
-        expected = {"modA": "FortranModule(module, 'moda', 'file.f90')"}
+        expected = {"moda": "FortranModule(module, 'moda', 'file.f90')"}
 
         assert self.testfile.modules is None
         module_list = self.testfile.get_modules(contents)
@@ -69,7 +69,7 @@ class TestSimpleFortranFile:
 
     def test_get_program(self):
         contents = ["program progA", "end program progA"]
-        expected = {"progA": "FortranModule(program, 'proga', 'file.f90')"}
+        expected = {"progA": "FortranModule(program, 'progA', 'file.f90')"}
 
         assert self.testfile.modules is None
         module_list = self.testfile.get_modules(contents)
@@ -88,9 +88,9 @@ class TestSimpleFortranFile:
             "end module modB",
         ]
         expected = {
-            "modA": "FortranModule(module, 'moda', 'file.f90')",
-            "modB": "FortranModule(module, 'modb', 'file.f90')",
-            "progA": "FortranModule(program, 'proga', 'file.f90')",
+            "moda": "FortranModule(module, 'moda', 'file.f90')",
+            "modb": "FortranModule(module, 'modb', 'file.f90')",
+            "progA": "FortranModule(program, 'progA', 'file.f90')",
         }
 
         assert self.testfile.modules is None
@@ -119,7 +119,7 @@ class TestReadFortranFile:
 
     def test_get_single_module(self):
         testfile = FortranFile(filename="moduleA.f90", readfile=True)
-        expected = {"modA": "FortranModule(module, 'moda', 'moduleA.f90')"}
+        expected = {"moda": "FortranModule(module, 'moda', 'moduleA.f90')"}
 
         for key, value in expected.items():
             assert key in testfile.modules
@@ -128,11 +128,11 @@ class TestReadFortranFile:
     def test_get_program_and_multiple_modules(self):
         testfile = FortranFile(filename="multiple_modules.f90", readfile=True)
         expected = {
-            "modA": "FortranModule(module, 'moda', 'multiple_modules.f90')",
-            "modB": "FortranModule(module, 'modb', 'multiple_modules.f90')",
-            "modC": "FortranModule(module, 'modc', 'multiple_modules.f90')",
-            "modD": "FortranModule(module, 'modd', 'multiple_modules.f90')",
-            "progA": "FortranModule(program, 'proga', 'multiple_modules.f90')",
+            "moda": "FortranModule(module, 'moda', 'multiple_modules.f90')",
+            "modb": "FortranModule(module, 'modb', 'multiple_modules.f90')",
+            "modc": "FortranModule(module, 'modc', 'multiple_modules.f90')",
+            "modd": "FortranModule(module, 'modd', 'multiple_modules.f90')",
+            "progA": "FortranModule(program, 'progA', 'multiple_modules.f90')",
         }
 
         for key, value in expected.items():
@@ -141,16 +141,16 @@ class TestReadFortranFile:
 
     def test_single_uses(self):
         testfile = FortranFile(filename="moduleB.f90", readfile=True)
-        assert testfile.uses == ["modA"]
+        assert testfile.uses == ["moda"]
 
     def test_multiple_uses(self):
         testfile = FortranFile(filename="moduleC.f90", readfile=True)
-        assert set(testfile.uses) == set(["modA", "modB"])
+        assert set(testfile.uses) == set(["moda", "modb"])
 
     def test_multiple_uses_in_multiple_units(self):
         testfile = FortranFile(filename="multiple_modules.f90", readfile=True)
         assert set(testfile.uses) == set(
-            ["modA", "modB", "modC", "modD", "iso_c_binding"]
+            ["moda", "modb", "modc", "modd", "iso_c_binding"]
         )
 
     def test_macro_replacement_dict(self):
@@ -159,7 +159,7 @@ class TestReadFortranFile:
             readfile=True,
             macros={"modA": "module_A", "modB": "module_B"},
         )
-        assert sorted(testfile.uses) == sorted(["module_A", "module_B"])
+        assert sorted(testfile.uses) == sorted(["module_a", "module_b"])
 
     def test_macro_replacement_list(self):
         testfile = FortranFile(
@@ -167,13 +167,13 @@ class TestReadFortranFile:
             readfile=True,
             macros=["modA=module_A", "modB=module_B"],
         )
-        assert sorted(testfile.uses) == sorted(["module_A", "module_B"])
+        assert sorted(testfile.uses) == sorted(["module_a", "module_b"])
 
     def test_macro_replacement_single_value(self):
         testfile = FortranFile(
             filename="moduleC.f90", readfile=True, macros="modA=module_A"
         )
-        assert sorted(testfile.uses) == sorted(["module_A", "modB"])
+        assert sorted(testfile.uses) == sorted(["module_a", "modb"])
 
     def test_conditional_include(self):
         testfile = FortranFile(
