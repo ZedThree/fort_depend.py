@@ -13,9 +13,9 @@ jobs:
   black:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Setup Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: 3.x
     - name: Install black
@@ -28,7 +28,7 @@ jobs:
         black --version
     - name: Run black
       run: |
-        black fortdepend setup.py tests
+        black fortdepend tests
     - uses: stefanzweifel/git-auto-commit-action@v4
       with:
         commit_message: "Apply black changes"
