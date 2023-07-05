@@ -3,7 +3,7 @@ import contextlib
 
 
 @contextlib.contextmanager
-def smart_open(filename, mode="Ur"):
+def smart_open(filename, mode="Ur", *args, **kwargs):
     """Open stdin or stdout using a contextmanager
 
     From: http://stackoverflow.com/a/29824059/2043465
@@ -19,7 +19,7 @@ def smart_open(filename, mode="Ur"):
         else:
             fh = sys.stdout
     else:
-        fh = open(filename, mode)
+        fh = open(filename, mode, *args, **kwargs)
     try:
         yield fh
     finally:
