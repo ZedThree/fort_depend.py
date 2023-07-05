@@ -96,12 +96,10 @@ class FortranFile:
         ends = []
 
         for num, line in enumerate(contents):
-            unit = re.match(UNIT_REGEX, line)
-            end = re.match(END_REGEX, line)
-            if unit:
+            if unit := UNIT_REGEX.match(line):
                 found_units.append(unit)
                 starts.append(num)
-            if end:
+            if end := END_REGEX.match(line):
                 ends.append(num)
 
         if found_units:
@@ -179,8 +177,7 @@ class FortranModule:
         uses = []
 
         for line in contents[self.defined_at : self.end]:
-            found = re.match(USE_REGEX, line)
-            if found:
+            if found := USE_REGEX.match(line):
                 uses.append(found.group("moduse").strip().lower())
 
         # Remove duplicates
