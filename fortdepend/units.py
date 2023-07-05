@@ -1,6 +1,6 @@
-from .preprocessor import FortranPreprocessor
 import re
 
+from .preprocessor import FortranPreprocessor
 from .smartopen import smart_open
 
 UNIT_REGEX = re.compile(
@@ -50,20 +50,20 @@ class FortranFile:
                 contents = f.read()
 
             preprocessor = FortranPreprocessor()
+            macros = macros or {}
 
-            if macros:
-                if isinstance(macros, dict):
-                    for k, v in macros.items():
-                        preprocessor.define("{} {}".format(k, v))
-                else:
-                    if not isinstance(macros, list):
-                        macros = [macros]
-                    for macro in macros:
-                        if "=" in macro:
-                            temp = macro.split("=")
-                            preprocessor.define("{} {}".format(*temp))
-                        else:
-                            preprocessor.define(macro)
+            if isinstance(macros, dict):
+                for k, v in macros.items():
+                    preprocessor.define(f"{k} {v}")
+            else:
+                if not isinstance(macros, list):
+                    macros = [macros]
+                for macro in macros:
+                    if "=" in macro:
+                        key, value = macro.split("=")
+                        preprocessor.define(f"{key} {value}")
+                    else:
+                        preprocessor.define(macro)
 
             if cpp_includes:
                 if not isinstance(cpp_includes, list):
@@ -81,7 +81,7 @@ class FortranFile:
         return self.filename
 
     def __repr__(self):
-        return "FortranFile('{}')".format(self.filename)
+        return f"FortranFile('{self.filename}')"
 
     def get_modules(self, contents, macros=None):
         """Return all the modules or programs that are in the file
@@ -96,22 +96,17 @@ class FortranFile:
         ends = []
 
         for num, line in enumerate(contents):
-            unit = re.match(UNIT_REGEX, line)
-            end = re.match(END_REGEX, line)
-            if unit:
+            if unit := UNIT_REGEX.match(line):
                 found_units.append(unit)
                 starts.append(num)
-            if end:
+            if end := END_REGEX.match(line):
                 ends.append(num)
 
         if found_units:
             if (len(found_units) != len(starts)) or (len(starts) != len(ends)):
-                error_string = (
-                    "Unmatched start/end of modules in {} ({} begins/{} ends)".format(
-                        self.filename, len(starts), len(ends)
-                    )
+                raise ValueError(
+                    f"Unmatched start/end of modules in {self.filename} ({len(starts)} begins/{len(ends)} ends)"
                 )
-                raise ValueError(error_string)
             for unit, start, end in zip(found_units, starts, ends):
                 name = unit.group("modname")
                 mod = FortranModule(
@@ -167,9 +162,7 @@ class FortranModule:
         return self.name
 
     def __repr__(self):
-        return "FortranModule({}, '{}', '{}')".format(
-            self.unit_type, self.name, self.source_file.filename
-        )
+        return f"FortranModule({self.unit_type}, '{self.name}', '{self.source_file.filename}')"
 
     def get_uses(self, contents, macros=None):
         """Return which modules are used in the file after expanding macros
@@ -183,8 +176,7 @@ class FortranModule:
         uses = []
 
         for line in contents[self.defined_at : self.end]:
-            found = re.match(USE_REGEX, line)
-            if found:
+            if found := USE_REGEX.match(line):
                 uses.append(found.group("moduse").strip().lower())
 
         # Remove duplicates

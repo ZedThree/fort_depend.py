@@ -1,20 +1,13 @@
-from __future__ import print_function
-
-import os
 import sys
+from contextlib import suppress
+from pathlib import Path
 
 # Terminal colours
 from colorama import Fore
 
+from .graph import Graph
 from .smartopen import smart_open
 from .units import FortranFile, FortranModule
-from .graph import Graph
-
-# Python 2/3 compatibility
-try:
-    input = raw_input
-except NameError:
-    pass
 
 DEPFILE_HEADER = "# This file is generated automatically. DO NOT EDIT!"
 DEFAULT_IGNORED_MODULES = ["iso_c_binding", "iso_fortran_env"]
@@ -61,7 +54,7 @@ class FortranProject:
         verbose=False,
     ):
         if name is None:
-            self.name = os.path.basename(os.getcwd())
+            self.name = Path.cwd().name
         else:
             self.name = name
 
@@ -107,10 +100,9 @@ class FortranProject:
         elif not isinstance(extensions, list):
             extensions = [extensions]
 
-        tmp = os.listdir(".")
         files = []
         for ext in extensions:
-            files.extend([x for x in tmp if x.endswith(ext)])
+            files.extend([x.name for x in Path.cwd().iterdir() if x.suffix == ext])
 
         return files
 
@@ -297,25 +289,23 @@ class FortranProject:
             skip_programs (bool): Don't write dependencies for programs
         """
 
+        build = Path(build)
+
         def _format_dependencies(target, target_extension, dep_list):
-            _, filename = os.path.split(target)
-            target_name = os.path.splitext(filename)[0] + target_extension
-            listing = "\n{} : ".format(os.path.join(build, target_name))
+            target_name = Path(target).with_suffix(target_extension).name
+            listing = f"\n{build / target_name} : "
             for dep in dep_list:
-                _, depfilename = os.path.split(dep)
-                depobjectname = os.path.splitext(depfilename)[0] + ".o"
-                listing += " \\\n\t{}".format(os.path.join(build, depobjectname))
+                depobjectname = Path(dep).with_suffix(".o").name
+                listing += f" \\\n\t{build / depobjectname}"
             listing += "\n"
             return listing
 
+        filename = Path(filename)
+
         # Test file doesn't exist
-        if os.path.exists(filename):
-            if not (overwrite):
-                print(
-                    Fore.RED
-                    + "Warning: file '{}' exists.".format(filename)
-                    + Fore.RESET
-                )
+        if filename.exists():
+            if not overwrite:
+                print(f"{Fore.RED}Warning: file '{filename}' exists.{Fore.RESET}")
                 opt = input("Overwrite? Y... for yes.")
                 if opt.lower().startswith("y"):
                     pass
@@ -374,13 +364,10 @@ class FortranProject:
             self.modules.pop(ignore_mod, None)
             # Remove from 'used' modules
             for module in self.modules.values():
-                try:
+                with suppress(ValueError):
                     module.uses.remove(ignore_mod)
-                except ValueError:
-                    pass
+
             # Remove from 'used' files
             for source_file in self.files.values():
-                try:
+                with suppress(ValueError):
                     source_file.uses.remove(ignore_mod)
-                except ValueError:
-                    pass
