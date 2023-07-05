@@ -104,9 +104,7 @@ class FortranFile:
 
         if found_units:
             if (len(found_units) != len(starts)) or (len(starts) != len(ends)):
-                error_string = (
-                    f"Unmatched start/end of modules in {self.filename} ({len(starts)} begins/{len(ends)} ends)"
-                )
+                error_string = f"Unmatched start/end of modules in {self.filename} ({len(starts)} begins/{len(ends)} ends)"
                 raise ValueError(error_string)
             for unit, start, end in zip(found_units, starts, ends):
                 name = unit.group("modname")
