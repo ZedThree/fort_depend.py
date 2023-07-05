@@ -1,13 +1,13 @@
 import sys
-from pathlib import Path
 from contextlib import suppress
+from pathlib import Path
 
 # Terminal colours
 from colorama import Fore
 
+from .graph import Graph
 from .smartopen import smart_open
 from .units import FortranFile, FortranModule
-from .graph import Graph
 
 DEPFILE_HEADER = "# This file is generated automatically. DO NOT EDIT!"
 DEFAULT_IGNORED_MODULES = ["iso_c_binding", "iso_fortran_env"]

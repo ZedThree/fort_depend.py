@@ -1,6 +1,6 @@
-from .preprocessor import FortranPreprocessor
 import re
 
+from .preprocessor import FortranPreprocessor
 from .smartopen import smart_open
 
 UNIT_REGEX = re.compile(

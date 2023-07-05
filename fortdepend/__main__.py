@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 import argparse
+
 import colorama
-from fortdepend import FortranProject
-from fortdepend import __version__
+
+from fortdepend import FortranProject, __version__
 
 
 def create_argument_parser():
